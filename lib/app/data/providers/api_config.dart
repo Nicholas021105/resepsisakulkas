@@ -1,10 +1,11 @@
-/// Konfigurasi server data resep. URL disimpan di SATU konstanta agar mudah
-/// diganti setelah repositori GitHub data dibuat (lihat
-/// `server_data/README.md`).
+/// Konfigurasi server data resep. URL disimpan di SATU konstanta.
 abstract class ApiConfig {
-  /// Ganti `GANTI_USERNAME` dengan username GitHub pemilik repo data.
+  /// Data server diambil dari folder `server_data/` di repo app ini sendiri
+  /// (github.com/Nicholas021105/resepsisakulkas), lewat raw.githubusercontent.com.
+  /// Cukup edit lalu push `server_data/resep.json` untuk memperbarui resep
+  /// tanpa build ulang app (lihat `server_data/README.md`).
   static const urlKatalog =
-      'https://raw.githubusercontent.com/GANTI_USERNAME/resep-sisa-kulkas-data/main/resep.json';
+      'https://raw.githubusercontent.com/Nicholas021105/resepsisakulkas/main/server_data/resep.json';
 
   static const timeout = Duration(seconds: 10);
 
