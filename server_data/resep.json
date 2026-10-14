@@ -1,0 +1,790 @@
+{
+  "versi": 1,
+  "bahan": [
+    { "id": "telur", "nama": "Telur", "kategori": "protein", "emoji": "🥚", "bumbuDasar": false },
+    { "id": "tempe", "nama": "Tempe", "kategori": "protein", "emoji": "🟫", "bumbuDasar": false },
+    { "id": "tahu", "nama": "Tahu", "kategori": "protein", "emoji": "⬜", "bumbuDasar": false },
+    { "id": "ayam", "nama": "Ayam", "kategori": "protein", "emoji": "🍗", "bumbuDasar": false },
+    { "id": "ikan-teri", "nama": "Ikan teri", "kategori": "protein", "emoji": "🐟", "bumbuDasar": false },
+    { "id": "sosis", "nama": "Sosis", "kategori": "protein", "emoji": "🌭", "bumbuDasar": false },
+    { "id": "kornet", "nama": "Kornet", "kategori": "protein", "emoji": "🥫", "bumbuDasar": false },
+    { "id": "udang", "nama": "Udang", "kategori": "protein", "emoji": "🦐", "bumbuDasar": false },
+
+    { "id": "kangkung", "nama": "Kangkung", "kategori": "sayur", "emoji": "🥬", "bumbuDasar": false },
+    { "id": "bayam", "nama": "Bayam", "kategori": "sayur", "emoji": "🍃", "bumbuDasar": false },
+    { "id": "sawi-hijau", "nama": "Sawi hijau", "kategori": "sayur", "emoji": "🥬", "bumbuDasar": false },
+    { "id": "wortel", "nama": "Wortel", "kategori": "sayur", "emoji": "🥕", "bumbuDasar": false },
+    { "id": "kentang", "nama": "Kentang", "kategori": "sayur", "emoji": "🥔", "bumbuDasar": false },
+    { "id": "kol", "nama": "Kol", "kategori": "sayur", "emoji": "🥗", "bumbuDasar": false },
+    { "id": "tauge", "nama": "Tauge", "kategori": "sayur", "emoji": "🌱", "bumbuDasar": false },
+    { "id": "buncis", "nama": "Buncis", "kategori": "sayur", "emoji": "🫛", "bumbuDasar": false },
+    { "id": "jagung", "nama": "Jagung", "kategori": "sayur", "emoji": "🌽", "bumbuDasar": false },
+    { "id": "tomat", "nama": "Tomat", "kategori": "sayur", "emoji": "🍅", "bumbuDasar": false },
+    { "id": "daun-bawang", "nama": "Daun bawang", "kategori": "sayur", "emoji": "🌿", "bumbuDasar": false },
+    { "id": "seledri", "nama": "Seledri", "kategori": "sayur", "emoji": "🌿", "bumbuDasar": false },
+    { "id": "brokoli", "nama": "Brokoli", "kategori": "sayur", "emoji": "🥦", "bumbuDasar": false },
+    { "id": "labu-siam", "nama": "Labu siam", "kategori": "sayur", "emoji": "🥒", "bumbuDasar": false },
+
+    { "id": "nasi", "nama": "Nasi", "kategori": "karbohidrat", "emoji": "🍚", "bumbuDasar": false },
+    { "id": "mie-instan", "nama": "Mie instan", "kategori": "karbohidrat", "emoji": "🍜", "bumbuDasar": false },
+    { "id": "tepung-terigu", "nama": "Tepung terigu", "kategori": "karbohidrat", "emoji": "🌾", "bumbuDasar": false },
+    { "id": "roti-tawar", "nama": "Roti tawar", "kategori": "karbohidrat", "emoji": "🍞", "bumbuDasar": false },
+    { "id": "bihun", "nama": "Bihun", "kategori": "karbohidrat", "emoji": "🍝", "bumbuDasar": false },
+    { "id": "pisang", "nama": "Pisang", "kategori": "karbohidrat", "emoji": "🍌", "bumbuDasar": false },
+
+    { "id": "garam", "nama": "Garam", "kategori": "bumbu", "emoji": "🧂", "bumbuDasar": true },
+    { "id": "gula", "nama": "Gula", "kategori": "bumbu", "emoji": "🍬", "bumbuDasar": true },
+    { "id": "minyak-goreng", "nama": "Minyak goreng", "kategori": "bumbu", "emoji": "🫗", "bumbuDasar": true },
+    { "id": "air", "nama": "Air", "kategori": "bumbu", "emoji": "💧", "bumbuDasar": true },
+    { "id": "bawang-merah", "nama": "Bawang merah", "kategori": "bumbu", "emoji": "🧅", "bumbuDasar": false },
+    { "id": "bawang-putih", "nama": "Bawang putih", "kategori": "bumbu", "emoji": "🧄", "bumbuDasar": false },
+    { "id": "cabai", "nama": "Cabai", "kategori": "bumbu", "emoji": "🌶️", "bumbuDasar": false },
+    { "id": "kecap-manis", "nama": "Kecap manis", "kategori": "bumbu", "emoji": "🍶", "bumbuDasar": false },
+    { "id": "saus-tomat", "nama": "Saus tomat", "kategori": "bumbu", "emoji": "🥫", "bumbuDasar": false },
+    { "id": "saus-tiram", "nama": "Saus tiram", "kategori": "bumbu", "emoji": "🦪", "bumbuDasar": false },
+    { "id": "merica", "nama": "Merica bubuk", "kategori": "bumbu", "emoji": "⚫", "bumbuDasar": false },
+    { "id": "kaldu-bubuk", "nama": "Kaldu bubuk", "kategori": "bumbu", "emoji": "🥣", "bumbuDasar": false },
+    { "id": "margarin", "nama": "Margarin", "kategori": "bumbu", "emoji": "🧈", "bumbuDasar": false },
+    { "id": "daun-salam", "nama": "Daun salam", "kategori": "bumbu", "emoji": "🍂", "bumbuDasar": false }
+  ],
+  "resep": [
+    {
+      "id": "telur-dadar",
+      "nama": "Telur Dadar Bawang",
+      "deskripsi": "Lauk sepuluh menit yang selalu bisa diandalkan saat tanggal tua.",
+      "waktuMenit": 10,
+      "porsi": 1,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "telur", "takaran": "2 butir", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "2 siung, iris tipis", "opsional": false },
+        { "bahanId": "daun-bawang", "takaran": "1 batang, iris", "opsional": true },
+        { "bahanId": "garam", "takaran": "secukupnya", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "2 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Kocok telur bersama garam sampai berbusa.",
+        "Masukkan irisan bawang merah dan daun bawang, aduk rata.",
+        "Panaskan minyak di wajan dengan api sedang.",
+        "Tuang telur, ratakan, lalu balik setelah bagian bawah kecokelatan.",
+        "Angkat saat kedua sisi matang."
+      ]
+    },
+    {
+      "id": "telur-ceplok-kecap",
+      "nama": "Telur Ceplok Kecap",
+      "deskripsi": "Telur mata sapi berbalut kecap manis gurih untuk teman nasi hangat.",
+      "waktuMenit": 12,
+      "porsi": 1,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "telur", "takaran": "2 butir", "opsional": false },
+        { "bahanId": "kecap-manis", "takaran": "2 sdm", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "3 siung, iris", "opsional": false },
+        { "bahanId": "cabai", "takaran": "2 buah, iris serong", "opsional": true },
+        { "bahanId": "minyak-goreng", "takaran": "3 sdm", "opsional": false },
+        { "bahanId": "air", "takaran": "3 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Goreng telur ceplok satu per satu, sisihkan.",
+        "Tumis bawang merah dan cabai dengan sisa minyak sampai harum.",
+        "Tambahkan kecap manis dan air, aduk hingga sedikit mengental.",
+        "Masukkan telur, balur dengan saus kecap sebentar, lalu angkat."
+      ]
+    },
+    {
+      "id": "orek-tempe",
+      "nama": "Orek Tempe Manis Pedas",
+      "deskripsi": "Tempe kering manis pedas yang awet untuk stok lauk beberapa hari.",
+      "waktuMenit": 25,
+      "porsi": 3,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "tempe", "takaran": "1 papan, potong korek api", "opsional": false },
+        { "bahanId": "kecap-manis", "takaran": "3 sdm", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "4 siung, iris", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "2 siung, iris", "opsional": false },
+        { "bahanId": "cabai", "takaran": "3 buah, iris", "opsional": false },
+        { "bahanId": "gula", "takaran": "1 sdt", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "secukupnya", "opsional": false },
+        { "bahanId": "daun-salam", "takaran": "1 lembar", "opsional": true }
+      ],
+      "langkah": [
+        "Goreng tempe hingga kering, tiriskan.",
+        "Tumis bawang merah, bawang putih, cabai, dan daun salam sampai harum.",
+        "Masukkan kecap manis dan gula, aduk hingga meletup kecil.",
+        "Masukkan tempe, aduk cepat sampai bumbu menyelimuti rata.",
+        "Masak sebentar lagi hingga bumbu agak kering, lalu angkat."
+      ]
+    },
+    {
+      "id": "tempe-goreng",
+      "nama": "Tempe Goreng Bawang Putih",
+      "deskripsi": "Tempe renyah berbumbu bawang putih yang tidak pernah gagal.",
+      "waktuMenit": 15,
+      "porsi": 2,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "tempe", "takaran": "1 papan, iris 1 cm", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "3 siung, haluskan", "opsional": false },
+        { "bahanId": "garam", "takaran": "1 sdt", "opsional": false },
+        { "bahanId": "air", "takaran": "100 ml", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "untuk menggoreng", "opsional": false }
+      ],
+      "langkah": [
+        "Larutkan bawang putih halus dan garam dengan air.",
+        "Rendam irisan tempe dalam larutan bumbu selama 10 menit.",
+        "Panaskan minyak, goreng tempe hingga keemasan.",
+        "Tiriskan dan sajikan selagi hangat."
+      ]
+    },
+    {
+      "id": "tempe-mendoan",
+      "nama": "Tempe Mendoan",
+      "deskripsi": "Tempe tipis berbalut adonan tepung, digoreng setengah matang khas Banyumas.",
+      "waktuMenit": 20,
+      "porsi": 2,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "tempe", "takaran": "1 papan, iris tipis lebar", "opsional": false },
+        { "bahanId": "tepung-terigu", "takaran": "6 sdm", "opsional": false },
+        { "bahanId": "daun-bawang", "takaran": "2 batang, iris", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "2 siung, haluskan", "opsional": false },
+        { "bahanId": "garam", "takaran": "½ sdt", "opsional": false },
+        { "bahanId": "air", "takaran": "100 ml", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "untuk menggoreng", "opsional": false },
+        { "bahanId": "kecap-manis", "takaran": "untuk cocolan", "opsional": true }
+      ],
+      "langkah": [
+        "Campur tepung, bawang putih, garam, dan air hingga menjadi adonan kental.",
+        "Masukkan irisan daun bawang ke adonan.",
+        "Celupkan tempe ke adonan hingga terbalut rata.",
+        "Goreng sebentar di minyak panas sampai adonan baru setengah matang.",
+        "Sajikan dengan cocolan kecap manis."
+      ]
+    },
+    {
+      "id": "tahu-kecap",
+      "nama": "Tahu Kecap Pedas",
+      "deskripsi": "Tahu goreng disiram saus kecap pedas, cocok dimakan dengan nasi panas.",
+      "waktuMenit": 20,
+      "porsi": 2,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "tahu", "takaran": "4 potong, potong dadu", "opsional": false },
+        { "bahanId": "kecap-manis", "takaran": "3 sdm", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "3 siung, iris", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "2 siung, iris", "opsional": false },
+        { "bahanId": "cabai", "takaran": "3 buah, iris", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "secukupnya", "opsional": false },
+        { "bahanId": "air", "takaran": "50 ml", "opsional": false }
+      ],
+      "langkah": [
+        "Goreng tahu sampai kulitnya kecokelatan, tiriskan.",
+        "Tumis bawang merah, bawang putih, dan cabai hingga layu.",
+        "Tambahkan kecap manis dan air, masak hingga mendidih.",
+        "Masukkan tahu, aduk sampai bumbu meresap dan kuah menyusut."
+      ]
+    },
+    {
+      "id": "tahu-goreng",
+      "nama": "Tahu Goreng Gurih",
+      "deskripsi": "Tahu goreng sederhana berbumbu bawang putih, renyah di luar lembut di dalam.",
+      "waktuMenit": 15,
+      "porsi": 2,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "tahu", "takaran": "5 potong", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "2 siung, haluskan", "opsional": false },
+        { "bahanId": "garam", "takaran": "1 sdt", "opsional": false },
+        { "bahanId": "air", "takaran": "100 ml", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "untuk menggoreng", "opsional": false },
+        { "bahanId": "cabai", "takaran": "beberapa buah, untuk teman makan", "opsional": true }
+      ],
+      "langkah": [
+        "Larutkan bawang putih dan garam dengan air.",
+        "Rendam tahu selama 10 menit agar bumbu meresap.",
+        "Goreng tahu di minyak panas hingga kulitnya garing.",
+        "Sajikan dengan cabai rawit utuh."
+      ]
+    },
+    {
+      "id": "tahu-telur",
+      "nama": "Tahu Telur Kecap",
+      "deskripsi": "Tahu dan telur dikocok bersama lalu digoreng, disiram kecap manis.",
+      "waktuMenit": 20,
+      "porsi": 2,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "tahu", "takaran": "2 potong, hancurkan kasar", "opsional": false },
+        { "bahanId": "telur", "takaran": "2 butir", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "1 siung, cincang", "opsional": false },
+        { "bahanId": "kecap-manis", "takaran": "2 sdm", "opsional": false },
+        { "bahanId": "cabai", "takaran": "2 buah, iris", "opsional": true },
+        { "bahanId": "garam", "takaran": "secukupnya", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "3 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Kocok telur dengan garam dan bawang putih cincang.",
+        "Masukkan tahu yang sudah dihancurkan, aduk rata.",
+        "Goreng adonan seperti membuat telur dadar tebal.",
+        "Pindahkan ke piring, siram kecap manis dan taburi irisan cabai."
+      ]
+    },
+    {
+      "id": "tumis-kangkung",
+      "nama": "Tumis Kangkung Bawang",
+      "deskripsi": "Sayur hijau cepat saji dengan aroma bawang yang harum.",
+      "waktuMenit": 15,
+      "porsi": 2,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "kangkung", "takaran": "1 ikat, siangi", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "3 siung, iris", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "3 siung, iris", "opsional": false },
+        { "bahanId": "cabai", "takaran": "3 buah, iris", "opsional": false },
+        { "bahanId": "saus-tiram", "takaran": "1 sdm", "opsional": true },
+        { "bahanId": "garam", "takaran": "secukupnya", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "2 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Cuci kangkung lalu tiriskan.",
+        "Tumis bawang putih, bawang merah, dan cabai hingga harum.",
+        "Masukkan kangkung dengan api besar, aduk cepat.",
+        "Tambahkan saus tiram dan garam, masak sebentar sampai kangkung layu."
+      ]
+    },
+    {
+      "id": "sayur-bening-bayam",
+      "nama": "Sayur Bening Bayam",
+      "deskripsi": "Kuah bening segar yang ringan untuk menemani lauk goreng.",
+      "waktuMenit": 15,
+      "porsi": 3,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "bayam", "takaran": "1 ikat, petik daunnya", "opsional": false },
+        { "bahanId": "jagung", "takaran": "1 tongkol, pipil", "opsional": true },
+        { "bahanId": "bawang-merah", "takaran": "3 siung, iris", "opsional": false },
+        { "bahanId": "garam", "takaran": "1 sdt", "opsional": false },
+        { "bahanId": "gula", "takaran": "½ sdt", "opsional": false },
+        { "bahanId": "air", "takaran": "600 ml", "opsional": false }
+      ],
+      "langkah": [
+        "Rebus air bersama irisan bawang merah hingga mendidih.",
+        "Masukkan jagung pipil dan masak sampai empuk.",
+        "Tambahkan bayam, garam, dan gula.",
+        "Matikan api begitu bayam layu agar warnanya tetap hijau."
+      ]
+    },
+    {
+      "id": "nasi-goreng",
+      "nama": "Nasi Goreng Kampung",
+      "deskripsi": "Nasi sisa semalam disulap jadi nasi goreng kecap yang mengenyangkan.",
+      "waktuMenit": 15,
+      "porsi": 1,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "nasi", "takaran": "1 piring", "opsional": false },
+        { "bahanId": "telur", "takaran": "1 butir", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "3 siung, iris", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "2 siung, cincang", "opsional": false },
+        { "bahanId": "kecap-manis", "takaran": "2 sdm", "opsional": false },
+        { "bahanId": "cabai", "takaran": "2 buah, iris", "opsional": true },
+        { "bahanId": "garam", "takaran": "secukupnya", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "2 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Tumis bawang merah, bawang putih, dan cabai hingga harum.",
+        "Pinggirkan bumbu, masukkan telur lalu orak-arik.",
+        "Masukkan nasi, aduk rata dengan bumbu dan telur.",
+        "Tambahkan kecap manis dan garam, aduk dengan api besar hingga harum.",
+        "Cicipi, lalu sajikan selagi panas."
+      ]
+    },
+    {
+      "id": "mie-goreng-telur",
+      "nama": "Mie Goreng Telur",
+      "deskripsi": "Mie instan goreng yang dibuat lebih istimewa dengan telur dan sayur.",
+      "waktuMenit": 12,
+      "porsi": 1,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "mie-instan", "takaran": "1 bungkus", "opsional": false },
+        { "bahanId": "telur", "takaran": "1 butir", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "1 siung, cincang", "opsional": false },
+        { "bahanId": "sawi-hijau", "takaran": "2 lembar, potong", "opsional": true },
+        { "bahanId": "kecap-manis", "takaran": "1 sdm", "opsional": true },
+        { "bahanId": "minyak-goreng", "takaran": "1 sdm", "opsional": false },
+        { "bahanId": "air", "takaran": "400 ml untuk merebus", "opsional": false }
+      ],
+      "langkah": [
+        "Rebus mie hingga setengah matang, tiriskan.",
+        "Tumis bawang putih, lalu orak-arik telur di wajan yang sama.",
+        "Masukkan sawi dan mie, aduk rata.",
+        "Tambahkan bumbu mie dan kecap manis, aduk hingga tercampur."
+      ]
+    },
+    {
+      "id": "mie-rebus",
+      "nama": "Mie Rebus Kuah Pedas",
+      "deskripsi": "Semangkuk mie kuah hangat untuk malam yang dingin.",
+      "waktuMenit": 10,
+      "porsi": 1,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "mie-instan", "takaran": "1 bungkus", "opsional": false },
+        { "bahanId": "air", "takaran": "450 ml", "opsional": false },
+        { "bahanId": "telur", "takaran": "1 butir", "opsional": true },
+        { "bahanId": "sawi-hijau", "takaran": "2 lembar", "opsional": true },
+        { "bahanId": "cabai", "takaran": "2 buah, iris", "opsional": true }
+      ],
+      "langkah": [
+        "Didihkan air di panci kecil.",
+        "Masukkan mie, irisan cabai, dan sawi.",
+        "Pecahkan telur ke dalam kuah tanpa diaduk agar utuh.",
+        "Siapkan bumbu di mangkuk, tuang mie beserta kuahnya, aduk rata."
+      ]
+    },
+    {
+      "id": "sop-ayam",
+      "nama": "Sop Ayam Sayur",
+      "deskripsi": "Sop ayam bening dengan wortel dan kentang, enak saat badan kurang fit.",
+      "waktuMenit": 45,
+      "porsi": 4,
+      "tingkat": "sedang",
+      "bahan": [
+        { "bahanId": "ayam", "takaran": "250 gram, potong kecil", "opsional": false },
+        { "bahanId": "wortel", "takaran": "1 buah, iris bulat", "opsional": false },
+        { "bahanId": "kentang", "takaran": "2 buah, potong dadu", "opsional": false },
+        { "bahanId": "kol", "takaran": "3 lembar, potong", "opsional": true },
+        { "bahanId": "seledri", "takaran": "1 batang, iris", "opsional": true },
+        { "bahanId": "bawang-putih", "takaran": "3 siung, geprek", "opsional": false },
+        { "bahanId": "merica", "takaran": "½ sdt", "opsional": false },
+        { "bahanId": "kaldu-bubuk", "takaran": "½ sdt", "opsional": true },
+        { "bahanId": "garam", "takaran": "1 sdt", "opsional": false },
+        { "bahanId": "air", "takaran": "1 liter", "opsional": false }
+      ],
+      "langkah": [
+        "Rebus ayam dalam air hingga mendidih, buang buih yang muncul.",
+        "Tumis bawang putih sebentar lalu masukkan ke rebusan ayam.",
+        "Masukkan wortel dan kentang, masak hingga empuk.",
+        "Tambahkan kol, garam, merica, dan kaldu bubuk.",
+        "Masak sebentar lagi, taburi seledri sebelum diangkat."
+      ]
+    },
+    {
+      "id": "ayam-goreng",
+      "nama": "Ayam Goreng Bawang",
+      "deskripsi": "Ayam goreng gurih dengan bumbu bawang sederhana tanpa ungkep lama.",
+      "waktuMenit": 40,
+      "porsi": 3,
+      "tingkat": "sedang",
+      "bahan": [
+        { "bahanId": "ayam", "takaran": "500 gram", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "4 siung, haluskan", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "4 siung, haluskan", "opsional": false },
+        { "bahanId": "garam", "takaran": "1½ sdt", "opsional": false },
+        { "bahanId": "air", "takaran": "300 ml", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "untuk menggoreng", "opsional": false },
+        { "bahanId": "daun-salam", "takaran": "2 lembar", "opsional": true }
+      ],
+      "langkah": [
+        "Lumuri ayam dengan bawang halus dan garam.",
+        "Rebus ayam bersama bumbu, daun salam, dan air hingga air menyusut.",
+        "Panaskan minyak, goreng ayam hingga kulitnya kecokelatan.",
+        "Tiriskan sebelum disajikan."
+      ]
+    },
+    {
+      "id": "ayam-kecap",
+      "nama": "Ayam Kecap Manis",
+      "deskripsi": "Potongan ayam dimasak kecap hingga mengilap, manis gurih kesukaan semua.",
+      "waktuMenit": 35,
+      "porsi": 3,
+      "tingkat": "sedang",
+      "bahan": [
+        { "bahanId": "ayam", "takaran": "400 gram, potong kecil", "opsional": false },
+        { "bahanId": "kecap-manis", "takaran": "4 sdm", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "5 siung, iris", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "3 siung, cincang", "opsional": false },
+        { "bahanId": "tomat", "takaran": "1 buah, potong", "opsional": true },
+        { "bahanId": "minyak-goreng", "takaran": "3 sdm", "opsional": false },
+        { "bahanId": "air", "takaran": "200 ml", "opsional": false }
+      ],
+      "langkah": [
+        "Goreng ayam sebentar hingga permukaannya kecokelatan, sisihkan.",
+        "Tumis bawang merah dan bawang putih hingga harum.",
+        "Masukkan ayam, kecap manis, dan air.",
+        "Masak dengan api kecil hingga kuah mengental dan ayam empuk.",
+        "Tambahkan tomat menjelang diangkat."
+      ]
+    },
+    {
+      "id": "perkedel-kentang",
+      "nama": "Perkedel Kentang",
+      "deskripsi": "Kentang tumbuk bercampur telur, lembut dan gurih untuk lauk pendamping.",
+      "waktuMenit": 35,
+      "porsi": 3,
+      "tingkat": "sedang",
+      "bahan": [
+        { "bahanId": "kentang", "takaran": "3 buah", "opsional": false },
+        { "bahanId": "telur", "takaran": "1 butir", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "3 siung, iris lalu goreng", "opsional": false },
+        { "bahanId": "daun-bawang", "takaran": "1 batang, iris", "opsional": true },
+        { "bahanId": "merica", "takaran": "¼ sdt", "opsional": true },
+        { "bahanId": "garam", "takaran": "1 sdt", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "untuk menggoreng", "opsional": false }
+      ],
+      "langkah": [
+        "Kupas dan potong kentang, lalu goreng hingga matang.",
+        "Haluskan kentang selagi panas.",
+        "Campur kentang dengan bawang goreng, daun bawang, garam, dan merica.",
+        "Bentuk bulat pipih, celupkan ke kocokan telur.",
+        "Goreng hingga kuning kecokelatan."
+      ]
+    },
+    {
+      "id": "telur-balado",
+      "nama": "Telur Balado",
+      "deskripsi": "Telur rebus berbalut sambal merah yang pedas manis.",
+      "waktuMenit": 25,
+      "porsi": 2,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "telur", "takaran": "4 butir, rebus lalu kupas", "opsional": false },
+        { "bahanId": "cabai", "takaran": "6 buah", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "4 siung", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "2 siung", "opsional": false },
+        { "bahanId": "tomat", "takaran": "1 buah", "opsional": false },
+        { "bahanId": "gula", "takaran": "1 sdt", "opsional": false },
+        { "bahanId": "garam", "takaran": "½ sdt", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "secukupnya", "opsional": false }
+      ],
+      "langkah": [
+        "Goreng telur rebus sebentar hingga kulitnya sedikit kering.",
+        "Haluskan cabai, bawang merah, bawang putih, dan tomat.",
+        "Tumis bumbu halus sampai matang dan minyaknya keluar.",
+        "Tambahkan gula dan garam, lalu masukkan telur dan aduk rata."
+      ]
+    },
+    {
+      "id": "sambal-tomat",
+      "nama": "Sambal Tomat Goreng",
+      "deskripsi": "Sambal serbaguna yang bikin lauk sederhana terasa lebih nikmat.",
+      "waktuMenit": 15,
+      "porsi": 4,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "cabai", "takaran": "8 buah", "opsional": false },
+        { "bahanId": "tomat", "takaran": "2 buah", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "4 siung", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "2 siung", "opsional": false },
+        { "bahanId": "garam", "takaran": "½ sdt", "opsional": false },
+        { "bahanId": "gula", "takaran": "1 sdt", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "3 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Goreng cabai, tomat, bawang merah, dan bawang putih hingga layu.",
+        "Ulek semua bahan bersama garam dan gula.",
+        "Siram dengan sedikit minyak panas bekas menggoreng."
+      ]
+    },
+    {
+      "id": "bakwan-sayur",
+      "nama": "Bakwan Sayur",
+      "deskripsi": "Gorengan renyah dari sisa sayur di kulkas, cocok untuk camilan atau lauk.",
+      "waktuMenit": 25,
+      "porsi": 4,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "tepung-terigu", "takaran": "10 sdm", "opsional": false },
+        { "bahanId": "kol", "takaran": "3 lembar, iris tipis", "opsional": false },
+        { "bahanId": "wortel", "takaran": "1 buah, serut", "opsional": false },
+        { "bahanId": "tauge", "takaran": "1 genggam", "opsional": true },
+        { "bahanId": "daun-bawang", "takaran": "1 batang, iris", "opsional": true },
+        { "bahanId": "bawang-putih", "takaran": "2 siung, haluskan", "opsional": false },
+        { "bahanId": "garam", "takaran": "1 sdt", "opsional": false },
+        { "bahanId": "air", "takaran": "150 ml", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "untuk menggoreng", "opsional": false }
+      ],
+      "langkah": [
+        "Campur tepung, bawang putih, garam, dan air hingga adonan kental.",
+        "Masukkan kol, wortel, tauge, dan daun bawang, aduk rata.",
+        "Ambil satu sendok sayur adonan, goreng di minyak panas.",
+        "Balik sekali hingga kedua sisi kering dan keemasan."
+      ]
+    },
+    {
+      "id": "capcay",
+      "nama": "Capcay Kuah Sederhana",
+      "deskripsi": "Aneka sayur dimasak cepat dengan saus tiram, segar dan berwarna.",
+      "waktuMenit": 25,
+      "porsi": 3,
+      "tingkat": "sedang",
+      "bahan": [
+        { "bahanId": "sawi-hijau", "takaran": "1 ikat kecil, potong", "opsional": false },
+        { "bahanId": "wortel", "takaran": "1 buah, iris serong", "opsional": false },
+        { "bahanId": "brokoli", "takaran": "½ kuntum, potong", "opsional": true },
+        { "bahanId": "udang", "takaran": "100 gram", "opsional": true },
+        { "bahanId": "sosis", "takaran": "2 buah, iris", "opsional": true },
+        { "bahanId": "bawang-putih", "takaran": "3 siung, cincang", "opsional": false },
+        { "bahanId": "saus-tiram", "takaran": "2 sdm", "opsional": false },
+        { "bahanId": "air", "takaran": "250 ml", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "2 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Tumis bawang putih hingga harum.",
+        "Masukkan udang dan sosis, masak hingga berubah warna.",
+        "Tambahkan wortel dan brokoli, beri air, masak hingga agak empuk.",
+        "Masukkan sawi dan saus tiram, aduk sebentar lalu angkat."
+      ]
+    },
+    {
+      "id": "oseng-tahu-tauge",
+      "nama": "Oseng Tahu Tauge",
+      "deskripsi": "Tumisan cepat yang renyah, murah, dan kaya protein.",
+      "waktuMenit": 15,
+      "porsi": 2,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "tahu", "takaran": "2 potong, potong dadu kecil", "opsional": false },
+        { "bahanId": "tauge", "takaran": "2 genggam", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "2 siung, iris", "opsional": false },
+        { "bahanId": "cabai", "takaran": "2 buah, iris", "opsional": false },
+        { "bahanId": "kecap-manis", "takaran": "1 sdm", "opsional": true },
+        { "bahanId": "garam", "takaran": "secukupnya", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "2 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Goreng tahu sebentar hingga kulitnya kering.",
+        "Tumis bawang putih dan cabai sampai harum.",
+        "Masukkan tahu dan tauge, aduk dengan api besar.",
+        "Bumbui garam dan kecap manis, angkat sebelum tauge terlalu layu."
+      ]
+    },
+    {
+      "id": "tumis-buncis",
+      "nama": "Tumis Buncis Telur",
+      "deskripsi": "Buncis renyah ditumis dengan orak-arik telur, sederhana tapi bergizi.",
+      "waktuMenit": 15,
+      "porsi": 2,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "buncis", "takaran": "200 gram, iris serong", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "2 siung, iris", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "3 siung, iris", "opsional": false },
+        { "bahanId": "telur", "takaran": "1 butir", "opsional": true },
+        { "bahanId": "saus-tiram", "takaran": "1 sdm", "opsional": true },
+        { "bahanId": "garam", "takaran": "secukupnya", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "2 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Tumis bawang merah dan bawang putih hingga harum.",
+        "Masukkan telur, orak-arik hingga setengah matang.",
+        "Tambahkan buncis dan sedikit air, masak hingga buncis empuk.",
+        "Bumbui garam dan saus tiram, aduk rata lalu angkat."
+      ]
+    },
+    {
+      "id": "sayur-sop",
+      "nama": "Sayur Sop Tanpa Daging",
+      "deskripsi": "Sop sayur hemat yang tetap gurih untuk makan bersama teman kos.",
+      "waktuMenit": 30,
+      "porsi": 4,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "wortel", "takaran": "1 buah, iris", "opsional": false },
+        { "bahanId": "kentang", "takaran": "2 buah, potong dadu", "opsional": false },
+        { "bahanId": "kol", "takaran": "4 lembar, potong", "opsional": false },
+        { "bahanId": "buncis", "takaran": "5 batang, potong", "opsional": true },
+        { "bahanId": "seledri", "takaran": "1 batang, iris", "opsional": true },
+        { "bahanId": "bawang-putih", "takaran": "3 siung, geprek", "opsional": false },
+        { "bahanId": "merica", "takaran": "½ sdt", "opsional": false },
+        { "bahanId": "garam", "takaran": "1 sdt", "opsional": false },
+        { "bahanId": "air", "takaran": "1 liter", "opsional": false }
+      ],
+      "langkah": [
+        "Didihkan air bersama bawang putih geprek.",
+        "Masukkan kentang dan wortel, masak hingga setengah empuk.",
+        "Tambahkan buncis dan kol, bumbui garam dan merica.",
+        "Masak hingga semua sayur empuk, taburi seledri lalu angkat."
+      ]
+    },
+    {
+      "id": "omelet-sayur",
+      "nama": "Omelet Sayur",
+      "deskripsi": "Telur dadar tebal berisi sayur, cara mudah makan sayur untuk yang tidak suka sayur.",
+      "waktuMenit": 15,
+      "porsi": 1,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "telur", "takaran": "2 butir", "opsional": false },
+        { "bahanId": "wortel", "takaran": "½ buah, serut", "opsional": false },
+        { "bahanId": "daun-bawang", "takaran": "1 batang, iris", "opsional": false },
+        { "bahanId": "tomat", "takaran": "½ buah, potong dadu", "opsional": true },
+        { "bahanId": "garam", "takaran": "secukupnya", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "2 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Kocok telur dengan garam.",
+        "Masukkan wortel, daun bawang, dan tomat, aduk rata.",
+        "Tuang ke wajan berminyak panas dengan api kecil.",
+        "Tutup wajan sebentar agar bagian atas ikut matang, lalu lipat dan angkat."
+      ]
+    },
+    {
+      "id": "nasi-telur",
+      "nama": "Nasi Telur Kecap",
+      "deskripsi": "Menu darurat akhir bulan: nasi hangat, telur, dan kecap.",
+      "waktuMenit": 10,
+      "porsi": 1,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "nasi", "takaran": "1 piring", "opsional": false },
+        { "bahanId": "telur", "takaran": "1 butir", "opsional": false },
+        { "bahanId": "kecap-manis", "takaran": "1 sdm", "opsional": false },
+        { "bahanId": "margarin", "takaran": "1 sdm", "opsional": true },
+        { "bahanId": "minyak-goreng", "takaran": "1 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Goreng telur ceplok setengah matang.",
+        "Letakkan telur di atas nasi hangat.",
+        "Tambahkan margarin dan kecap manis, aduk selagi panas."
+      ]
+    },
+    {
+      "id": "pisang-goreng",
+      "nama": "Pisang Goreng Krispi",
+      "deskripsi": "Camilan sore yang manis dan renyah untuk teman ngopi.",
+      "waktuMenit": 20,
+      "porsi": 3,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "pisang", "takaran": "4 buah, belah memanjang", "opsional": false },
+        { "bahanId": "tepung-terigu", "takaran": "8 sdm", "opsional": false },
+        { "bahanId": "gula", "takaran": "2 sdm", "opsional": false },
+        { "bahanId": "garam", "takaran": "sejumput", "opsional": false },
+        { "bahanId": "air", "takaran": "120 ml", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "untuk menggoreng", "opsional": false }
+      ],
+      "langkah": [
+        "Campur tepung, gula, garam, dan air menjadi adonan kental.",
+        "Celupkan pisang ke adonan hingga terbalut.",
+        "Goreng di minyak panas hingga kuning keemasan.",
+        "Tiriskan sebelum disajikan."
+      ]
+    },
+    {
+      "id": "tumis-sosis",
+      "nama": "Tumis Sosis Saus Tomat",
+      "deskripsi": "Sosis potong ditumis saus tomat, cepat dan disukai semua umur.",
+      "waktuMenit": 15,
+      "porsi": 2,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "sosis", "takaran": "4 buah, iris serong", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "3 siung, iris", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "2 siung, cincang", "opsional": false },
+        { "bahanId": "saus-tomat", "takaran": "3 sdm", "opsional": false },
+        { "bahanId": "saus-tiram", "takaran": "1 sdm", "opsional": true },
+        { "bahanId": "minyak-goreng", "takaran": "2 sdm", "opsional": false },
+        { "bahanId": "air", "takaran": "3 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Tumis bawang merah dan bawang putih hingga harum.",
+        "Masukkan sosis, masak hingga sedikit kecokelatan.",
+        "Tambahkan saus tomat, saus tiram, dan air.",
+        "Aduk hingga saus mengental dan melapisi sosis."
+      ]
+    },
+    {
+      "id": "telur-kornet",
+      "nama": "Telur Dadar Kornet",
+      "deskripsi": "Telur dadar tebal berisi kornet, gurih dan mengenyangkan.",
+      "waktuMenit": 12,
+      "porsi": 2,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "telur", "takaran": "3 butir", "opsional": false },
+        { "bahanId": "kornet", "takaran": "3 sdm", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "2 siung, iris", "opsional": false },
+        { "bahanId": "daun-bawang", "takaran": "1 batang, iris", "opsional": true },
+        { "bahanId": "garam", "takaran": "sedikit saja", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "2 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Kocok telur, lalu campurkan kornet, bawang merah, dan daun bawang.",
+        "Tambahkan sedikit garam karena kornet sudah asin.",
+        "Goreng dengan api kecil hingga matang di kedua sisi."
+      ]
+    },
+    {
+      "id": "tempe-teri-pedas",
+      "nama": "Tempe Teri Pedas Manis",
+      "deskripsi": "Kering tempe dan teri yang renyah, tahan lama untuk bekal.",
+      "waktuMenit": 30,
+      "porsi": 4,
+      "tingkat": "sedang",
+      "bahan": [
+        { "bahanId": "tempe", "takaran": "1 papan, potong kecil", "opsional": false },
+        { "bahanId": "ikan-teri", "takaran": "50 gram", "opsional": false },
+        { "bahanId": "cabai", "takaran": "5 buah, iris", "opsional": false },
+        { "bahanId": "bawang-merah", "takaran": "4 siung, iris", "opsional": false },
+        { "bahanId": "bawang-putih", "takaran": "2 siung, iris", "opsional": false },
+        { "bahanId": "gula", "takaran": "2 sdm", "opsional": false },
+        { "bahanId": "garam", "takaran": "½ sdt", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "untuk menggoreng", "opsional": false }
+      ],
+      "langkah": [
+        "Goreng tempe dan teri secara terpisah hingga kering.",
+        "Tumis bawang merah, bawang putih, dan cabai sampai harum.",
+        "Masukkan gula dan garam, aduk hingga gula meleleh.",
+        "Masukkan tempe dan teri, aduk cepat hingga terbalut bumbu."
+      ]
+    },
+    {
+      "id": "bihun-goreng",
+      "nama": "Bihun Goreng Sayur",
+      "deskripsi": "Bihun goreng kecap dengan sayur seadanya, ringan tapi mengenyangkan.",
+      "waktuMenit": 20,
+      "porsi": 2,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "bihun", "takaran": "1 keping, rendam air panas", "opsional": false },
+        { "bahanId": "telur", "takaran": "1 butir", "opsional": true },
+        { "bahanId": "kol", "takaran": "2 lembar, iris", "opsional": true },
+        { "bahanId": "wortel", "takaran": "½ buah, iris korek api", "opsional": true },
+        { "bahanId": "bawang-putih", "takaran": "2 siung, cincang", "opsional": false },
+        { "bahanId": "kecap-manis", "takaran": "2 sdm", "opsional": false },
+        { "bahanId": "garam", "takaran": "secukupnya", "opsional": false },
+        { "bahanId": "minyak-goreng", "takaran": "2 sdm", "opsional": false }
+      ],
+      "langkah": [
+        "Rendam bihun hingga lunak, tiriskan.",
+        "Tumis bawang putih, lalu orak-arik telur.",
+        "Masukkan kol dan wortel, masak hingga layu.",
+        "Masukkan bihun, kecap manis, dan garam, aduk hingga rata."
+      ]
+    },
+    {
+      "id": "roti-telur",
+      "nama": "Roti Telur Margarin",
+      "deskripsi": "Sarapan kilat dari roti tawar yang dicelup telur lalu dipanggang di wajan.",
+      "waktuMenit": 10,
+      "porsi": 1,
+      "tingkat": "mudah",
+      "bahan": [
+        { "bahanId": "roti-tawar", "takaran": "2 lembar", "opsional": false },
+        { "bahanId": "telur", "takaran": "1 butir", "opsional": false },
+        { "bahanId": "margarin", "takaran": "1 sdm", "opsional": false },
+        { "bahanId": "gula", "takaran": "1 sdt", "opsional": true },
+        { "bahanId": "garam", "takaran": "sejumput", "opsional": false }
+      ],
+      "langkah": [
+        "Kocok telur dengan garam dan gula.",
+        "Celupkan roti tawar ke kocokan telur hingga meresap.",
+        "Panggang di wajan bermargarin sampai kedua sisi kecokelatan."
+      ]
+    }
+  ]
+}
