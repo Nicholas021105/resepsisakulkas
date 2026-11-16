@@ -202,24 +202,42 @@ class KulkasKosongPainter extends CustomPainter {
     final siluet = garis(p.tintaLembut, 0.011);
     void putus(Path jalur) =>
         canvas.drawPath(_putusPutus(jalur, s * 0.022, s * 0.016), siluet);
-    // Telur & tomat di rak atas.
+    // Telur (lonjong, lancip di atas) & tomat (pipih, bertangkai) di rak
+    // atas: dibedakan bentuknya agar terbaca juga di ukuran kecil.
+    putus(
+      Path()
+        ..moveTo(s * 0.265, s * (rak1 - 0.008))
+        ..cubicTo(
+          s * 0.222,
+          s * (rak1 - 0.008),
+          s * 0.232,
+          s * (rak1 - 0.112),
+          s * 0.265,
+          s * (rak1 - 0.112),
+        )
+        ..cubicTo(
+          s * 0.298,
+          s * (rak1 - 0.112),
+          s * 0.308,
+          s * (rak1 - 0.008),
+          s * 0.265,
+          s * (rak1 - 0.008),
+        ),
+    );
     putus(
       Path()..addOval(
         Rect.fromCenter(
-          center: o(0.27, rak1 - 0.052),
-          width: s * 0.07,
-          height: s * 0.09,
+          center: o(0.4, rak1 - 0.045),
+          width: s * 0.105,
+          height: s * 0.078,
         ),
       ),
     );
-    putus(
-      Path()
-        ..addOval(
-          Rect.fromCircle(center: o(0.385, rak1 - 0.045), radius: s * 0.042),
-        )
-        ..moveTo(s * 0.37, s * (rak1 - 0.092))
-        ..lineTo(s * 0.4, s * (rak1 - 0.092)),
-    );
+    // Tangkai tomat: garis utuh (bukan putus-putus) supaya tetap terlihat.
+    canvas
+      ..drawLine(o(0.4, rak1 - 0.084), o(0.4, rak1 - 0.108), siluet)
+      ..drawLine(o(0.4, rak1 - 0.088), o(0.378, rak1 - 0.1), siluet)
+      ..drawLine(o(0.4, rak1 - 0.088), o(0.422, rak1 - 0.1), siluet);
     // Botol & sayur di rak bawah.
     putus(
       Path()
@@ -256,32 +274,56 @@ class KulkasKosongPainter extends CustomPainter {
     );
     canvas.drawRRect(dalam, garis(p.tinta, 0.016));
 
-    // Pintu bawah, berengsel di sisi kanan badan. Di bawah 90° terlihat
-    // sisi luarnya (menutup interior); setelahnya sisi dalam yang terayun
-    // ke kanan sebagai trapesium.
+    // Pintu bawah: trapesium LURUS berengsel di tepi kanan badan. Sisi luar
+    // (tepi bebas) lebih tinggi: tepi atas naik dan tepi bawah turun sama
+    // besar. Di bawah 90° terlihat sisi luarnya (menutup interior);
+    // setelahnya sisi dalam, terayun ke kanan.
     final sudut = _sudutBuka * buka;
-    final lebar = _kanan - _kiri;
-    final xBebas = _kanan - lebar * cos(sudut);
-    final dy = 0.045 * sin(sudut);
-    final pintu = Path()
-      ..moveTo(s * _kanan, s * _sekat)
-      ..lineTo(s * xBebas, s * (_sekat - dy))
-      ..lineTo(s * xBebas, s * (_bawah + dy))
-      ..lineTo(s * _kanan, s * _bawah)
-      ..close();
+    final xBebas = _kanan - (_kanan - _kiri) * cos(sudut);
+    final miring = 0.05 * sin(sudut);
     final sisiLuar = sudut < pi / 2;
-    // Titik pada pintu: u dari engsel (0) ke tepi bebas (1), v atas ke bawah.
-    Offset diPintu(double u, double v) {
-      final x = _kanan + (xBebas - _kanan) * u;
-      final atas = _sekat - dy * u, bawah = _bawah + dy * u;
-      return o(x, atas + (bawah - atas) * v);
+    final rentang = xBebas - _kanan;
+    // Tepi atas/bawah pintu sebagai fungsi x. Semua isi pintu dihitung
+    // dengan interpolasi di antara keduanya: y = atas(x) + f × tinggi(x),
+    // sehingga rak ikut perspektif pintu (rak atas hampir datar, rak bawah
+    // miring searah tepi bawah).
+    double porsi(double x) => rentang.abs() < 1e-9 ? 0 : (x - _kanan) / rentang;
+    double atasPintu(double x) => _sekat - miring * porsi(x);
+    double bawahPintu(double x) => _bawah + miring * porsi(x);
+    Offset diPintu(double t, double f) {
+      final x = _kanan + rentang * t;
+      return o(x, atasPintu(x) + f * (bawahPintu(x) - atasPintu(x)));
     }
 
+    /// Segi empat di pintu: t0–t1 dari engsel ke tepi bebas, f0–f1 dari
+    /// tepi atas ke tepi bawah.
+    Path segi(double t0, double t1, double f0, double f1) {
+      final a = diPintu(t0, f0), b = diPintu(t1, f0);
+      final c = diPintu(t1, f1), d = diPintu(t0, f1);
+      return Path()
+        ..moveTo(a.dx, a.dy)
+        ..lineTo(b.dx, b.dy)
+        ..lineTo(c.dx, c.dy)
+        ..lineTo(d.dx, d.dy)
+        ..close();
+    }
+
+    Path jalur(List<(double, double)> titik) {
+      final awal = diPintu(titik.first.$1, titik.first.$2);
+      final hasil = Path()..moveTo(awal.dx, awal.dy);
+      for (final (t, f) in titik.skip(1)) {
+        final p = diPintu(t, f);
+        hasil.lineTo(p.dx, p.dy);
+      }
+      return hasil;
+    }
+
+    final daunPintu = segi(0, 1, 0, 1);
     if (sisiLuar) {
       canvas
         ..save()
         ..clipRRect(badan)
-        ..drawPath(pintu, isi(p.permukaan))
+        ..drawPath(daunPintu, isi(p.permukaan))
         ..restore();
       if (cos(sudut) > 0.25) {
         canvas
@@ -297,33 +339,49 @@ class KulkasKosongPainter extends CustomPainter {
           );
       }
     } else {
+      // Ketebalan pintu: strip tipis di tepi luar.
+      final tebal = rentang.abs() < 1e-9 ? 0.0 : 0.045 / rentang;
+      final strip = segi(1, 1 + tebal, 0, 1);
       canvas
-        ..drawPath(pintu, isi(p.aksenLembut))
-        ..drawPath(pintu, garis(p.tinta, 0.022));
-      // Dua rak pintu.
-      for (final v in [0.5, 0.82]) {
-        final rak = Path()
-          ..moveTo(diPintu(0.16, v - 0.09).dx, diPintu(0.16, v - 0.09).dy)
-          ..lineTo(diPintu(0.16, v).dx, diPintu(0.16, v).dy)
-          ..lineTo(diPintu(0.86, v).dx, diPintu(0.86, v).dy)
-          ..lineTo(diPintu(0.86, v - 0.09).dx, diPintu(0.86, v - 0.09).dy);
-        canvas
-          ..drawPath(rak, isi(p.permukaan))
-          ..drawPath(rak, garis(p.aksen, 0.018));
-      }
-      // Siluet botol di rak pintu atas.
-      final b0 = diPintu(0.4, 0.4), b1 = diPintu(0.62, 0.4);
-      final t0 = diPintu(0.4, 0.24), t1 = diPintu(0.62, 0.24);
-      final l0 = diPintu(0.46, 0.16), l1 = diPintu(0.56, 0.16);
+        ..drawPath(strip, isi(p.abuCincin))
+        ..drawPath(strip, garis(p.tinta, 0.014))
+        ..drawPath(daunPintu, isi(p.permukaan))
+        // Panel dalam.
+        ..drawPath(segi(0.1, 0.9, 0.07, 0.93), isi(p.aksenLembut));
+      // Siluet stoples (rak atas) dan botol (rak bawah) digambar SEBELUM
+      // bilah rak, sehingga bagian bawahnya tertutup bilah.
       putus(
-        Path()
-          ..moveTo(b0.dx, b0.dy)
-          ..lineTo(t0.dx, t0.dy)
-          ..lineTo(l0.dx, l0.dy)
-          ..lineTo(l1.dx, l1.dy)
-          ..lineTo(t1.dx, t1.dy)
-          ..lineTo(b1.dx, b1.dy),
+        jalur(const [
+          (0.3, 0.46),
+          (0.3, 0.25),
+          (0.38, 0.25),
+          (0.38, 0.19),
+          (0.62, 0.19),
+          (0.62, 0.25),
+          (0.7, 0.25),
+          (0.7, 0.46),
+        ]),
       );
+      putus(
+        jalur(const [
+          (0.36, 0.8),
+          (0.36, 0.64),
+          (0.45, 0.6),
+          (0.45, 0.54),
+          (0.57, 0.54),
+          (0.57, 0.6),
+          (0.66, 0.64),
+          (0.66, 0.8),
+        ]),
+      );
+      // Dua bilah rak pintu.
+      for (final (f0, f1) in const [(0.40, 0.50), (0.74, 0.84)]) {
+        final bilah = segi(0.12, 0.88, f0, f1);
+        canvas
+          ..drawPath(bilah, isi(p.permukaan))
+          ..drawPath(bilah, garis(p.aksen, 0.016));
+      }
+      canvas.drawPath(daunPintu, garis(p.tinta, 0.022));
     }
 
     // Garis tepi badan di atas segalanya (pintu terbuka keluar dari badan).
@@ -334,6 +392,12 @@ class KulkasKosongPainter extends CustomPainter {
         o(_kanan, _bawah),
         garis(p.tinta, 0.032),
       );
+    }
+    // Dua titik engsel di sisi badan.
+    for (final y in [_sekat + 0.085, _bawah - 0.085]) {
+      canvas
+        ..drawCircle(o(_kanan, y), s * 0.024, isi(p.tinta))
+        ..drawCircle(o(_kanan, y), s * 0.011, isi(p.abuCincin));
     }
 
     // Empat magnet pil di pintu freezer, muncul berurutan.
@@ -422,7 +486,7 @@ class KulkasKosongPainter extends CustomPainter {
     final titik = _selang(maju, 0.85, 1, Curves.easeOut);
     if (titik > 0) {
       canvas
-        ..drawCircle(o(0.95, 0.27), s * 0.014 * titik, isi(p.wortel))
+        ..drawCircle(o(0.955, 0.2), s * 0.014 * titik, isi(p.wortel))
         ..drawCircle(o(0.045, 0.36), s * 0.012 * titik, isi(p.aksen));
     }
   }
