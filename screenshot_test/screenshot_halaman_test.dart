@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:resepsisakulkas/app/data/models/hasil_cocok.dart';
 import 'package:resepsisakulkas/app/data/models/katalog_model.dart';
-import 'package:resepsisakulkas/app/data/models/resep_model.dart';
 import 'package:resepsisakulkas/app/modules/belanja/controllers/belanja_controller.dart';
 import 'package:resepsisakulkas/app/modules/favorit/controllers/favorit_controller.dart';
 import 'package:resepsisakulkas/app/modules/favorit/controllers/riwayat_controller.dart';
@@ -84,6 +83,9 @@ void main() {
     Set<String> segera = const {},
   }) async {
     aturLayar(tester, skala: skala);
+    // Bila test ini gagal di tengah jalan, state GetX tidak boleh terbawa
+    // ke test berikutnya.
+    addTearDown(Get.reset);
     siapkanDependensi(
       ambil: () async {
         if (gagal) throw Exception('gagal');
@@ -495,43 +497,74 @@ void main() {
     });
   }
 
-  // Lembar periksa: sampul semua jenis sajian × beberapa resep.
-  testWidgets('32 sampul resep', (tester) async {
-    aturLayar(tester);
-    siapkanDependensi(
-      ambil: () async =>
-          HasilAmbil(katalog: katalog, sumber: SumberData.bawaan),
-    );
-    final tema = denganEmoji(AppTheme.terang);
-    await tester.pumpWidget(
-      RepaintBoundary(
-        key: kunciLayar,
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: tema,
-          home: Scaffold(
-            appBar: AppBar(title: const Text('Sampul resep')),
-            body: GridView.count(
-              crossAxisCount: 4,
-              padding: const EdgeInsets.all(AppSpacing.m),
-              mainAxisSpacing: AppSpacing.s,
-              crossAxisSpacing: AppSpacing.s,
-              children: [
-                for (final sajian in JenisSajian.values)
-                  for (final r
-                      in katalog.resep.where((r) => r.sajian == sajian).take(4))
-                    SampulResep(resep: r, ukuran: 76),
-              ],
+  // Lembar periksa: SELURUH sampul resep dalam grid, di ukuran kartu
+  // (76, detail halus disembunyikan) dan ukuran detail (112, detail penuh).
+  for (final (nama, ukuran, kolom) in [
+    ('32_sampul_kartu', AppSpacing.sampul, 5),
+    ('32_sampul_detail', 112.0, 6),
+  ]) {
+    testWidgets('$nama: semua resep', (tester) async {
+      const jarak = AppSpacing.s;
+      const tinggiLabel = 14.0;
+      final baris = (katalog.resep.length / kolom).ceil();
+      final lebar = kolom * ukuran + (kolom + 1) * jarak;
+      final tinggi = baris * (ukuran + tinggiLabel + jarak) + jarak;
+      tester.view.devicePixelRatio = 3;
+      tester.view.physicalSize = Size(lebar, tinggi) * 3;
+      addTearDown(tester.view.reset);
+      addTearDown(Get.reset);
+      siapkanDependensi(
+        ambil: () async =>
+            HasilAmbil(katalog: katalog, sumber: SumberData.bawaan),
+      );
+      final tema = denganEmoji(AppTheme.terang);
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: kunciLayar,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: tema,
+            home: Scaffold(
+              body: Padding(
+                padding: const EdgeInsets.all(jarak),
+                child: Wrap(
+                  spacing: jarak,
+                  runSpacing: jarak,
+                  children: [
+                    for (final r in katalog.resep)
+                      SizedBox(
+                        width: ukuran,
+                        child: Column(
+                          children: [
+                            SampulResep(resep: r, ukuran: ukuran),
+                            SizedBox(
+                              height: tinggiLabel,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  r.id,
+                                  style: tema.textTheme.labelSmall?.copyWith(
+                                    letterSpacing: 0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
-    await foto(tester, app, '32_sampul_resep');
-    await tester.pumpWidget(const SizedBox());
-    Get.reset();
-  });
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await foto(tester, app, nama);
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
 
   // Lembar periksa: semua ikon pelukis pada 20, 28, dan 32 px.
   testWidgets('18 ikon bahan pelukis', (tester) async {

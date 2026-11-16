@@ -169,7 +169,39 @@ class OnboardingView extends GetView<OnboardingController> {
 class _IlustrasiResep extends StatelessWidget {
   const _IlustrasiResep();
 
-  static Widget _ubin(double sudut, SampulPainter pelukis) => Transform.rotate(
+  // Dua resep contoh untuk ilustrasi (bukan dari katalog).
+  static const _sop = Resep(
+    id: 'contoh-sayur-bening',
+    nama: 'Sayur bening',
+    deskripsi: '',
+    waktuMenit: 15,
+    porsi: 2,
+    tingkat: TingkatResep.mudah,
+    sajian: JenisSajian.kuah,
+    bahan: [
+      BahanResep(bahanId: 'bayam', takaran: ''),
+      BahanResep(bahanId: 'jagung', takaran: ''),
+      BahanResep(bahanId: 'wortel', takaran: ''),
+    ],
+    langkah: [],
+  );
+  static const _tempe = Resep(
+    id: 'contoh-tempe-goreng',
+    nama: 'Tempe goreng',
+    deskripsi: '',
+    waktuMenit: 15,
+    porsi: 2,
+    tingkat: TingkatResep.mudah,
+    sajian: JenisSajian.goreng,
+    bahan: [
+      BahanResep(bahanId: 'tempe', takaran: ''),
+      BahanResep(bahanId: 'cabai', takaran: ''),
+      BahanResep(bahanId: 'bawang-putih', takaran: ''),
+    ],
+    langkah: [],
+  );
+
+  static Widget _ubin(double sudut, Resep resep) => Transform.rotate(
     angle: sudut,
     child: Container(
       width: 104,
@@ -179,7 +211,7 @@ class _IlustrasiResep extends StatelessWidget {
         border: Border.all(color: AppColors.putih, width: 3),
       ),
       clipBehavior: Clip.antiAlias,
-      child: CustomPaint(painter: pelukis),
+      child: CustomPaint(painter: SampulPainter(susunSampul(resep))),
     ),
   );
 
@@ -192,32 +224,8 @@ class _IlustrasiResep extends StatelessWidget {
         height: 168,
         child: Stack(
           children: [
-            Positioned(
-              left: 8,
-              top: 8,
-              child: _ubin(
-                -0.14,
-                const SampulPainter(
-                  sajian: JenisSajian.kuah,
-                  nada: NadaSampul.hijau,
-                  taburan: [],
-                  benih: 3,
-                ),
-              ),
-            ),
-            Positioned(
-              right: 12,
-              top: 36,
-              child: _ubin(
-                0.1,
-                const SampulPainter(
-                  sajian: JenisSajian.goreng,
-                  nada: NadaSampul.emas,
-                  taburan: [],
-                  benih: 8,
-                ),
-              ),
-            ),
+            Positioned(left: 8, top: 8, child: _ubin(-0.14, _sop)),
+            Positioned(right: 12, top: 36, child: _ubin(0.1, _tempe)),
             Positioned(
               left: 76,
               bottom: 0,
