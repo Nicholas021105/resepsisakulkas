@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:resepsisakulkas/app/data/models/bahan_model.dart';
 import 'package:resepsisakulkas/app/data/models/katalog_model.dart';
+import 'package:resepsisakulkas/app/data/models/resep_model.dart';
 import 'package:resepsisakulkas/app/utils/pencocok_resep.dart';
 
 /// Integritas assets/data/resep.json (data bawaan aplikasi).
@@ -21,9 +22,10 @@ void main() {
   });
 
   test('JSON bisa di-parse oleh Katalog.fromJson', () {
-    expect(katalog.versi, greaterThanOrEqualTo(1));
-    expect(katalog.bahan.length, inInclusiveRange(35, 45));
-    expect(katalog.resep.length, inInclusiveRange(28, 35));
+    // Katalog versi 2: ± 60 resep (sebelumnya 32 resep, 42 bahan).
+    expect(katalog.versi, greaterThanOrEqualTo(2));
+    expect(katalog.bahan.length, inInclusiveRange(45, 60));
+    expect(katalog.resep.length, inInclusiveRange(58, 70));
   });
 
   test('tidak ada id bahan maupun id resep ganda', () {
@@ -79,6 +81,77 @@ void main() {
       expect(r.langkah.length, inInclusiveRange(3, 7), reason: r.id);
       expect(r.deskripsi.trim(), isNotEmpty, reason: r.id);
       expect(r.waktuMenit, greaterThan(0), reason: r.id);
+    }
+  });
+
+  test('tidak ada bahan ganda dalam satu resep', () {
+    for (final r in katalog.resep) {
+      final id = r.bahan.map((b) => b.bahanId).toList();
+      expect(id.toSet().length, id.length, reason: r.id);
+    }
+  });
+
+  test('setiap bahan dipakai minimal satu resep', () {
+    final terpakai = {
+      for (final r in katalog.resep) ...r.bahan.map((b) => b.bahanId),
+    };
+    expect(
+      katalog.bahan.map((b) => b.id).where((id) => !terpakai.contains(id)),
+      isEmpty,
+    );
+  });
+
+  test('setiap resep punya kategori & sajian yang dikenal', () {
+    final kategori = KategoriResep.values.map((k) => k.name).toSet()
+      ..remove(KategoriResep.lainnya.name);
+    final sajian = JenisSajian.values.map((s) => s.name).toSet();
+    for (final r in json['resep'] as List) {
+      expect(kategori, contains((r as Map)['kategori']), reason: '${r['id']}');
+      expect(sajian, contains(r['sajian']), reason: '${r['id']}');
+    }
+    // Semua kategori (selain "lainnya") terisi, jadi chip jelajah tidak
+    // pernah kosong.
+    expect(katalog.resep.map((r) => r.kategori.name).toSet(), kategori);
+  });
+
+  test('tiga tingkat kesulitan terwakili; waktu masuk akal', () {
+    expect(
+      katalog.resep.map((r) => r.tingkat).toSet(),
+      TingkatResep.values.toSet(),
+    );
+    for (final r in katalog.resep) {
+      expect(r.waktuMenit, inInclusiveRange(5, 90), reason: r.id);
+      expect(r.porsi, inInclusiveRange(1, 6), reason: r.id);
+      if (r.tingkat == TingkatResep.sulit) {
+        expect(r.waktuMenit, greaterThanOrEqualTo(30), reason: r.id);
+      }
+    }
+  });
+
+  test('masa simpan: bahan segar punya awetHari, bumbu dasar tidak', () {
+    final byId = katalog.bahanById;
+    for (final id in ['bayam', 'kangkung', 'tauge', 'tahu', 'tempe', 'ayam']) {
+      expect(byId[id]?.awetHari, inInclusiveRange(1, 3), reason: id);
+    }
+    expect(byId['telur']?.awetHari, greaterThan(7));
+    for (final b in katalog.bahan.where((b) => b.bumbuDasar)) {
+      expect(b.awetHari, isNull, reason: b.id);
+    }
+    for (final b in katalog.bahan) {
+      if (b.awetHari != null) {
+        expect(b.awetHari, inInclusiveRange(1, 30), reason: b.id);
+      }
+    }
+  });
+
+  test('langkah berakhir titik dan takaran tidak kosong', () {
+    for (final r in katalog.resep) {
+      for (final l in r.langkah) {
+        expect(l.trim().endsWith('.'), isTrue, reason: '${r.id}: $l');
+      }
+      for (final b in r.bahan) {
+        expect(b.takaran.trim(), isNotEmpty, reason: '${r.id}: ${b.bahanId}');
+      }
     }
   });
 

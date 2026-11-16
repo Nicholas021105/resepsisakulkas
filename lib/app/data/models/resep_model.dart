@@ -1,10 +1,44 @@
+import 'bahan_model.dart';
+
 enum TingkatResep {
   mudah('Mudah'),
-  sedang('Sedang');
+  sedang('Sedang'),
+  sulit('Sulit');
 
   const TingkatResep(this.label);
 
   final String label;
+}
+
+/// Kategori hidangan untuk jelajah resep. Opsional sejak katalog versi 2;
+/// resep tanpa kategori masuk [lainnya].
+enum KategoriResep {
+  sarapan('Sarapan'),
+  lauk('Lauk'),
+  sayur('Sayur'),
+  nasiMie('Nasi & mie'),
+  camilan('Camilan'),
+  pelengkap('Sambal & pelengkap'),
+  lainnya('Lainnya');
+
+  const KategoriResep(this.label);
+
+  final String label;
+}
+
+/// Bentuk sajian, menentukan ilustrasi sampul resep (`SampulResep`).
+/// Opsional sejak katalog versi 2; tanpa nilai memakai [piring].
+enum JenisSajian {
+  piring,
+  goreng,
+  tumis,
+  kuah,
+  nasi,
+  mie,
+  telur,
+  sambal,
+  manis,
+  roti,
 }
 
 class BahanResep {
@@ -42,6 +76,8 @@ class Resep {
   final int waktuMenit;
   final int porsi;
   final TingkatResep tingkat;
+  final KategoriResep kategori;
+  final JenisSajian sajian;
   final List<BahanResep> bahan;
   final List<String> langkah;
 
@@ -54,10 +90,17 @@ class Resep {
     required this.tingkat,
     required this.bahan,
     required this.langkah,
+    this.kategori = KategoriResep.lainnya,
+    this.sajian = JenisSajian.piring,
   });
 
   Iterable<BahanResep> get bahanWajib => bahan.where((b) => !b.opsional);
 
+  /// Kompatibilitas skema:
+  /// - `tingkat` selalu `mudah`/`sedang` agar aplikasi versi 1.0 (yang
+  ///   hanya mengenal dua tingkat) tetap bisa membaca katalog; resep sulit
+  ///   ditulis `"tingkat": "sedang", "tingkatV2": "sulit"`.
+  /// - `kategori` dan `sajian` opsional; nilai tak dikenal memakai default.
   factory Resep.fromJson(Map<String, dynamic> json) {
     return Resep(
       id: json['id'] as String,
@@ -65,7 +108,17 @@ class Resep {
       deskripsi: json['deskripsi'] as String,
       waktuMenit: json['waktuMenit'] as int,
       porsi: json['porsi'] as int,
-      tingkat: TingkatResep.values.byName(json['tingkat'] as String),
+      tingkat: enumAtau(
+        TingkatResep.values,
+        json['tingkatV2'] ?? json['tingkat'],
+        enumAtau(TingkatResep.values, json['tingkat'], TingkatResep.sedang),
+      ),
+      kategori: enumAtau(
+        KategoriResep.values,
+        json['kategori'],
+        KategoriResep.lainnya,
+      ),
+      sajian: enumAtau(JenisSajian.values, json['sajian'], JenisSajian.piring),
       bahan: (json['bahan'] as List<dynamic>)
           .map((e) => BahanResep.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList(),
@@ -79,7 +132,12 @@ class Resep {
     'deskripsi': deskripsi,
     'waktuMenit': waktuMenit,
     'porsi': porsi,
-    'tingkat': tingkat.name,
+    'tingkat': tingkat == TingkatResep.sulit
+        ? TingkatResep.sedang.name
+        : tingkat.name,
+    if (tingkat == TingkatResep.sulit) 'tingkatV2': tingkat.name,
+    if (kategori != KategoriResep.lainnya) 'kategori': kategori.name,
+    if (sajian != JenisSajian.piring) 'sajian': sajian.name,
     'bahan': bahan.map((b) => b.toJson()).toList(),
     'langkah': langkah,
   };

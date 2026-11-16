@@ -20,11 +20,7 @@ abstract class AppPages {
   static GetPage<dynamic> _tab(String nama, int index) => GetPage(
     name: nama,
     page: () => const BerandaView(),
-    bindings: [
-      KulkasBinding(),
-      ResepBinding(),
-      FavoritBinding(),
-    ],
+    bindings: [KulkasBinding(), ResepBinding(), FavoritBinding()],
     middlewares: [TabMiddleware(index)],
     transition: Transition.noTransition,
   );
