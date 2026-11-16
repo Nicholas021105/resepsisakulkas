@@ -17,10 +17,12 @@ import 'package:resepsisakulkas/app/modules/masak/controllers/masak_controller.d
 import 'package:resepsisakulkas/app/modules/onboarding/controllers/onboarding_controller.dart';
 import 'package:resepsisakulkas/app/modules/resep/controllers/resep_controller.dart';
 import 'package:resepsisakulkas/app/routes/app_routes.dart';
+import 'package:resepsisakulkas/app/theme/app_palet.dart';
 import 'package:resepsisakulkas/app/theme/app_spacing.dart';
 import 'package:resepsisakulkas/app/theme/app_theme.dart';
 import 'package:resepsisakulkas/app/utils/notifikasi.dart';
 import 'package:resepsisakulkas/app/widgets/ikon_bahan.dart';
+import 'package:resepsisakulkas/app/widgets/ilustrasi_kulkas.dart';
 import 'package:resepsisakulkas/app/widgets/sampul_resep.dart';
 
 import '../test/helpers/aplikasi_uji.dart';
@@ -426,6 +428,72 @@ void main() {
       },
     ),
   );
+
+  // Lembar periksa: ilustrasi kulkas kosong di kedua tema, pada ukuran
+  // ringkasan Kulkasku (112) dan onboarding (168), plus tahap animasinya.
+  for (final gelap in [false, true]) {
+    testWidgets('33 ilustrasi kulkas kosong${gelap ? ' (gelap)' : ''}', (
+      tester,
+    ) async {
+      aturLayar(tester);
+      final tema = denganEmoji(gelap ? AppTheme.gelap : AppTheme.terang);
+      final p = gelap ? Palet.gelap : Palet.terang;
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: kunciLayar,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: tema,
+            home: Scaffold(
+              appBar: AppBar(title: const Text('Ilustrasi kulkas kosong')),
+              body: ListView(
+                padding: const EdgeInsets.all(AppSpacing.l),
+                children: [
+                  Text('112 dan 168 px', style: tema.textTheme.labelSmall),
+                  const SizedBox(height: AppSpacing.s),
+                  const Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      IlustrasiKulkasKosong(ukuran: 112),
+                      SizedBox(width: AppSpacing.l),
+                      IlustrasiKulkasKosong(ukuran: 168),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  Text(
+                    'Tahap animasi: 0 · 25 · 45 · 65 · 85 %',
+                    style: tema.textTheme.labelSmall,
+                  ),
+                  const SizedBox(height: AppSpacing.s),
+                  Row(
+                    children: [
+                      for (final maju in [0.0, 0.25, 0.45, 0.65, 0.85])
+                        CustomPaint(
+                          size: const Size.square(64),
+                          painter: KulkasKosongPainter(p, maju: maju),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  Text('Ukuran besar', style: tema.textTheme.labelSmall),
+                  const SizedBox(height: AppSpacing.s),
+                  Center(
+                    child: CustomPaint(
+                      size: const Size.square(300),
+                      painter: KulkasKosongPainter(p),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await foto(tester, app, '33_ilustrasi_kulkas${gelap ? '_gelap' : ''}');
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
 
   // Lembar periksa: sampul semua jenis sajian × beberapa resep.
   testWidgets('32 sampul resep', (tester) async {

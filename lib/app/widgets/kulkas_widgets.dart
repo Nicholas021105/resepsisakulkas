@@ -10,6 +10,10 @@ import '../theme/app_palet.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text.dart';
 
+// Ilustrasi kulkas kosong ada di berkasnya sendiri; diekspor agar halaman
+// cukup mengimpor kulkas_widgets.
+export 'ilustrasi_kulkas.dart';
+
 /// Ikon sumber data: server = tersinkron, cache = riwayat, bawaan = bawaan
 /// aplikasi (bukan awan, karena awan berarti online).
 IconData ikonSumber(SumberData sumber) => switch (sumber) {
@@ -179,127 +183,6 @@ class _CincinPainter extends CustomPainter {
   @override
   bool shouldRepaint(_CincinPainter lama) =>
       lama.nilai != nilai || lama.warna != warna || lama.jalur != jalur;
-}
-
-/// Ilustrasi kulkas terbuka yang kosong (CustomPainter).
-class IlustrasiKulkasKosong extends StatelessWidget {
-  final double ukuran;
-
-  const IlustrasiKulkasKosong({super.key, this.ukuran = 140});
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: Size(ukuran, ukuran),
-      painter: _KulkasPainter(context.palet),
-    );
-  }
-}
-
-class _KulkasPainter extends CustomPainter {
-  const _KulkasPainter(this.p);
-
-  final Palet p;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width, h = size.height;
-    final garis = Paint()
-      ..color = p.tinta
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = w * 0.025
-      ..strokeJoin = StrokeJoin.round;
-
-    // Bayangan lembut di lantai.
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(w * 0.52, h * 0.93),
-        width: w * 0.78,
-        height: h * 0.08,
-      ),
-      Paint()
-        ..color = p.bayangan
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.02),
-    );
-
-    // Badan kulkas.
-    final badan = RRect.fromRectAndRadius(
-      Rect.fromLTWH(w * 0.16, h * 0.04, w * 0.46, h * 0.86),
-      Radius.circular(w * 0.06),
-    );
-    canvas.drawRRect(badan, Paint()..color = p.aksenLembut);
-    canvas.drawRRect(badan, garis);
-    // Rak kosong.
-    for (final y in [0.28, 0.5, 0.72]) {
-      canvas.drawLine(
-        Offset(w * 0.2, h * y),
-        Offset(w * 0.58, h * y),
-        garis..color = p.aksen,
-      );
-    }
-    garis.color = p.tinta;
-    // Pintu terbuka (miring ke kanan).
-    final pintu = Path()
-      ..moveTo(w * 0.62, h * 0.04)
-      ..lineTo(w * 0.9, h * 0.12)
-      ..lineTo(w * 0.9, h * 0.82)
-      ..lineTo(w * 0.62, h * 0.9)
-      ..close();
-    canvas.drawPath(pintu, Paint()..color = p.permukaan);
-    canvas.drawPath(pintu, garis);
-    // Gagang pintu.
-    canvas.drawLine(
-      Offset(w * 0.67, h * 0.4),
-      Offset(w * 0.67, h * 0.56),
-      Paint()
-        ..color = p.garis
-        ..strokeWidth = w * 0.03
-        ..strokeCap = StrokeCap.round,
-    );
-    // Magnet kecil berwarna kategori di pintu, sedikit miring.
-    for (final (x, y, sudut, kategori) in [
-      (0.77, 0.26, -0.2, KategoriBahan.protein),
-      (0.8, 0.46, 0.15, KategoriBahan.sayur),
-      (0.76, 0.66, -0.1, KategoriBahan.karbohidrat),
-    ]) {
-      canvas
-        ..save()
-        ..translate(w * x, h * y)
-        ..rotate(sudut);
-      final magnet = RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset.zero, width: w * 0.13, height: h * 0.08),
-        Radius.circular(w * 0.04),
-      );
-      canvas
-        ..drawRRect(magnet, Paint()..color = AppColors.magnet(kategori))
-        ..drawRRect(
-          magnet,
-          Paint()
-            ..color = p.tinta
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = w * 0.012,
-        )
-        ..restore();
-    }
-    // Udara dingin.
-    final dingin = Paint()
-      ..color = p.aksen
-      ..strokeWidth = w * 0.02
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(
-      Offset(w * 0.04, h * 0.38),
-      Offset(w * 0.1, h * 0.38),
-      dingin,
-    );
-    canvas.drawLine(
-      Offset(w * 0.02, h * 0.48),
-      Offset(w * 0.1, h * 0.48),
-      dingin,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_KulkasPainter lama) => lama.p != p;
 }
 
 /// Empty state: ilustrasi, judul, pesan, dan satu ajakan bertindak.
