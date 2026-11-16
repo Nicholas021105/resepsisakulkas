@@ -212,10 +212,7 @@ class PengaturanView extends GetView<PengaturanController> {
                   ListTile(
                     contentPadding: _paddingBaris,
                     horizontalTitleGap: _jarakJudul,
-                    leading: KotakIkon(
-                      latar: context.palet.aksenLembut,
-                      child: Icon(Icons.kitchen, color: context.palet.aksenTua),
-                    ),
+                    leading: const IkonAplikasi(key: Key('ikon-app-tentang')),
                     title: Text('ResepSisaKulkas', style: teks.titleMedium),
                     subtitle: Obx(
                       () => Text(

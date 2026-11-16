@@ -48,6 +48,22 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  # Membuat ikon launcher dari assets/ikon/ (hanya saat pengembangan):
+  #   dart run flutter_launcher_icons
+  flutter_launcher_icons: ^0.14.4
+
+# Ikon aplikasi. Hanya Android yang diaktifkan karena proyek ini hanya punya
+# folder android/.
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/ikon/ikon_app.png"
+  adaptive_icon_foreground: "assets/ikon/ikon_depan.png"
+  adaptive_icon_background: "#1F8A70"
+  # ikon_depan.png sudah punya ruang aman sendiri; tanpa ini generator
+  # menambah inset 16% dan gambarnya mengecil.
+  adaptive_icon_foreground_inset: 0
+  min_sdk_android: 21
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -62,6 +78,9 @@ flutter:
 
   assets:
     - assets/data/resep.json
+    # Ikon aplikasi untuk ditampilkan di dalam app (Pengaturan, onboarding).
+    # Berkas lain di assets/ikon/ hanya sumber untuk generator ikon.
+    - assets/ikon/ikon_app.png
     # Dibundel agar nomor versi di Pengaturan dibaca dari satu sumber
     # (lihat lib/app/utils/info_aplikasi.dart).
     - pubspec.yaml

@@ -291,3 +291,31 @@ class AksiTutupLembar extends StatelessWidget {
     );
   }
 }
+
+/// Ikon aplikasi (aset gambar yang sama dengan ikon launcher), bersudut
+/// bulat. Dekoratif kecuali diberi [label] untuk pembaca layar.
+class IkonAplikasi extends StatelessWidget {
+  final double ukuran;
+  final String? label;
+
+  const IkonAplikasi({super.key, this.ukuran = 40, this.label});
+
+  static const aset = 'assets/ikon/ikon_app.png';
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(ukuran * 0.24),
+      child: Image.asset(
+        aset,
+        width: ukuran,
+        height: ukuran,
+        // Sumber 1024 px diperkecil: dekode seperlunya saja.
+        cacheWidth: (ukuran * MediaQuery.devicePixelRatioOf(context)).round(),
+        filterQuality: FilterQuality.medium,
+        semanticLabel: label,
+        excludeFromSemantics: label == null,
+      ),
+    );
+  }
+}

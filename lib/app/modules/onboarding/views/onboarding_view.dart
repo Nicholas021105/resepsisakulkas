@@ -7,6 +7,7 @@ import '../../../theme/app_palet.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../widgets/kulkas_widgets.dart';
 import '../../../widgets/sampul_resep.dart';
+import '../../../widgets/umum_widgets.dart';
 import '../controllers/onboarding_controller.dart';
 
 class OnboardingView extends GetView<OnboardingController> {
@@ -47,18 +48,32 @@ class OnboardingView extends GetView<OnboardingController> {
       body: SafeArea(
         child: Column(
           children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  top: AppSpacing.xs,
-                  right: AppSpacing.s,
-                ),
-                child: TextButton(
-                  key: const Key('onboarding-lewati'),
-                  onPressed: controller.selesai,
-                  child: const Text('Lewati'),
-                ),
+            Padding(
+              padding: const EdgeInsets.only(
+                top: AppSpacing.xs,
+                left: AppSpacing.l,
+                right: AppSpacing.s,
+              ),
+              child: Row(
+                children: [
+                  // Ikon yang sama dengan ikon launcher: pengguna baru saja
+                  // mengetuknya untuk sampai ke sini.
+                  const IkonAplikasi(key: Key('ikon-app-onboarding')),
+                  const SizedBox(width: AppSpacing.s),
+                  Expanded(
+                    child: Text(
+                      'ResepSisaKulkas',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: teks.titleMedium,
+                    ),
+                  ),
+                  TextButton(
+                    key: const Key('onboarding-lewati'),
+                    onPressed: controller.selesai,
+                    child: const Text('Lewati'),
+                  ),
+                ],
               ),
             ),
             Expanded(

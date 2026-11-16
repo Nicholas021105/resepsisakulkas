@@ -101,3 +101,13 @@ Disimpan di `get_storage`. Kunci versi 1.0 (`bahanDimiliki`, `favorit`, `bumbuDa
 - Timer hanya berjalan selama aplikasi terbuka; tidak ada notifikasi lokal.
 - Layar tidak ditahan tetap menyala saat mode masak (perlu paket tambahan).
 - Kulkas mencatat ada atau tidak ada, bukan jumlah bahan.
+
+## Ikon aplikasi
+
+Sumber ikon ada di `assets/ikon/`. Setelah mengganti `ikon_app.png` atau `ikon_depan.png`, buat ulang ikon launcher Android:
+
+```bash
+dart run flutter_launcher_icons
+```
+
+Konfigurasinya di `pubspec.yaml` (bagian `flutter_launcher_icons`). Hanya `ikon_app.png` yang ikut dibundel ke dalam app.
