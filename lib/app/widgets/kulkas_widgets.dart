@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../data/models/bahan_model.dart';
 import '../data/models/katalog_model.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_palet.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text.dart';
 
@@ -16,15 +17,6 @@ IconData ikonSumber(SumberData sumber) => switch (sumber) {
   SumberData.cache => Icons.history,
   SumberData.bawaan => Icons.inventory_2_outlined,
 };
-
-/// Bayangan sangat halus untuk kartu yang "terangkat".
-const bayanganKartu = [
-  BoxShadow(
-    color: AppColors.bayanganHalus,
-    blurRadius: 16,
-    offset: Offset(0, 4),
-  ),
-];
 
 /// Memudarkan tepi isi yang bisa digulir (kanan untuk baris chip, bawah
 /// untuk area gulir di atas tombol) sebagai petunjuk "masih ada lagi".
@@ -78,10 +70,10 @@ class PintuKulkas extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.permukaan,
+        color: context.palet.permukaan,
         borderRadius: BorderRadius.circular(AppSpacing.radiusL),
-        border: Border.all(color: AppColors.garis),
-        boxShadow: bayanganKartu,
+        border: Border.all(color: context.palet.garis),
+        boxShadow: context.palet.bayanganKartu,
       ),
       child: Stack(
         children: [
@@ -102,7 +94,7 @@ class PintuKulkas extends StatelessWidget {
               width: 5,
               height: 72,
               decoration: BoxDecoration(
-                color: AppColors.garis,
+                color: context.palet.garis,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
               ),
             ),
@@ -122,7 +114,8 @@ class CincinPersen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final warna = AppColors.cincin(persen);
+    final p = context.palet;
+    final warna = p.cincin(persen);
     return Semantics(
       label: '$persen persen cocok',
       child: SizedBox.square(
@@ -132,7 +125,7 @@ class CincinPersen extends StatelessWidget {
           duration: const Duration(milliseconds: 500),
           curve: Curves.easeOutCubic,
           builder: (_, nilai, anak) => CustomPaint(
-            painter: _CincinPainter(nilai: nilai, warna: warna),
+            painter: _CincinPainter(nilai: nilai, warna: warna, jalur: p.garis),
             child: anak,
           ),
           child: Center(
@@ -142,7 +135,10 @@ class CincinPersen extends StatelessWidget {
               padding: EdgeInsets.all(ukuran * 0.2),
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: Text('$persen%', style: AppText.angka(ukuran / 4)),
+                child: Text(
+                  '$persen%',
+                  style: AppText.angka(ukuran / 4, warna: p.tinta),
+                ),
               ),
             ),
           ),
@@ -155,8 +151,13 @@ class CincinPersen extends StatelessWidget {
 class _CincinPainter extends CustomPainter {
   final double nilai;
   final Color warna;
+  final Color jalur;
 
-  _CincinPainter({required this.nilai, required this.warna});
+  _CincinPainter({
+    required this.nilai,
+    required this.warna,
+    required this.jalur,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -169,7 +170,7 @@ class _CincinPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = tebal
       ..strokeCap = StrokeCap.round;
-    canvas.drawArc(rect, 0, 2 * pi, false, cat..color = AppColors.garis);
+    canvas.drawArc(rect, 0, 2 * pi, false, cat..color = jalur);
     if (nilai > 0) {
       canvas.drawArc(rect, -pi / 2, 2 * pi * nilai, false, cat..color = warna);
     }
@@ -177,7 +178,7 @@ class _CincinPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_CincinPainter lama) =>
-      lama.nilai != nilai || lama.warna != warna;
+      lama.nilai != nilai || lama.warna != warna || lama.jalur != jalur;
 }
 
 /// Ilustrasi kulkas terbuka yang kosong (CustomPainter).
@@ -190,19 +191,21 @@ class IlustrasiKulkasKosong extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomPaint(
       size: Size(ukuran, ukuran),
-      painter: const _KulkasPainter(),
+      painter: _KulkasPainter(context.palet),
     );
   }
 }
 
 class _KulkasPainter extends CustomPainter {
-  const _KulkasPainter();
+  const _KulkasPainter(this.p);
+
+  final Palet p;
 
   @override
   void paint(Canvas canvas, Size size) {
     final w = size.width, h = size.height;
     final garis = Paint()
-      ..color = AppColors.tinta
+      ..color = p.tinta
       ..style = PaintingStyle.stroke
       ..strokeWidth = w * 0.025
       ..strokeJoin = StrokeJoin.round;
@@ -215,7 +218,7 @@ class _KulkasPainter extends CustomPainter {
         height: h * 0.08,
       ),
       Paint()
-        ..color = AppColors.bayangan
+        ..color = p.bayangan
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.02),
     );
 
@@ -224,17 +227,17 @@ class _KulkasPainter extends CustomPainter {
       Rect.fromLTWH(w * 0.16, h * 0.04, w * 0.46, h * 0.86),
       Radius.circular(w * 0.06),
     );
-    canvas.drawRRect(badan, Paint()..color = AppColors.aksenLembut);
+    canvas.drawRRect(badan, Paint()..color = p.aksenLembut);
     canvas.drawRRect(badan, garis);
     // Rak kosong.
     for (final y in [0.28, 0.5, 0.72]) {
       canvas.drawLine(
         Offset(w * 0.2, h * y),
         Offset(w * 0.58, h * y),
-        garis..color = AppColors.aksen,
+        garis..color = p.aksen,
       );
     }
-    garis.color = AppColors.tinta;
+    garis.color = p.tinta;
     // Pintu terbuka (miring ke kanan).
     final pintu = Path()
       ..moveTo(w * 0.62, h * 0.04)
@@ -242,14 +245,14 @@ class _KulkasPainter extends CustomPainter {
       ..lineTo(w * 0.9, h * 0.82)
       ..lineTo(w * 0.62, h * 0.9)
       ..close();
-    canvas.drawPath(pintu, Paint()..color = AppColors.permukaan);
+    canvas.drawPath(pintu, Paint()..color = p.permukaan);
     canvas.drawPath(pintu, garis);
     // Gagang pintu.
     canvas.drawLine(
       Offset(w * 0.67, h * 0.4),
       Offset(w * 0.67, h * 0.56),
       Paint()
-        ..color = AppColors.garis
+        ..color = p.garis
         ..strokeWidth = w * 0.03
         ..strokeCap = StrokeCap.round,
     );
@@ -272,7 +275,7 @@ class _KulkasPainter extends CustomPainter {
         ..drawRRect(
           magnet,
           Paint()
-            ..color = AppColors.tinta
+            ..color = p.tinta
             ..style = PaintingStyle.stroke
             ..strokeWidth = w * 0.012,
         )
@@ -280,7 +283,7 @@ class _KulkasPainter extends CustomPainter {
     }
     // Udara dingin.
     final dingin = Paint()
-      ..color = AppColors.aksen
+      ..color = p.aksen
       ..strokeWidth = w * 0.02
       ..strokeCap = StrokeCap.round;
     canvas.drawLine(
@@ -296,7 +299,7 @@ class _KulkasPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_KulkasPainter lama) => false;
+  bool shouldRepaint(_KulkasPainter lama) => lama.p != p;
 }
 
 /// Empty state: ilustrasi, judul, pesan, dan satu ajakan bertindak.
@@ -336,7 +339,7 @@ class KeadaanKosong extends StatelessWidget {
           Text(
             pesan,
             textAlign: TextAlign.center,
-            style: teks.bodyMedium?.copyWith(color: AppColors.tintaLembut),
+            style: teks.bodyMedium?.copyWith(color: context.palet.tintaLembut),
           ),
           if (labelAksi != null && onAksi != null) ...[
             const SizedBox(height: AppSpacing.xl),
@@ -379,9 +382,12 @@ class IlustrasiHati extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _LingkaranIlustrasi(
+    return _LingkaranIlustrasi(
       ukuran: 120,
-      child: CustomPaint(size: Size(60, 56), painter: _HatiPainter()),
+      child: CustomPaint(
+        size: const Size(60, 56),
+        painter: _HatiPainter(context.palet.hatiKoral),
+      ),
     );
   }
 }
@@ -399,14 +405,14 @@ class _LingkaranIlustrasi extends StatelessWidget {
       width: ukuran,
       height: ukuran,
       alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        color: AppColors.aksenLembut,
+      decoration: BoxDecoration(
+        color: context.palet.aksenLembut,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: AppColors.bayangan,
+            color: context.palet.bayangan,
             blurRadius: 18,
-            offset: Offset(0, 6),
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -416,7 +422,9 @@ class _LingkaranIlustrasi extends StatelessWidget {
 }
 
 class _HatiPainter extends CustomPainter {
-  const _HatiPainter();
+  const _HatiPainter(this.warna);
+
+  final Color warna;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -428,7 +436,7 @@ class _HatiPainter extends CustomPainter {
       ..cubicTo(w * 0.58, -h * 0.02, w * 0.82, 0, w * 0.92, h * 0.2)
       ..cubicTo(w * 1.02, h * 0.4, w * 0.9, h * 0.68, w * 0.5, h * 0.96)
       ..close();
-    canvas.drawPath(hati, Paint()..color = AppColors.hatiKoral);
+    canvas.drawPath(hati, Paint()..color = warna);
     // Kilau kecil di kiri atas.
     canvas.drawArc(
       Rect.fromLTWH(w * 0.16, h * 0.14, w * 0.26, h * 0.3),
@@ -444,5 +452,5 @@ class _HatiPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_HatiPainter lama) => false;
+  bool shouldRepaint(_HatiPainter lama) => lama.warna != warna;
 }

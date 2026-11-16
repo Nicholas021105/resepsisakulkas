@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:resepsisakulkas/app/controllers/main_controller.dart';
+import 'package:resepsisakulkas/app/controllers/tema_controller.dart';
 import 'package:resepsisakulkas/app/data/models/katalog_model.dart';
 import 'package:resepsisakulkas/app/data/services/katalog_service.dart';
 import 'package:resepsisakulkas/app/data/services/storage_service.dart';
@@ -26,6 +27,7 @@ RepoTetap siapkanDependensi({
     ..set[StorageService.kunciFavorit] = {...favorit}
     ..boolean[StorageService.kunciBumbuDasar] = bumbuDasar;
   Get.put<StorageService>(storage, permanent: true);
+  Get.put(TemaController(), permanent: true);
   final repo = RepoTetap(ambil);
   Get.put(KatalogService(repo), permanent: true);
   Get.put(KulkasController(), permanent: true);
@@ -34,13 +36,19 @@ RepoTetap siapkanDependensi({
   return repo;
 }
 
-Widget aplikasiUji({String rute = AppPages.initial, ThemeData? tema}) =>
-    GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: tema ?? AppTheme.terang,
-      initialRoute: rute,
-      getPages: AppPages.routes,
-    );
+Widget aplikasiUji({
+  String rute = AppPages.initial,
+  ThemeData? tema,
+  ThemeData? temaGelap,
+  ThemeMode mode = ThemeMode.light,
+}) => GetMaterialApp(
+  debugShowCheckedModeBanner: false,
+  theme: tema ?? AppTheme.terang,
+  darkTheme: temaGelap ?? AppTheme.gelap,
+  themeMode: mode,
+  initialRoute: rute,
+  getPages: AppPages.routes,
+);
 
 /// Habiskan antrean snackbar lalu bersihkan GetX.
 Future<void> bersihkan(WidgetTester tester) async {

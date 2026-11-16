@@ -1,34 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../theme/app_colors.dart';
+import '../theme/app_palet.dart';
 import '../theme/app_spacing.dart';
-import '../theme/app_text.dart';
 
-void _snackbar(String judul, String pesan, IconData ikon, Color warnaIkon) {
+/// Palet tema aktif untuk overlay yang dibuat tanpa BuildContext halaman
+/// (snackbar & dialog GetX).
+Palet get _palet => Get.theme.extension<Palet>() ?? Palet.terang;
+
+void _snackbar(
+  String judul,
+  String pesan,
+  IconData ikon,
+  Color warnaIkon, {
+  String? labelAksi,
+  VoidCallback? onAksi,
+}) {
+  final p = _palet;
   _gantiSnackbar();
   Get.snackbar(
     judul,
     pesan,
     snackPosition: SnackPosition.BOTTOM,
     icon: Icon(ikon, color: warnaIkon),
-    backgroundColor: AppColors.tinta,
-    colorText: AppColors.putih,
+    backgroundColor: p.balik,
+    colorText: p.diBalik,
     borderRadius: AppSpacing.radiusM,
+    duration: Duration(seconds: labelAksi == null ? 3 : 5),
     margin: const EdgeInsets.fromLTRB(
       AppSpacing.m,
       0,
       AppSpacing.m,
       AppSpacing.xxxl + AppSpacing.xxl,
     ),
+    mainButton: labelAksi == null || onAksi == null
+        ? null
+        : TextButton(
+            style: TextButton.styleFrom(foregroundColor: p.diBalik),
+            onPressed: () {
+              _gantiSnackbar();
+              onAksi();
+            },
+            child: Text(labelAksi),
+          ),
   );
 }
 
-void tampilkanSukses(String pesan) =>
-    _snackbar('Berhasil', pesan, Icons.check_circle, AppColors.aksenLembut);
+/// Umpan balik berhasil; [labelAksi] + [onAksi] menambah tombol (mis.
+/// "Urungkan").
+void tampilkanSukses(String pesan, {String? labelAksi, VoidCallback? onAksi}) =>
+    _snackbar(
+      'Berhasil',
+      pesan,
+      Icons.check_circle,
+      _palet.modeGelap ? _palet.aksenTua : _palet.aksenLembut,
+      labelAksi: labelAksi,
+      onAksi: onAksi,
+    );
 
-void tampilkanInfo(String pesan) =>
-    _snackbar('Info', pesan, Icons.info_outline, AppColors.wortelLembut);
+void tampilkanInfo(String pesan, {String? labelAksi, VoidCallback? onAksi}) =>
+    _snackbar(
+      'Info',
+      pesan,
+      Icons.info_outline,
+      _palet.modeGelap ? _palet.wortelTeks : _palet.wortelLembut,
+      labelAksi: labelAksi,
+      onAksi: onAksi,
+    );
 
 /// Menutup dialog/bottom sheet teratas. `Get.back()` di GetX 4 menutup
 /// snackbar lebih dulu bila ada yang tampil, jadi navigator dipakai langsung.
@@ -40,23 +78,22 @@ void konfirmasi({
   required String pesan,
   required String teksYa,
   required VoidCallback onYa,
+  String teksBatal = 'Batal',
 }) {
+  final p = _palet;
+  final teks = Get.textTheme;
   Get.defaultDialog(
     title: judul,
-    titleStyle: AppText.textTheme.headlineSmall,
+    titleStyle: teks.headlineSmall,
     // Isi dibatasi tingginya dan bisa digulir agar pesan panjang tidak
     // meluap di layar kecil atau dengan huruf besar.
     content: ConstrainedBox(
       constraints: BoxConstraints(maxHeight: Get.height * 0.2),
       child: SingleChildScrollView(
-        child: Text(
-          pesan,
-          textAlign: TextAlign.center,
-          style: AppText.textTheme.bodyMedium,
-        ),
+        child: Text(pesan, textAlign: TextAlign.center, style: teks.bodyMedium),
       ),
     ),
-    backgroundColor: AppColors.permukaan,
+    backgroundColor: p.permukaanTinggi,
     radius: AppSpacing.radiusL,
     titlePadding: const EdgeInsets.fromLTRB(
       AppSpacing.xl,
@@ -65,10 +102,11 @@ void konfirmasi({
       0,
     ),
     contentPadding: const EdgeInsets.all(AppSpacing.xl),
-    cancel: const TextButton(onPressed: tutupOverlay, child: Text('Batal')),
+    cancel: TextButton(onPressed: tutupOverlay, child: Text(teksBatal)),
     confirm: FilledButton(
       style: FilledButton.styleFrom(
-        backgroundColor: AppColors.wortelTeks,
+        backgroundColor: p.wortelTeks,
+        foregroundColor: p.diBalik,
         minimumSize: const Size(AppSpacing.sentuh, AppSpacing.sentuh),
       ),
       onPressed: () {

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../../../controllers/main_controller.dart';
 import '../../../data/models/bahan_model.dart';
 import '../../../theme/app_colors.dart';
+import '../../../theme/app_palet.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_text.dart';
 import '../../../widgets/bottom_nav.dart';
@@ -132,7 +133,7 @@ class _Ringkasan extends GetView<KulkasController> {
                       'Tempel bahan pertamamu dengan mengetuk magnet di '
                       'bawah.',
                       style: teks.bodyMedium?.copyWith(
-                        color: AppColors.tintaLembut,
+                        color: context.palet.tintaLembut,
                       ),
                     ),
                   ],
@@ -223,7 +224,7 @@ class _PratinjauKulkas extends StatelessWidget {
                   overflow: TextOverflow.fade,
                   softWrap: false,
                   style: Theme.of(context).textTheme.labelMedium
-                      ?.copyWith(color: AppColors.tintaLembut),
+                      ?.copyWith(color: context.palet.tintaLembut),
                 ),
               ),
             ],
@@ -289,7 +290,7 @@ class _DaftarBahan extends GetView<KulkasController> {
           child: Text(
             'Bahan tidak ditemukan. Coba kata lain.',
             textAlign: TextAlign.center,
-            style: teks.bodyMedium?.copyWith(color: AppColors.tintaLembut),
+            style: teks.bodyMedium?.copyWith(color: context.palet.tintaLembut),
           ),
         );
       }
@@ -349,7 +350,7 @@ class _TombolLihatResep extends GetView<KulkasController> {
       final kosong = controller.kulkasKosong;
       final jumlah = controller.jumlahResepCocok;
       final gaya = Theme.of(context).textTheme.labelLarge
-          ?.copyWith(color: AppColors.putih);
+          ?.copyWith(color: context.palet.diAksen);
       return SizedBox(
         width: double.infinity,
         child: FilledButton(
@@ -377,7 +378,10 @@ class _TombolLihatResep extends GetView<KulkasController> {
                         child: Text(
                           '$jumlah',
                           key: ValueKey(jumlah),
-                          style: AppText.angka(18, warna: AppColors.putih),
+                          style: AppText.angka(
+                            18,
+                            warna: context.palet.diAksen,
+                          ),
                         ),
                       ),
                       Text(' resep cocok', style: gaya),

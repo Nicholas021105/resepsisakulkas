@@ -1,14 +1,26 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:resepsisakulkas/app/data/models/katalog_model.dart';
 import 'package:resepsisakulkas/app/data/providers/resep_provider.dart';
 import 'package:resepsisakulkas/app/data/repositories/resep_repository.dart';
 import 'package:resepsisakulkas/app/data/services/storage_service.dart';
 
-/// StorageService di memori (tanpa GetStorage/plugin).
-class StorageMemori implements StorageService {
+/// StorageService di memori (tanpa GetStorage/plugin). Set, bool, dan cache
+/// disimpan bertipe agar mudah diperiksa test; nilai lain lewat [mentah]
+/// dan dibolak-balik JSON seperti penyimpanan sungguhan.
+class StorageMemori extends StorageService {
   final Map<String, Set<String>> set = {};
   final Map<String, bool> boolean = {};
+  final Map<String, dynamic> mentah = {};
   CacheKatalog? cache;
+
+  @override
+  dynamic bacaMentah(String kunci) => mentah[kunci];
+
+  @override
+  Future<void> tulisMentah(String kunci, dynamic nilai) async =>
+      mentah[kunci] = jsonDecode(jsonEncode(nilai));
 
   @override
   Set<String> bacaSet(String kunci) => {...?set[kunci]};

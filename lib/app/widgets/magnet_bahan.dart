@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../data/models/bahan_model.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_palet.dart';
 import '../theme/app_spacing.dart';
 import 'ikon_bahan.dart';
 
@@ -40,17 +41,19 @@ class MagnetBahan extends StatelessWidget {
           decoration: BoxDecoration(
             color: dipilih
                 ? AppColors.magnet(bahan.kategori)
-                : AppColors.permukaan,
+                : context.palet.permukaan,
             borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
             border: Border.all(
               color: dipilih
-                  ? AppColors.tinta
+                  ? context.palet.tinta
                   : AppColors.magnet(bahan.kategori),
               width: dipilih ? 1.6 : 2,
             ),
             boxShadow: [
               BoxShadow(
-                color: dipilih ? AppColors.bayanganTegas : AppColors.bayangan,
+                color: dipilih
+                    ? context.palet.bayanganTegas
+                    : context.palet.bayangan,
                 blurRadius: dipilih ? 8 : 4,
                 offset: Offset(0, dipilih ? 3 : 2),
               ),
@@ -90,15 +93,17 @@ class MagnetBahan extends StatelessWidget {
                         duration: _durasi,
                         curve: Curves.easeOut,
                         child: dipilih
-                            ? const Padding(
-                                padding: EdgeInsets.only(left: AppSpacing.s),
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                  left: AppSpacing.s,
+                                ),
                                 child: CircleAvatar(
                                   radius: 9,
-                                  backgroundColor: AppColors.aksenTua,
+                                  backgroundColor: context.palet.aksenTua,
                                   child: Icon(
                                     Icons.check,
                                     size: 13,
-                                    color: AppColors.putih,
+                                    color: context.palet.diAksen,
                                   ),
                                 ),
                               )

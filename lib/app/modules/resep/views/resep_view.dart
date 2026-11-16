@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../../../controllers/main_controller.dart';
 import '../../../data/models/hasil_cocok.dart';
 import '../../../data/services/katalog_service.dart';
-import '../../../theme/app_colors.dart';
+import '../../../theme/app_palet.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../utils/formatter.dart';
 import '../../../widgets/bottom_nav.dart';
@@ -94,7 +94,7 @@ class _Kepala extends GetView<ResepController> {
                   ikonSumber(sumber),
                   key: Key('ikon-sumber-${sumber.name}'),
                   size: 16,
-                  color: AppColors.tintaLembut,
+                  color: context.palet.tintaLembut,
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Expanded(

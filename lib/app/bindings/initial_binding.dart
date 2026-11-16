@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 import '../controllers/main_controller.dart';
+import '../controllers/tema_controller.dart';
 import '../data/providers/resep_provider.dart';
 import '../data/repositories/resep_repository.dart';
 import '../data/services/katalog_service.dart';
@@ -12,6 +13,7 @@ class InitialBinding extends Bindings {
   @override
   void dependencies() {
     final storage = Get.put(StorageService(), permanent: true);
+    Get.put(TemaController(), permanent: true);
     final provider = Get.put(ResepProvider(), permanent: true);
     Get.put(
       KatalogService(ResepRepository(provider: provider, storage: storage)),

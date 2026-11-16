@@ -15,4 +15,23 @@ abstract class AppSpacing {
 
   /// Target sentuh minimal.
   static const double sentuh = 48;
+
+  /// Tinggi tombol utama.
+  static const double tombol = 56;
+
+  /// Sisi sampul resep di kartu daftar.
+  static const double sampul = 76;
+
+  /// Lebar isi maksimal agar nyaman dibaca di layar lebar/landscape.
+  static const double lebarIsi = 560;
+}
+
+/// Durasi dan kurva gerak yang dipakai bersama.
+abstract class AppGerak {
+  static const cepat = Duration(milliseconds: 160);
+  static const sedang = Duration(milliseconds: 260);
+  static const lambat = Duration(milliseconds: 480);
+
+  /// Animasi magnet "menempel" ke pintu kulkas.
+  static const tempel = Duration(milliseconds: 420);
 }

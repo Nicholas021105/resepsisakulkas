@@ -5,7 +5,7 @@ import '../data/models/bahan_model.dart';
 import '../data/models/hasil_cocok.dart';
 import '../data/services/katalog_service.dart';
 import '../routes/app_routes.dart';
-import '../theme/app_colors.dart';
+import '../theme/app_palet.dart';
 import '../theme/app_spacing.dart';
 import 'ikon_bahan.dart';
 import 'kulkas_widgets.dart';
@@ -28,13 +28,16 @@ class KartuResep extends StatelessWidget {
     final radius = BorderRadius.circular(AppSpacing.radiusM);
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.m),
-      decoration: BoxDecoration(borderRadius: radius, boxShadow: bayanganKartu),
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        boxShadow: context.palet.bayanganKartu,
+      ),
       child: Material(
-        color: AppColors.permukaan,
+        color: context.palet.permukaan,
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
           borderRadius: radius,
-          side: const BorderSide(color: AppColors.garis, width: 0.6),
+          side: BorderSide(color: context.palet.garis, width: 0.6),
         ),
         child: InkWell(
           key: Key('resep-${r.id}'),
@@ -93,7 +96,7 @@ class KartuResep extends StatelessWidget {
                 top: 0,
                 bottom: 0,
                 width: lebarStrip,
-                child: ColoredBox(color: AppColors.cincin(hasil.persen)),
+                child: ColoredBox(color: context.palet.cincin(hasil.persen)),
               ),
             ],
           ),
@@ -118,7 +121,7 @@ class ChipStatus extends StatelessWidget {
         vertical: 3,
       ),
       decoration: BoxDecoration(
-        color: kurang ? AppColors.wortelLembut : AppColors.aksenLembut,
+        color: kurang ? context.palet.wortelLembut : context.palet.aksenLembut,
         borderRadius: BorderRadius.circular(AppSpacing.radiusS),
       ),
       child: Text(
@@ -126,7 +129,7 @@ class ChipStatus extends StatelessWidget {
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-          color: kurang ? AppColors.wortelTeks : AppColors.aksenTua,
+          color: kurang ? context.palet.wortelTeks : context.palet.aksenTua,
         ),
       ),
     );
@@ -173,9 +176,9 @@ class _PratinjauBahan extends StatelessWidget {
             alignment: Alignment.center,
             decoration: kurang.contains(b.id)
                 ? BoxDecoration(
-                    color: AppColors.wortelLembut,
+                    color: context.palet.wortelLembut,
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.wortel, width: 1.2),
+                    border: Border.all(color: context.palet.wortel, width: 1.2),
                   )
                 : null,
             child: IkonBahan.dari(b, ukuran: ukuranIkon),
@@ -184,7 +187,7 @@ class _PratinjauBahan extends StatelessWidget {
           Text(
             '+$sisa',
             style: Theme.of(context).textTheme.labelMedium
-                ?.copyWith(color: AppColors.tintaLembut),
+                ?.copyWith(color: context.palet.tintaLembut),
           ),
       ],
     );

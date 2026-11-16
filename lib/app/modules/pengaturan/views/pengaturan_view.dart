@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../../../theme/app_colors.dart';
+import '../../../theme/app_palet.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../widgets/bottom_nav.dart';
 import '../../../widgets/kulkas_widgets.dart';
+import '../../../widgets/umum_widgets.dart';
 import '../controllers/pengaturan_controller.dart';
 
 /// Semua baris memakai ikon dalam kotak 40×40 dan jarak judul yang sama,
@@ -19,7 +20,9 @@ class PengaturanView extends GetView<PengaturanController> {
   @override
   Widget build(BuildContext context) {
     final teks = Theme.of(context).textTheme;
-    final subjudul = teks.bodyMedium?.copyWith(color: AppColors.tintaLembut);
+    final subjudul = teks.bodyMedium?.copyWith(
+      color: context.palet.tintaLembut,
+    );
     return Scaffold(
       appBar: AppBar(
         leading: const TombolKembali(),
@@ -34,7 +37,53 @@ class PengaturanView extends GetView<PengaturanController> {
             AppSpacing.xxl,
           ),
           children: [
-            const _JudulBagian('DATA RESEP'),
+            const JudulBagian('TAMPILAN'),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.l),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Tema', style: teks.titleMedium),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Tema gelap lebih nyaman saat memasak malam hari.',
+                      style: subjudul,
+                    ),
+                    const SizedBox(height: AppSpacing.m),
+                    Obx(
+                      () => PilihanSegmen<ThemeMode>(
+                        key: const Key('pilih-tema'),
+                        nilai: controller.modeTema,
+                        onPilih: controller.ubahTema,
+                        pilihan: const [
+                          Segmen(
+                            ThemeMode.system,
+                            'Sistem',
+                            ikon: Icons.brightness_auto_outlined,
+                            kunci: Key('tema-sistem'),
+                          ),
+                          Segmen(
+                            ThemeMode.light,
+                            'Terang',
+                            ikon: Icons.light_mode_outlined,
+                            kunci: Key('tema-terang'),
+                          ),
+                          Segmen(
+                            ThemeMode.dark,
+                            'Gelap',
+                            ikon: Icons.dark_mode_outlined,
+                            kunci: Key('tema-gelap'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            const JudulBagian('DATA RESEP'),
             Card(
               child: Obx(
                 () => Column(
@@ -42,11 +91,11 @@ class PengaturanView extends GetView<PengaturanController> {
                     ListTile(
                       contentPadding: _paddingBaris,
                       horizontalTitleGap: _jarakJudul,
-                      leading: _KotakIkon(
-                        latar: AppColors.aksenLembut,
+                      leading: KotakIkon(
+                        latar: context.palet.aksenLembut,
                         child: Icon(
                           ikonSumber(controller.sumber),
-                          color: AppColors.aksenTua,
+                          color: context.palet.aksenTua,
                         ),
                       ),
                       title: Text(
@@ -97,7 +146,7 @@ class PengaturanView extends GetView<PengaturanController> {
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            const _JudulBagian('KULKAS'),
+            const JudulBagian('KULKAS'),
             Card(
               clipBehavior: Clip.antiAlias,
               child: Column(
@@ -107,9 +156,9 @@ class PengaturanView extends GetView<PengaturanController> {
                       key: const Key('opsi-bumbu-dasar'),
                       contentPadding: _paddingBaris,
                       horizontalTitleGap: _jarakJudul,
-                      secondary: const _KotakIkon(
-                        latar: AppColors.latar,
-                        child: Text(
+                      secondary: KotakIkon(
+                        latar: context.palet.latar,
+                        child: const Text(
                           '🧂',
                           textScaler: TextScaler.noScaling,
                           style: TextStyle(fontSize: 22, height: 1),
@@ -131,11 +180,11 @@ class PengaturanView extends GetView<PengaturanController> {
                       key: const Key('pengaturan-kosongkan'),
                       contentPadding: _paddingBaris,
                       horizontalTitleGap: _jarakJudul,
-                      iconColor: AppColors.bahaya,
-                      textColor: AppColors.bahaya,
-                      leading: const _KotakIkon(
-                        latar: AppColors.bahayaLembut,
-                        child: Icon(Icons.delete_sweep_outlined),
+                      iconColor: context.palet.bahaya,
+                      textColor: context.palet.bahaya,
+                      leading: KotakIkon(
+                        latar: context.palet.bahayaLembut,
+                        child: const Icon(Icons.delete_sweep_outlined),
                       ),
                       // Warna judul dari textColor (otomatis abu saat
                       // nonaktif).
@@ -154,7 +203,7 @@ class PengaturanView extends GetView<PengaturanController> {
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            const _JudulBagian('TENTANG'),
+            const JudulBagian('TENTANG'),
             Card(
               key: const Key('kartu-tentang'),
               child: Column(
@@ -162,15 +211,17 @@ class PengaturanView extends GetView<PengaturanController> {
                   ListTile(
                     contentPadding: _paddingBaris,
                     horizontalTitleGap: _jarakJudul,
-                    leading: const _KotakIkon(
-                      latar: AppColors.aksenLembut,
-                      child: Icon(Icons.kitchen, color: AppColors.aksenTua),
+                    leading: KotakIkon(
+                      latar: context.palet.aksenLembut,
+                      child: Icon(Icons.kitchen, color: context.palet.aksenTua),
                     ),
                     title: Text('ResepSisaKulkas', style: teks.titleMedium),
-                    subtitle: Text(
-                      'Versi ${PengaturanController.versiApp}',
-                      key: const Key('versi-app'),
-                      style: subjudul,
+                    subtitle: Obx(
+                      () => Text(
+                        'Versi ${controller.versiApp.value ?? '…'}',
+                        key: const Key('versi-app'),
+                        style: subjudul,
+                      ),
                     ),
                   ),
                   const Divider(),
@@ -178,11 +229,11 @@ class PengaturanView extends GetView<PengaturanController> {
                     () => ListTile(
                       contentPadding: _paddingBaris,
                       horizontalTitleGap: _jarakJudul,
-                      leading: const _KotakIkon(
-                        latar: AppColors.latar,
+                      leading: KotakIkon(
+                        latar: context.palet.latar,
                         child: Icon(
                           Icons.menu_book_outlined,
-                          color: AppColors.tinta,
+                          color: context.palet.tinta,
                         ),
                       ),
                       title: Text('Data resep', style: teks.titleMedium),
@@ -200,42 +251,6 @@ class PengaturanView extends GetView<PengaturanController> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _JudulBagian extends StatelessWidget {
-  final String teks;
-
-  const _JudulBagian(this.teks);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: AppSpacing.xs, bottom: AppSpacing.s),
-      child: Text(teks, style: Theme.of(context).textTheme.labelSmall),
-    );
-  }
-}
-
-/// Kotak ikon 40×40 yang sama untuk semua baris (leading).
-class _KotakIkon extends StatelessWidget {
-  final Widget child;
-  final Color latar;
-
-  const _KotakIkon({required this.child, required this.latar});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: latar,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusS),
-      ),
-      child: child,
     );
   }
 }

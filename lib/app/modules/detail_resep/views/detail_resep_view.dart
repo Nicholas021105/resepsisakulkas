@@ -8,6 +8,7 @@ import '../../../data/models/bahan_model.dart';
 import '../../../data/models/hasil_cocok.dart';
 import '../../../data/models/resep_model.dart';
 import '../../../theme/app_colors.dart';
+import '../../../theme/app_palet.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_text.dart';
 import '../../../widgets/bottom_nav.dart';
@@ -52,7 +53,9 @@ class DetailResepView extends GetView<DetailResepController> {
                     Transform.scale(scale: 1 + 0.25 * sin(pi * t), child: anak),
                 child: Icon(
                   favorit ? Icons.favorite : Icons.favorite_border,
-                  color: favorit ? AppColors.hatiKoral : AppColors.tinta,
+                  color: favorit
+                      ? context.palet.hatiKoral
+                      : context.palet.tinta,
                 ),
               ),
             ),
@@ -93,7 +96,9 @@ class _Isi extends GetView<DetailResepController> {
               const SizedBox(height: AppSpacing.xs),
               Text(
                 r.deskripsi,
-                style: teks.bodyMedium?.copyWith(color: AppColors.tintaLembut),
+                style: teks.bodyMedium?.copyWith(
+                  color: context.palet.tintaLembut,
+                ),
               ),
               const SizedBox(height: AppSpacing.l),
               Wrap(
@@ -118,8 +123,8 @@ class _Isi extends GetView<DetailResepController> {
                         : 'Kurang ${hasil.kurang.length}',
                     style: teks.labelLarge?.copyWith(
                       color: hasil.siapDimasak
-                          ? AppColors.aksenTua
-                          : AppColors.wortelTeks,
+                          ? context.palet.aksenTua
+                          : context.palet.wortelTeks,
                     ),
                   ),
                 ],
@@ -167,7 +172,7 @@ class _PanelHeader extends GetView<DetailResepController> {
       key: const Key('detail-header'),
       padding: const EdgeInsets.all(AppSpacing.l),
       decoration: BoxDecoration(
-        color: AppColors.mintPucat,
+        color: context.palet.mintPucat,
         borderRadius: BorderRadius.circular(AppSpacing.radiusL),
       ),
       child: Row(
@@ -183,13 +188,13 @@ class _PanelHeader extends GetView<DetailResepController> {
                     height: 48,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: AppColors.permukaan,
+                      color: context.palet.permukaan,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: AppColors.magnet(b.kategori),
                         width: 2,
                       ),
-                      boxShadow: bayanganKartu,
+                      boxShadow: context.palet.bayanganKartu,
                     ),
                     child: IkonBahan.dari(b, ukuran: 32),
                   ),
@@ -218,14 +223,14 @@ class _Info extends StatelessWidget {
         vertical: AppSpacing.s,
       ),
       decoration: BoxDecoration(
-        color: AppColors.permukaan,
+        color: context.palet.permukaan,
         borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-        border: Border.all(color: AppColors.garis),
+        border: Border.all(color: context.palet.garis),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(ikon, size: 16, color: AppColors.tintaLembut),
+          Icon(ikon, size: 16, color: context.palet.tintaLembut),
           const SizedBox(width: AppSpacing.xs),
           Text(teks, style: Theme.of(context).textTheme.labelMedium),
         ],
@@ -245,10 +250,10 @@ class _KartuBahan extends StatelessWidget {
     return Container(
       key: const Key('kartu-bahan'),
       decoration: BoxDecoration(
-        color: AppColors.permukaan,
+        color: context.palet.permukaan,
         borderRadius: BorderRadius.circular(AppSpacing.radiusM),
-        border: Border.all(color: AppColors.garis),
-        boxShadow: bayanganKartu,
+        border: Border.all(color: context.palet.garis),
+        boxShadow: context.palet.bayanganKartu,
       ),
       clipBehavior: Clip.antiAlias,
       child: LayoutBuilder(
@@ -284,7 +289,7 @@ class _BarisBahan extends GetView<DetailResepController> {
     final kurang = !ada && !bahan.opsional;
     return Container(
       key: Key('bahan-${bahan.bahanId}'),
-      color: kurang ? AppColors.wortelLembut : AppColors.permukaan,
+      color: kurang ? context.palet.wortelLembut : context.palet.permukaan,
       padding: const EdgeInsets.all(AppSpacing.m),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,8 +298,10 @@ class _BarisBahan extends GetView<DetailResepController> {
             ada ? Icons.check_circle : Icons.remove_circle_outline,
             size: 22,
             color: ada
-                ? AppColors.aksen
-                : (kurang ? AppColors.wortelTeks : AppColors.tintaLembut),
+                ? context.palet.aksen
+                : (kurang
+                      ? context.palet.wortelTeks
+                      : context.palet.tintaLembut),
           ),
           const SizedBox(width: AppSpacing.s),
           data != null
@@ -341,15 +348,17 @@ class _ChipLabel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s - 2),
       decoration: BoxDecoration(
-        color: AppColors.permukaan,
+        color: context.palet.permukaan,
         borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-        border: Border.all(color: kurang ? AppColors.wortel : AppColors.garis),
+        border: Border.all(
+          color: kurang ? context.palet.wortel : context.palet.garis,
+        ),
       ),
       child: Text(
         teks,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
           letterSpacing: 0,
-          color: kurang ? AppColors.wortelTeks : AppColors.tintaLembut,
+          color: kurang ? context.palet.wortelTeks : context.palet.tintaLembut,
         ),
       ),
     );
@@ -389,12 +398,12 @@ class _BarisLangkah extends StatelessWidget {
           ),
         ),
         if (!terakhir)
-          const Positioned(
+          Positioned(
             left: diameter / 2 - 1,
             top: diameter + 2,
             bottom: 2,
             width: 2,
-            child: ColoredBox(color: AppColors.garis),
+            child: ColoredBox(color: context.palet.garis),
           ),
         Positioned(
           left: 0,
@@ -404,15 +413,15 @@ class _BarisLangkah extends StatelessWidget {
           child: Container(
             alignment: Alignment.center,
             padding: const EdgeInsets.all(AppSpacing.xs + 2),
-            decoration: const BoxDecoration(
-              color: AppColors.mintPucat,
+            decoration: BoxDecoration(
+              color: context.palet.mintPucat,
               shape: BoxShape.circle,
             ),
             child: FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
                 '$nomor',
-                style: AppText.angka(18, warna: AppColors.aksenTua),
+                style: AppText.angka(18, warna: context.palet.aksenTua),
               ),
             ),
           ),

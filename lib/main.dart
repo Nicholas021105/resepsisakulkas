@@ -5,19 +5,32 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 import 'app/bindings/initial_binding.dart';
+import 'app/controllers/tema_controller.dart';
+import 'app/data/services/storage_service.dart';
 import 'app/routes/app_pages.dart';
 import 'app/theme/app_theme.dart';
+import 'app/utils/migrasi_storage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await initializeDateFormatting('id_ID');
   Intl.defaultLocale = 'id_ID';
-  runApp(const ResepSisaKulkasApp());
+  final storage = StorageService();
+  try {
+    await migrasiStorage(storage, sekarang: DateTime.now());
+  } catch (_) {
+    // Migrasi yang gagal tidak boleh menghalangi aplikasi terbuka; semua
+    // pembacaan storage defensif dan migrasi dicoba lagi berikutnya.
+  }
+  runApp(ResepSisaKulkasApp(modeTema: TemaController.bacaMode(storage)));
 }
 
 class ResepSisaKulkasApp extends StatelessWidget {
-  const ResepSisaKulkasApp({super.key});
+  const ResepSisaKulkasApp({super.key, this.modeTema = ThemeMode.system});
+
+  /// Tema tersimpan, dipakai sejak frame pertama (tanpa kedip terang).
+  final ThemeMode modeTema;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +38,8 @@ class ResepSisaKulkasApp extends StatelessWidget {
       title: 'ResepSisaKulkas',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.terang,
+      darkTheme: AppTheme.gelap,
+      themeMode: modeTema,
       locale: const Locale('id', 'ID'),
       initialBinding: InitialBinding(),
       initialRoute: AppPages.initial,
