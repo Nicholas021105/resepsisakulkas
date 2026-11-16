@@ -17,6 +17,7 @@ import 'package:resepsisakulkas/app/modules/kulkas/controllers/kulkas_controller
 import 'package:resepsisakulkas/app/modules/kulkas/views/kulkas_view.dart';
 import 'package:resepsisakulkas/app/modules/masak/controllers/masak_controller.dart';
 import 'package:resepsisakulkas/app/modules/masak/views/masak_view.dart';
+import 'package:resepsisakulkas/app/modules/onboarding/controllers/onboarding_controller.dart';
 import 'package:resepsisakulkas/app/modules/resep/controllers/resep_controller.dart';
 import 'package:resepsisakulkas/app/routes/app_routes.dart';
 import 'package:resepsisakulkas/app/utils/notifikasi.dart';
@@ -403,6 +404,22 @@ void main() {
           kondisi == KondisiData.kosong ? findsOneWidget : findsNothing,
           reason: konteks,
         );
+      },
+    );
+  });
+
+  testWidgets('onboarding: ketiga layar', (tester) async {
+    await uji(
+      tester,
+      '/selamat-datang',
+      rute: (_) => Routes.onboarding,
+      cek: (kondisi, konteks) async {
+        for (var i = 1; i < OnboardingController.jumlahHalaman; i++) {
+          Get.find<OnboardingController>().pageController.jumpToPage(i);
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull, reason: '$konteks | layar $i');
+        }
+        expect(find.text('Mulai tempel bahan'), findsOneWidget);
       },
     );
   });

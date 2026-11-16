@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
+import '../../../routes/app_routes.dart';
 import '../../../theme/app_palet.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../widgets/bottom_nav.dart';
@@ -223,6 +224,29 @@ class PengaturanView extends GetView<PengaturanController> {
                         style: subjudul,
                       ),
                     ),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    key: const Key('lihat-pengenalan'),
+                    contentPadding: _paddingBaris,
+                    horizontalTitleGap: _jarakJudul,
+                    leading: KotakIkon(
+                      latar: context.palet.latar,
+                      child: Icon(
+                        Icons.waving_hand_outlined,
+                        color: context.palet.tinta,
+                      ),
+                    ),
+                    title: Text('Lihat pengenalan', style: teks.titleMedium),
+                    subtitle: Text(
+                      'Tiga layar singkat tentang cara pakai.',
+                      style: subjudul,
+                    ),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      color: context.palet.tintaLembut,
+                    ),
+                    onTap: () => Get.toNamed(Routes.onboarding),
                   ),
                   const Divider(),
                   Obx(

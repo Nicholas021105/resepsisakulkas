@@ -8,6 +8,7 @@ import 'app/bindings/initial_binding.dart';
 import 'app/controllers/tema_controller.dart';
 import 'app/data/services/storage_service.dart';
 import 'app/routes/app_pages.dart';
+import 'app/routes/app_routes.dart';
 import 'app/theme/app_theme.dart';
 import 'app/utils/migrasi_storage.dart';
 
@@ -23,11 +24,26 @@ Future<void> main() async {
     // Migrasi yang gagal tidak boleh menghalangi aplikasi terbuka; semua
     // pembacaan storage defensif dan migrasi dicoba lagi berikutnya.
   }
-  runApp(ResepSisaKulkasApp(modeTema: TemaController.bacaMode(storage)));
+  runApp(
+    ResepSisaKulkasApp(
+      modeTema: TemaController.bacaMode(storage),
+      // Pemasangan baru melihat pengenalan dulu; pengguna lama (ditandai
+      // migrasi) langsung ke Kulkas.
+      ruteAwal: storage.bacaBool(StorageService.kunciOnboarding) == true
+          ? AppPages.initial
+          : Routes.onboarding,
+    ),
+  );
 }
 
 class ResepSisaKulkasApp extends StatelessWidget {
-  const ResepSisaKulkasApp({super.key, this.modeTema = ThemeMode.system});
+  const ResepSisaKulkasApp({
+    super.key,
+    this.modeTema = ThemeMode.system,
+    this.ruteAwal = AppPages.initial,
+  });
+
+  final String ruteAwal;
 
   /// Tema tersimpan, dipakai sejak frame pertama (tanpa kedip terang).
   final ThemeMode modeTema;
@@ -42,7 +58,7 @@ class ResepSisaKulkasApp extends StatelessWidget {
       themeMode: modeTema,
       locale: const Locale('id', 'ID'),
       initialBinding: InitialBinding(),
-      initialRoute: AppPages.initial,
+      initialRoute: ruteAwal,
       getPages: AppPages.routes,
       defaultTransition: Transition.fadeIn,
       transitionDuration: const Duration(milliseconds: 280),

@@ -10,6 +10,8 @@ import '../modules/favorit/bindings/favorit_binding.dart';
 import '../modules/kulkas/bindings/kulkas_binding.dart';
 import '../modules/masak/bindings/masak_binding.dart';
 import '../modules/masak/views/masak_view.dart';
+import '../modules/onboarding/bindings/onboarding_binding.dart';
+import '../modules/onboarding/views/onboarding_view.dart';
 import '../modules/pengaturan/bindings/pengaturan_binding.dart';
 import '../modules/pengaturan/views/pengaturan_view.dart';
 import '../modules/resep/bindings/resep_binding.dart';
@@ -49,6 +51,12 @@ abstract class AppPages {
       page: () => const MasakView(),
       binding: MasakBinding(),
       transition: Transition.downToUp,
+    ),
+    GetPage(
+      name: Routes.onboarding,
+      page: () => const OnboardingView(),
+      binding: OnboardingBinding(),
+      transition: Transition.fadeIn,
     ),
     GetPage(
       name: Routes.pengaturan,
