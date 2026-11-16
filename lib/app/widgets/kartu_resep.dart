@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../data/models/bahan_model.dart';
 import '../data/models/hasil_cocok.dart';
+import '../data/models/resep_model.dart';
 import '../data/services/katalog_service.dart';
 import '../modules/belanja/controllers/belanja_controller.dart';
 import '../routes/app_routes.dart';
@@ -11,20 +12,82 @@ import '../theme/app_spacing.dart';
 import '../utils/kesegaran.dart';
 import 'ikon_bahan.dart';
 import 'kulkas_widgets.dart';
+import 'sampul_resep.dart';
 import 'umum_widgets.dart';
 
-/// Kartu resep: strip status di kiri, cincin persentase, nama, info singkat,
-/// pratinjau bahan, dan chip bahan yang kurang.
+/// Tag Hero sampul resep. [sumber] membedakan kartu yang sama di tempat
+/// berbeda (tab Resep, Favorit, saran), karena semua tab hidup bersamaan.
+String tagSampul(String sumber, String resepId) => 'sampul-$sumber-$resepId';
+
+/// Membuka detail resep; sampul "terbang" dari kartu ke halaman detail.
+void bukaDetailResep(Resep resep, String sumber) => Get.toNamed(
+  Routes.keDetail(resep.id),
+  arguments: tagSampul(sumber, resep.id),
+);
+
+/// Sampul resep + cincin persentase menumpang di sudut kanan bawah.
+class SampulDenganCincin extends StatelessWidget {
+  final HasilCocok hasil;
+  final String sumber;
+  final double ukuran;
+
+  const SampulDenganCincin({
+    super.key,
+    required this.hasil,
+    required this.sumber,
+    this.ukuran = AppSpacing.sampul,
+  });
+
+  static const _cincin = 42.0;
+  static const _keluar = AppSpacing.s;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palet;
+    return SizedBox(
+      width: ukuran + _keluar,
+      height: ukuran + _keluar,
+      child: Stack(
+        children: [
+          Hero(
+            tag: tagSampul(sumber, hasil.resep.id),
+            child: SampulResep(resep: hasil.resep, ukuran: ukuran),
+          ),
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: p.permukaan,
+                shape: BoxShape.circle,
+              ),
+              child: CincinPersen(persen: hasil.persen, ukuran: _cincin),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Kartu resep: strip status di kiri, sampul bergambar + cincin persentase,
+/// nama, info singkat, pratinjau bahan, label "segera habis", dan chip
+/// bahan yang kurang (dengan tombol tambah ke belanja).
 class KartuResep extends StatelessWidget {
   final HasilCocok hasil;
 
-  const KartuResep({super.key, required this.hasil});
+  /// Tempat kartu ini tampil (untuk tag Hero).
+  final String sumber;
+
+  const KartuResep({super.key, required this.hasil, this.sumber = 'resep'});
 
   static const lebarStrip = 4.0;
 
   @override
   Widget build(BuildContext context) {
     final teks = Theme.of(context).textTheme;
+    final p = context.palet;
     final r = hasil.resep;
     final byId = Get.find<KatalogService>().katalog.value?.bahanById ?? {};
     final namaKurang = [for (final id in hasil.kurang) byId[id]?.nama ?? id];
@@ -33,32 +96,32 @@ class KartuResep extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.m),
       decoration: BoxDecoration(
         borderRadius: radius,
-        boxShadow: context.palet.bayanganKartu,
+        boxShadow: p.bayanganKartu,
       ),
       child: Material(
-        color: context.palet.permukaan,
+        color: p.permukaan,
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
           borderRadius: radius,
-          side: BorderSide(color: context.palet.garis, width: 0.6),
+          side: BorderSide(color: p.garis, width: 0.6),
         ),
         child: InkWell(
           key: Key('resep-${r.id}'),
-          onTap: () => Get.toNamed(Routes.keDetail(r.id)),
+          onTap: () => bukaDetailResep(r, sumber),
           child: Stack(
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.l + lebarStrip,
-                  AppSpacing.l,
-                  AppSpacing.l,
-                  AppSpacing.l,
+                  AppSpacing.m + lebarStrip,
+                  AppSpacing.m,
+                  AppSpacing.m,
+                  AppSpacing.m,
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CincinPersen(persen: hasil.persen),
-                    const SizedBox(width: AppSpacing.m + 2),
+                    SampulDenganCincin(hasil: hasil, sumber: sumber),
+                    const SizedBox(width: AppSpacing.m),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,7 +175,7 @@ class KartuResep extends StatelessWidget {
                 top: 0,
                 bottom: 0,
                 width: lebarStrip,
-                child: ColoredBox(color: context.palet.cincin(hasil.persen)),
+                child: ColoredBox(color: p.cincin(hasil.persen)),
               ),
             ],
           ),
@@ -183,22 +246,22 @@ class ChipStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palet;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.s + 2,
         vertical: 3,
       ),
       decoration: BoxDecoration(
-        color: kurang ? context.palet.wortelLembut : context.palet.aksenLembut,
+        color: kurang ? p.wortelLembut : p.aksenLembut,
         borderRadius: BorderRadius.circular(AppSpacing.radiusS),
       ),
       child: Text(
         teks,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-          color: kurang ? context.palet.wortelTeks : context.palet.aksenTua,
-        ),
+        style: Theme.of(context).textTheme.labelMedium
+            ?.copyWith(color: kurang ? p.wortelTeks : p.aksenTua),
       ),
     );
   }
@@ -218,6 +281,7 @@ class _PratinjauBahan extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palet;
     final wajib = [
       for (final b in hasil.resep.bahan)
         if (!b.opsional && byId[b.bahanId] != null) byId[b.bahanId]!,
@@ -244,9 +308,9 @@ class _PratinjauBahan extends StatelessWidget {
             alignment: Alignment.center,
             decoration: kurang.contains(b.id)
                 ? BoxDecoration(
-                    color: context.palet.wortelLembut,
+                    color: p.wortelLembut,
                     shape: BoxShape.circle,
-                    border: Border.all(color: context.palet.wortel, width: 1.2),
+                    border: Border.all(color: p.wortel, width: 1.2),
                   )
                 : null,
             child: IkonBahan.dari(b, ukuran: ukuranIkon),
@@ -255,7 +319,7 @@ class _PratinjauBahan extends StatelessWidget {
           Text(
             '+$sisa',
             style: Theme.of(context).textTheme.labelMedium
-                ?.copyWith(color: context.palet.tintaLembut),
+                ?.copyWith(color: p.tintaLembut),
           ),
       ],
     );

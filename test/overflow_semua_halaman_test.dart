@@ -332,6 +332,14 @@ void main() {
         Get.find<ResepController>().pilihFilter(FilterHasil.semua);
       },
       cek: (kondisi, konteks) async {
+        // Di layar kecil kartu pertama berada di bawah pencarian, kategori,
+        // dan kartu saran: gulir sampai terlihat.
+        await tester.scrollUntilVisible(
+          find.byType(KartuResep, skipOffstage: false).first,
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.pumpAndSettle();
         expect(find.byType(KartuResep), findsWidgets, reason: konteks);
         expect(
           find.byWidgetPredicate(

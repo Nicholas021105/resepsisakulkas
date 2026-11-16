@@ -15,12 +15,18 @@ class DetailResepController extends GetxController {
   final FavoritController _favorit = Get.find<FavoritController>();
 
   late final String id;
+
+  /// Tag Hero sampul yang dikirim kartu asal lewat `Get.arguments`; null
+  /// bila halaman dibuka langsung (tanpa animasi Hero).
+  late final String? tagHero;
   final hasil = Rxn<HasilCocok>();
 
   @override
   void onInit() {
     super.onInit();
     id = Get.parameters['id'] ?? '';
+    final argumen = Get.arguments;
+    tagHero = argumen is String ? argumen : null;
     everAll([
       _katalog.katalog,
       _kulkas.bahanDimiliki,

@@ -13,7 +13,9 @@ import '../../../theme/app_spacing.dart';
 import '../../../theme/app_text.dart';
 import '../../../widgets/bottom_nav.dart';
 import '../../../widgets/ikon_bahan.dart';
+import '../../../widgets/kartu_resep.dart';
 import '../../../widgets/kulkas_widgets.dart';
+import '../../../widgets/sampul_resep.dart';
 import '../../belanja/controllers/belanja_controller.dart';
 import '../controllers/detail_resep_controller.dart';
 
@@ -112,8 +114,14 @@ class _Isi extends GetView<DetailResepController> {
                   ),
                   _Info(ikon: Icons.people_outline, teks: '${r.porsi} porsi'),
                   _Info(ikon: Icons.signal_cellular_alt, teks: r.tingkat.label),
+                  if (r.kategori != KategoriResep.lainnya)
+                    _Info(ikon: Icons.restaurant_menu, teks: r.kategori.label),
                 ],
               ),
+              if (hasil.pakaiSegera) ...[
+                const SizedBox(height: AppSpacing.m),
+                LabelSegera(hasil: hasil, byId: controller.bahanById),
+              ],
               const SizedBox(height: AppSpacing.xl),
               Row(
                 children: [
@@ -156,58 +164,82 @@ class _Isi extends GetView<DetailResepController> {
   }
 }
 
-/// Panel mint pucat: ikon bahan utama (maks 4) sebagai "magnet" + cincin
-/// persentase, supaya halaman tidak hanya teks.
+/// Panel mint pucat: sampul resep (tujuan animasi Hero dari kartu), cincin
+/// persentase, dan ikon bahan utama (maks 5) sebagai "magnet".
 class _PanelHeader extends GetView<DetailResepController> {
   final HasilCocok hasil;
 
   const _PanelHeader({required this.hasil});
 
-  static const maks = 4;
+  static const maks = 5;
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palet;
     final byId = controller.bahanById;
     final utama = <Bahan>[
       for (final b in hasil.resep.bahan)
         if (!b.opsional && !(byId[b.bahanId]?.bumbuDasar ?? true))
           byId[b.bahanId]!,
     ].take(maks);
+    final sampul = SampulResep(
+      resep: hasil.resep,
+      ukuran: 112,
+      radius: AppSpacing.radiusL - AppSpacing.s,
+    );
+    final tag = controller.tagHero;
     return Container(
       key: const Key('detail-header'),
-      padding: const EdgeInsets.all(AppSpacing.l),
+      padding: const EdgeInsets.all(AppSpacing.m),
       decoration: BoxDecoration(
-        color: context.palet.mintPucat,
+        color: p.mintPucat,
         borderRadius: BorderRadius.circular(AppSpacing.radiusL),
       ),
       child: Row(
         children: [
+          tag == null ? sampul : Hero(tag: tag, child: sampul),
+          const SizedBox(width: AppSpacing.m),
           Expanded(
-            child: Wrap(
-              spacing: AppSpacing.s,
-              runSpacing: AppSpacing.s,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (final b in utama)
-                  Container(
-                    width: 48,
-                    height: 48,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: context.palet.permukaan,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppColors.magnet(b.kategori),
-                        width: 2,
+                Row(
+                  children: [
+                    CincinPersen(persen: hasil.persen, ukuran: 60),
+                    const SizedBox(width: AppSpacing.s),
+                    Expanded(
+                      child: Text(
+                        'cocok dengan isi kulkasmu',
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
-                      boxShadow: context.palet.bayanganKartu,
                     ),
-                    child: IkonBahan.dari(b, ukuran: 32),
-                  ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.s),
+                Wrap(
+                  spacing: AppSpacing.xs,
+                  runSpacing: AppSpacing.xs,
+                  children: [
+                    for (final b in utama)
+                      Container(
+                        width: 36,
+                        height: 36,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: p.permukaan,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.magnet(b.kategori),
+                            width: 2,
+                          ),
+                        ),
+                        child: IkonBahan.dari(b, ukuran: 22),
+                      ),
+                  ],
+                ),
               ],
             ),
           ),
-          const SizedBox(width: AppSpacing.m),
-          CincinPersen(persen: hasil.persen, ukuran: 68),
         ],
       ),
     );

@@ -48,7 +48,8 @@ class FavoritView extends GetView<FavoritController> {
               AppSpacing.xl,
             ),
             itemCount: daftar.length,
-            itemBuilder: (_, i) => KartuResep(hasil: daftar[i]),
+            itemBuilder: (_, i) =>
+                KartuResep(hasil: daftar[i], sumber: 'favorit'),
           );
         }),
       ),

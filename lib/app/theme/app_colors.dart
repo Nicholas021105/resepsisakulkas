@@ -95,6 +95,31 @@ abstract class AppColors {
   static const tiramLabel = Color(0xFFF3E9D2);
   static const tiramCangkang = Color(0xFF8C8277);
 
+  /// Sampul resep gambar sendiri (SampulResep): ubin pastel per nada,
+  /// warna sajian + sisi gelapnya, dan perkakas dapur.
+  static const sampulHijau = Color(0xFFD9F0DD);
+  static const sampulMerah = Color(0xFFFBDDD6);
+  static const sampulCokelat = Color(0xFFEFE0CF);
+  static const sampulKuning = Color(0xFFFBEFC4);
+  static const sampulKrem = Color(0xFFF1E9DC);
+  static const sampulEmas = Color(0xFFFBE7C6);
+  static const sajianHijau = Color(0xFF5FAE6A);
+  static const sajianHijauTua = Color(0xFF3C8348);
+  static const sajianMerah = Color(0xFFD9482F);
+  static const sajianMerahTua = Color(0xFFA9301D);
+  static const sajianCokelat = Color(0xFF8A552F);
+  static const sajianCokelatTua = Color(0xFF5E3719);
+  static const sajianKuning = Color(0xFFF2C230);
+  static const sajianKuningTua = Color(0xFFC79410);
+  static const sajianKrem = Color(0xFFF5E6BC);
+  static const sajianKremTua = Color(0xFFD9BF85);
+  static const sajianEmas = Color(0xFFE3A548);
+  static const sajianEmasTua = Color(0xFFB67A22);
+  static const wajan = Color(0xFF3A4A46);
+  static const wajanDalam = Color(0xFF55675F);
+  static const batu = Color(0xFF7D8884);
+  static const batuDalam = Color(0xFF5F6B67);
+
   /// Warna magnet per kategori bahan (pastel yang sama di kedua tema; teks
   /// di atasnya selalu `palet.diMagnet`).
   static Color magnet(KategoriBahan kategori) => switch (kategori) {
