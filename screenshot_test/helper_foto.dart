@@ -75,14 +75,53 @@ Future<void> foto(WidgetTester tester, String app, String nama) async {
   final batas = tester.renderObject<RenderRepaintBoundary>(
     find.byKey(kunciLayar),
   );
-  await tester.runAsync(() async {
-    final gambar = await batas.toImage(pixelRatio: 3);
-    final png = await gambar.toByteData(format: ui.ImageByteFormat.png);
-    gambar.dispose();
-    // Direktori kerja `flutter test` adalah folder app.
-    final berkas = File('../screenshots/$app/$nama.png');
-    berkas.parent.createSync(recursive: true);
-    berkas.writeAsBytesSync(png!.buffer.asUint8List());
-  });
-  debugDisableShadows = true;
+  try {
+    await tester.runAsync(() async {
+      final gambar = await batas.toImage(pixelRatio: 3);
+      final png = await gambar.toByteData(format: ui.ImageByteFormat.png);
+      gambar.dispose();
+      // Direktori kerja `flutter test` adalah folder app.
+      final berkas = File('../screenshots/$app/$nama.png');
+      berkas.parent.createSync(recursive: true);
+      await tulisDenganUlang(berkas, png!.buffer.asUint8List());
+    });
+  } finally {
+    // Dikembalikan juga saat penulisan gagal, supaya test berikutnya tidak
+    // ikut gagal karena flag bayangan tertinggal.
+    debugDisableShadows = true;
+  }
+}
+
+/// Menimpa [berkas], mencoba lagi bila sedang dikunci.
+///
+/// Di Windows, menimpa PNG yang sedang dipetakan ke memori oleh proses lain
+/// (pratinjau/thumbnail gambar, pengindeks, antivirus yang memindai berkas
+/// yang baru ditulis) gagal dengan `FileSystemException` errno 1224 "user-
+/// mapped section open". Kuncinya hanya sesaat, jadi cukup ditunggu. Inilah
+/// penyebab screenshot test sesekali gagal saat dijalankan tepat setelah
+/// run sebelumnya menulis berkas yang sama.
+Future<void> tulisDenganUlang(
+  File berkas,
+  List<int> isi, {
+  int maksCoba = 25,
+  Duration jeda = const Duration(milliseconds: 200),
+  void Function(File berkas, List<int> isi)? tulis,
+}) async {
+  final menulis = tulis ?? (File f, List<int> b) => f.writeAsBytesSync(b);
+  for (var coba = 1; ; coba++) {
+    try {
+      menulis(berkas, isi);
+      return;
+    } on FileSystemException catch (galat) {
+      if (coba >= maksCoba) {
+        throw FileSystemException(
+          'Screenshot tidak bisa ditulis setelah $coba kali mencoba; berkas '
+          'masih dibuka program lain (penampil gambar?). Tutup lalu ulangi',
+          berkas.path,
+          galat.osError,
+        );
+      }
+      await Future<void>.delayed(jeda);
+    }
+  }
 }
