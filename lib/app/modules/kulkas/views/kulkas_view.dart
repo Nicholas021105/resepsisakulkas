@@ -8,10 +8,14 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_palet.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_text.dart';
+import '../../../utils/notifikasi.dart';
 import '../../../widgets/bottom_nav.dart';
 import '../../../widgets/ikon_bahan.dart';
+import '../../../widgets/kerangka.dart';
 import '../../../widgets/kulkas_widgets.dart';
 import '../../../widgets/magnet_bahan.dart';
+import '../../../widgets/umum_widgets.dart';
+import '../../resep/controllers/resep_controller.dart';
 import '../controllers/kulkas_controller.dart';
 
 class KulkasView extends GetView<KulkasController> {
@@ -102,13 +106,15 @@ class KulkasView extends GetView<KulkasController> {
   }
 }
 
-/// Kulkas kosong: ilustrasi + ajakan. Terisi: jumlah bahan + Kosongkan.
+/// Kulkas kosong: ilustrasi + ajakan. Terisi: jumlah bahan + Kosongkan,
+/// lalu banner bahan yang segera habis (atau petunjuk tekan lama).
 class _Ringkasan extends GetView<KulkasController> {
   const _Ringkasan();
 
   @override
   Widget build(BuildContext context) {
     final teks = Theme.of(context).textTheme;
+    final p = context.palet;
     return Obx(() {
       if (controller.kulkasKosong) {
         return Padding(
@@ -131,9 +137,7 @@ class _Ringkasan extends GetView<KulkasController> {
                     Text(
                       'Tempel bahan pertamamu dengan mengetuk magnet di '
                       'bawah.',
-                      style: teks.bodyMedium?.copyWith(
-                        color: context.palet.tintaLembut,
-                      ),
+                      style: teks.bodyMedium?.copyWith(color: p.tintaLembut),
                     ),
                   ],
                 ),
@@ -143,6 +147,7 @@ class _Ringkasan extends GetView<KulkasController> {
         );
       }
       final terpilih = controller.bahanTerpilih;
+      final segera = controller.daftarSegera;
       return Padding(
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.l,
@@ -158,7 +163,7 @@ class _Ringkasan extends GetView<KulkasController> {
               children: [
                 Expanded(
                   child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
+                    duration: AppGerak.cepat,
                     layoutBuilder: (anak, sebelumnya) => Stack(
                       alignment: Alignment.centerLeft,
                       children: [...sebelumnya, ?anak],
@@ -179,12 +184,105 @@ class _Ringkasan extends GetView<KulkasController> {
             ),
             Padding(
               padding: const EdgeInsets.only(right: AppSpacing.s),
-              child: _PratinjauKulkas(bahan: terpilih),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _PratinjauKulkas(bahan: terpilih),
+                  const SizedBox(height: AppSpacing.m),
+                  AnimatedSize(
+                    duration: AppGerak.sedang,
+                    curve: Curves.easeOut,
+                    alignment: Alignment.topCenter,
+                    child: segera.isEmpty
+                        ? Row(
+                            key: const Key('petunjuk-tekan-lama'),
+                            children: [
+                              Icon(
+                                Icons.touch_app_outlined,
+                                size: 16,
+                                color: p.tintaLembut,
+                              ),
+                              const SizedBox(width: AppSpacing.xs),
+                              Expanded(
+                                child: Text(
+                                  'Tekan lama magnet untuk menandai bahan '
+                                  'yang harus segera dihabiskan.',
+                                  style: teks.bodySmall,
+                                ),
+                              ),
+                            ],
+                          )
+                        : _BannerSegera(bahan: segera),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       );
     });
+  }
+}
+
+/// Banner kuning "n bahan segera habiskan" → membuka resep yang memakainya.
+class _BannerSegera extends StatelessWidget {
+  final List<Bahan> bahan;
+
+  const _BannerSegera({required this.bahan});
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palet;
+    final teks = Theme.of(context).textTheme;
+    final radius = BorderRadius.circular(AppSpacing.radiusM);
+    return Material(
+      color: p.pisangLembut,
+      borderRadius: radius,
+      child: InkWell(
+        key: const Key('banner-segera'),
+        borderRadius: radius,
+        onTap: () {
+          HapticFeedback.lightImpact();
+          // Resep yang memakai bahan ini ada di urutan teratas "Semua".
+          Get.find<ResepController>().tampilkanPenyelamat();
+          Get.find<MainController>().pindahTab(MainController.tabResep);
+        },
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: AppSpacing.sentuh),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.m,
+              vertical: AppSpacing.s,
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.hourglass_bottom, color: p.pisangTeks),
+                const SizedBox(width: AppSpacing.s),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${bahan.length} bahan segera habiskan',
+                        style: teks.titleSmall?.copyWith(color: p.pisangTeks),
+                      ),
+                      Text(
+                        '${bahan.map((b) => b.nama).join(', ')} · '
+                        'lihat resepnya',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: teks.bodySmall?.copyWith(color: p.pisangTeks),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right, color: p.pisangTeks),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -273,23 +371,20 @@ class _DaftarBahan extends GetView<KulkasController> {
   @override
   Widget build(BuildContext context) {
     final teks = Theme.of(context).textTheme;
+    final p = context.palet;
     return Obx(() {
-      if (!controller.katalogSiap) {
-        return const Padding(
-          padding: EdgeInsets.all(AppSpacing.xxl),
-          child: Center(child: CircularProgressIndicator()),
-        );
-      }
+      if (!controller.katalogSiap) return const KerangkaMagnet();
       final kelompok = controller.bahanPerKategori;
       // Dibaca di dalam Obx agar status magnet ikut diperbarui.
       final dimiliki = controller.bahanDimiliki.toSet();
+      final segera = controller.bahanSegera;
       if (kelompok.isEmpty) {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
           child: Text(
             'Bahan tidak ditemukan. Coba kata lain.',
             textAlign: TextAlign.center,
-            style: teks.bodyMedium?.copyWith(color: context.palet.tintaLembut),
+            style: teks.bodyMedium?.copyWith(color: p.tintaLembut),
           ),
         );
       }
@@ -298,24 +393,27 @@ class _DaftarBahan extends GetView<KulkasController> {
         children: [
           for (final MapEntry(key: kategori, value: daftar)
               in kelompok.entries) ...[
-            Padding(
-              padding: const EdgeInsets.only(
-                top: AppSpacing.s,
-                bottom: AppSpacing.m,
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: AppColors.magnet(kategori),
-                      shape: BoxShape.circle,
+            Semantics(
+              header: true,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  top: AppSpacing.s,
+                  bottom: AppSpacing.m,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: AppColors.magnet(kategori),
+                        shape: BoxShape.circle,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.s),
-                  Text(kategori.label.toUpperCase(), style: teks.labelSmall),
-                ],
+                    const SizedBox(width: AppSpacing.s),
+                    Text(kategori.label.toUpperCase(), style: teks.labelSmall),
+                  ],
+                ),
               ),
             ),
             Wrap(
@@ -327,12 +425,112 @@ class _DaftarBahan extends GetView<KulkasController> {
                     key: Key('magnet-${b.id}'),
                     bahan: b,
                     dipilih: dimiliki.contains(b.id),
+                    segera: segera.contains(b.id),
                     onTap: () => controller.toggle(b.id),
+                    onTekanLama: dimiliki.contains(b.id)
+                        ? () => bukaLembar<void>(LembarOpsiBahan(bahan: b))
+                        : null,
                   ),
               ],
             ),
             const SizedBox(height: AppSpacing.l),
           ],
+        ],
+      );
+    });
+  }
+}
+
+/// Lembar opsi satu bahan di kulkas (tekan lama magnet): kesegaran, tandai
+/// segera habiskan / masih segar, dan lepas.
+class LembarOpsiBahan extends GetView<KulkasController> {
+  final Bahan bahan;
+
+  const LembarOpsiBahan({super.key, required this.bahan});
+
+  @override
+  Widget build(BuildContext context) {
+    final teks = Theme.of(context).textTheme;
+    final p = context.palet;
+    return Obx(() {
+      final ditandai = controller.ditandaiSegera.contains(bahan.id);
+      final segera = controller.bahanSegera.contains(bahan.id);
+      return Column(
+        key: const Key('lembar-opsi-bahan'),
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: AppSpacing.tombol,
+                height: AppSpacing.tombol,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.magnet(bahan.kategori),
+                  shape: BoxShape.circle,
+                ),
+                child: IkonBahan.dari(bahan, ukuran: 32),
+              ),
+              const SizedBox(width: AppSpacing.m),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(bahan.nama, style: teks.titleLarge),
+                    Text(
+                      controller.keterangan(bahan),
+                      key: const Key('keterangan-kesegaran'),
+                      style: teks.bodyMedium?.copyWith(
+                        color: segera ? p.pisangTeks : p.tintaLembut,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.l),
+          if (!ditandai)
+            AksiLembar(
+              key: const Key('opsi-segera'),
+              ikon: Icons.hourglass_bottom,
+              judul: 'Tandai segera habiskan',
+              keterangan: 'Resep yang memakainya naik ke urutan atas.',
+              latarIkon: p.pisangLembut,
+              warnaIkon: p.pisangTeks,
+              onTap: () {
+                controller.toggleSegera(bahan.id);
+                tutupOverlay();
+              },
+            ),
+          if (segera)
+            AksiLembar(
+              key: const Key('opsi-segar'),
+              ikon: Icons.eco_outlined,
+              judul: 'Masih segar',
+              keterangan: ditandai
+                  ? 'Hapus tanda segera habiskan.'
+                  : 'Hitung ulang kesegarannya mulai hari ini.',
+              latarIkon: p.aksenLembut,
+              warnaIkon: p.aksenTua,
+              onTap: () {
+                controller.tandaiSegar(bahan.id);
+                tutupOverlay();
+              },
+            ),
+          AksiLembar(
+            key: const Key('opsi-lepas'),
+            ikon: Icons.remove_circle_outline,
+            judul: 'Lepas dari kulkas',
+            keterangan: 'Bahan ini sudah habis atau tidak ada lagi.',
+            latarIkon: p.bahayaLembut,
+            warnaIkon: p.bahaya,
+            onTap: () {
+              controller.lepas(bahan.id);
+              tutupOverlay();
+            },
+          ),
         ],
       );
     });
@@ -348,8 +546,9 @@ class _TombolLihatResep extends GetView<KulkasController> {
     return Obx(() {
       final kosong = controller.kulkasKosong;
       final jumlah = controller.jumlahResepCocok;
+      final p = context.palet;
       final gaya = Theme.of(context).textTheme.labelLarge
-          ?.copyWith(color: context.palet.diAksen);
+          ?.copyWith(color: p.diAksen);
       return SizedBox(
         width: double.infinity,
         child: FilledButton(
@@ -358,7 +557,7 @@ class _TombolLihatResep extends GetView<KulkasController> {
               ? null
               : () {
                   HapticFeedback.lightImpact();
-                  Get.find<MainController>().pindahTab(1);
+                  Get.find<MainController>().pindahTab(MainController.tabResep);
                 },
           child: FittedBox(
             fit: BoxFit.scaleDown,
@@ -369,7 +568,7 @@ class _TombolLihatResep extends GetView<KulkasController> {
                     children: [
                       Text('Lihat ', style: gaya),
                       AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 250),
+                        duration: AppGerak.sedang,
                         transitionBuilder: (anak, animasi) => ScaleTransition(
                           scale: animasi,
                           child: FadeTransition(opacity: animasi, child: anak),
@@ -377,10 +576,7 @@ class _TombolLihatResep extends GetView<KulkasController> {
                         child: Text(
                           '$jumlah',
                           key: ValueKey(jumlah),
-                          style: AppText.angka(
-                            18,
-                            warna: context.palet.diAksen,
-                          ),
+                          style: AppText.angka(18, warna: p.diAksen),
                         ),
                       ),
                       Text(' resep cocok', style: gaya),

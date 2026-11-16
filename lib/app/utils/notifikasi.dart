@@ -121,3 +121,48 @@ void konfirmasi({
 /// GetX mengantre snackbar; snackbar yang sedang tampil ditutup agar umpan
 /// balik terbaru langsung terlihat.
 void _gantiSnackbar() => Get.closeCurrentSnackbar();
+
+/// Lembar bawah bergaya aplikasi: pegangan di atas, isi bisa digulir (aman
+/// untuk layar kecil dan huruf besar), mengikuti tema aktif.
+Future<T?> bukaLembar<T>(Widget isi) {
+  final p = _palet;
+  return Get.bottomSheet<T>(
+    SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: Get.height * 0.85),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: AppSpacing.xxl,
+              height: AppSpacing.xs,
+              margin: const EdgeInsets.symmetric(vertical: AppSpacing.m),
+              decoration: BoxDecoration(
+                color: p.garis,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+              ),
+            ),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.l,
+                  0,
+                  AppSpacing.l,
+                  AppSpacing.l,
+                ),
+                child: isi,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+    backgroundColor: p.permukaanTinggi,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(AppSpacing.radiusL),
+      ),
+    ),
+  );
+}

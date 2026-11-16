@@ -7,8 +7,10 @@ import '../data/services/katalog_service.dart';
 import '../routes/app_routes.dart';
 import '../theme/app_palet.dart';
 import '../theme/app_spacing.dart';
+import '../utils/kesegaran.dart';
 import 'ikon_bahan.dart';
 import 'kulkas_widgets.dart';
+import 'umum_widgets.dart';
 
 /// Kartu resep: strip status di kiri, cincin persentase, nama, info singkat,
 /// pratinjau bahan, dan chip bahan yang kurang.
@@ -75,6 +77,10 @@ class KartuResep extends StatelessWidget {
                           const SizedBox(height: AppSpacing.s),
                           _PratinjauBahan(hasil: hasil, byId: byId),
                           const SizedBox(height: AppSpacing.s),
+                          if (hasil.pakaiSegera) ...[
+                            LabelSegera(hasil: hasil, byId: byId),
+                            const SizedBox(height: AppSpacing.xs),
+                          ],
                           hasil.siapDimasak
                               ? const ChipStatus(
                                   teks: '✓ Semua bahan ada',
@@ -102,6 +108,28 @@ class KartuResep extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Label kuning "Pakai … yang segera habis" untuk resep penyelamat bahan.
+class LabelSegera extends StatelessWidget {
+  final HasilCocok hasil;
+  final Map<String, Bahan> byId;
+
+  const LabelSegera({super.key, required this.hasil, required this.byId});
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palet;
+    return LabelPil(
+      key: Key('segera-${hasil.resep.id}'),
+      ikon: Icons.hourglass_bottom,
+      teks: labelPakaiSegera([
+        for (final id in hasil.segera) byId[id]?.nama ?? id,
+      ]),
+      latar: p.pisangLembut,
+      warna: p.pisangTeks,
     );
   }
 }

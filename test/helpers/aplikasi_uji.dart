@@ -15,22 +15,34 @@ import 'palsu.dart';
 
 /// Mendaftarkan service & controller permanent seperti InitialBinding,
 /// tetapi dengan storage memori dan repository tiruan.
+///
+/// [sejak] (id → tanggal ISO), [segera], dan [mentah] mengisi storage
+/// sebelum controller dibuat; [jam] mengganti jam KulkasController.
 RepoTetap siapkanDependensi({
   required Future<HasilAmbil> Function() ambil,
   Set<String> kulkas = const {},
   Set<String> favorit = const {},
   bool bumbuDasar = true,
+  Map<String, String> sejak = const {},
+  Set<String> segera = const {},
+  Map<String, dynamic> mentah = const {},
+  DateTime Function()? jam,
 }) {
   Get.testMode = true;
   final storage = StorageMemori()
     ..set[StorageService.kunciKulkas] = {...kulkas}
     ..set[StorageService.kunciFavorit] = {...favorit}
-    ..boolean[StorageService.kunciBumbuDasar] = bumbuDasar;
+    ..set[StorageService.kunciSegera] = {...segera}
+    ..boolean[StorageService.kunciBumbuDasar] = bumbuDasar
+    ..mentah.addAll({
+      if (sejak.isNotEmpty) StorageService.kunciSejak: {...sejak},
+      ...mentah,
+    });
   Get.put<StorageService>(storage, permanent: true);
   Get.put(TemaController(), permanent: true);
   final repo = RepoTetap(ambil);
   Get.put(KatalogService(repo), permanent: true);
-  Get.put(KulkasController(), permanent: true);
+  Get.put(KulkasController(jam: jam), permanent: true);
   Get.put(FavoritController(), permanent: true);
   Get.put(MainController(), permanent: true);
   return repo;

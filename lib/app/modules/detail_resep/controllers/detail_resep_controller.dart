@@ -25,6 +25,8 @@ class DetailResepController extends GetxController {
       _katalog.katalog,
       _kulkas.bahanDimiliki,
       _kulkas.bumbuDasarAda,
+      _kulkas.ditandaiSegera,
+      _kulkas.sejak,
     ], (_) => _hitung());
     _hitung();
   }
@@ -60,6 +62,7 @@ class DetailResepController extends GetxController {
             _kulkas.bahanDimiliki,
             katalog!.bahanById,
             bumbuDasarAda: _kulkas.bumbuDasarAda.value,
+            segera: _kulkas.bahanSegera,
           );
   }
 }

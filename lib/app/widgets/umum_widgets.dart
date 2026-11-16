@@ -213,3 +213,67 @@ class LabelPil extends StatelessWidget {
     );
   }
 }
+
+/// Satu aksi di lembar bawah: ikon dalam kotak, judul, dan keterangan.
+class AksiLembar extends StatelessWidget {
+  final IconData ikon;
+  final String judul;
+  final String? keterangan;
+  final Color latarIkon;
+  final Color warnaIkon;
+  final VoidCallback onTap;
+
+  const AksiLembar({
+    super.key,
+    required this.ikon,
+    required this.judul,
+    required this.latarIkon,
+    required this.warnaIkon,
+    required this.onTap,
+    this.keterangan,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final teks = Theme.of(context).textTheme;
+    final radius = BorderRadius.circular(AppSpacing.radiusM);
+    return Material(
+      color: AppColors.transparan,
+      child: InkWell(
+        borderRadius: radius,
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: AppSpacing.tombol),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.s,
+              vertical: AppSpacing.s,
+            ),
+            child: Row(
+              children: [
+                KotakIkon(
+                  latar: latarIkon,
+                  child: Icon(ikon, color: warnaIkon),
+                ),
+                const SizedBox(width: AppSpacing.m),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(judul, style: teks.titleMedium),
+                      if (keterangan != null)
+                        Text(keterangan!, style: teks.bodySmall),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
