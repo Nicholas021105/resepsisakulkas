@@ -21,7 +21,6 @@ class FavoritView extends GetView<FavoritController> {
           SizedBox(width: AppSpacing.xs),
         ],
       ),
-      bottomNavigationBar: const BottomNav(),
       body: SafeArea(
         child: Obx(() {
           final daftar = controller.resepFavorit;

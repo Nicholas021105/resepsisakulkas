@@ -25,7 +25,6 @@ class ResepView extends GetView<ResepController> {
           SizedBox(width: AppSpacing.xs),
         ],
       ),
-      bottomNavigationBar: const BottomNav(),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:resepsisakulkas/app/controllers/main_controller.dart';
 import 'package:resepsisakulkas/app/data/models/katalog_model.dart';
 import 'package:resepsisakulkas/app/data/services/storage_service.dart';
 import 'package:resepsisakulkas/app/modules/favorit/controllers/favorit_controller.dart';
@@ -65,7 +66,10 @@ void main() {
     // Tombol pill "Lihat n resep cocok" (telur-kecap, dadar, orek, campur).
     expect(find.text('4'), findsOneWidget);
     await ketuk(tester, find.byKey(const Key('lihat-resep')));
-    expect(Get.currentRoute, Routes.resep);
+    // Pindah tab tidak lagi mengganti route (state tiap tab dipertahankan);
+    // yang berubah adalah tab aktif di cangkang.
+    expect(Get.find<MainController>().indexTab.value, MainController.tabResep);
+    expect(Get.currentRoute, Routes.kulkas);
     expect(find.byKey(const Key('resep-dadar')), findsOneWidget);
 
     // F4: detail lewat route dinamis.

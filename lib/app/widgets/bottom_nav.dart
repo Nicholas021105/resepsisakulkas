@@ -5,42 +5,41 @@ import 'package:get/get.dart';
 import '../controllers/main_controller.dart';
 import '../routes/app_routes.dart';
 
-/// Navigasi utama: Kulkas · Resep · Favorit. Tab yang menyala diambil dari
-/// route halaman ini sendiri, jadi selalu benar walau halaman dibuka
-/// langsung atau lewat `Get.offAllNamed` di luar [MainController.pindahTab].
+/// Navigasi utama: Kulkas · Resep · Favorit. Tab yang menyala mengikuti
+/// [MainController.indexTab].
 class BottomNav extends GetView<MainController> {
   const BottomNav({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final rute = ModalRoute.of(context)?.settings.name;
-    final index = MainController.ruteTab.indexOf(rute ?? '');
-    return NavigationBar(
-      selectedIndex: index < 0 ? controller.indexTab.value : index,
-      onDestinationSelected: (i) {
-        HapticFeedback.lightImpact();
-        controller.pindahTab(i);
-      },
-      destinations: const [
-        NavigationDestination(
-          key: Key('nav-kulkas'),
-          icon: Icon(Icons.kitchen_outlined),
-          selectedIcon: Icon(Icons.kitchen),
-          label: 'Kulkas',
-        ),
-        NavigationDestination(
-          key: Key('nav-resep'),
-          icon: Icon(Icons.menu_book_outlined),
-          selectedIcon: Icon(Icons.menu_book),
-          label: 'Resep',
-        ),
-        NavigationDestination(
-          key: Key('nav-favorit'),
-          icon: Icon(Icons.favorite_border),
-          selectedIcon: Icon(Icons.favorite),
-          label: 'Favorit',
-        ),
-      ],
+    return Obx(
+      () => NavigationBar(
+        selectedIndex: controller.indexTab.value,
+        onDestinationSelected: (i) {
+          HapticFeedback.selectionClick();
+          controller.pindahTab(i);
+        },
+        destinations: const [
+          NavigationDestination(
+            key: Key('nav-kulkas'),
+            icon: Icon(Icons.kitchen_outlined),
+            selectedIcon: Icon(Icons.kitchen),
+            label: 'Kulkas',
+          ),
+          NavigationDestination(
+            key: Key('nav-resep'),
+            icon: Icon(Icons.menu_book_outlined),
+            selectedIcon: Icon(Icons.menu_book),
+            label: 'Resep',
+          ),
+          NavigationDestination(
+            key: Key('nav-favorit'),
+            icon: Icon(Icons.favorite_border),
+            selectedIcon: Icon(Icons.favorite),
+            label: 'Favorit',
+          ),
+        ],
+      ),
     );
   }
 }

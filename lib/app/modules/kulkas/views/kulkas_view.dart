@@ -61,7 +61,6 @@ class KulkasView extends GetView<KulkasController> {
           SizedBox(width: AppSpacing.xs),
         ],
       ),
-      bottomNavigationBar: const BottomNav(),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, batas) {
