@@ -190,6 +190,11 @@ abstract class AppTheme {
         labelTextStyle: WidgetStatePropertyAll(teks.labelMedium),
         iconTheme: WidgetStatePropertyAll(IconThemeData(color: p.tinta)),
       ),
+      badgeTheme: BadgeThemeData(
+        backgroundColor: p.wortelTeks,
+        textColor: p.diBalik,
+        textStyle: teks.labelSmall?.copyWith(letterSpacing: 0),
+      ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: p.aksen,
         linearTrackColor: p.garis,

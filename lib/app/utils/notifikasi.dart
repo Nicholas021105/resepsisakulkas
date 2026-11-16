@@ -127,34 +127,13 @@ void _gantiSnackbar() => Get.closeCurrentSnackbar();
 Future<T?> bukaLembar<T>(Widget isi) {
   final p = _palet;
   return Get.bottomSheet<T>(
-    SafeArea(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: Get.height * 0.85),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: AppSpacing.xxl,
-              height: AppSpacing.xs,
-              margin: const EdgeInsets.symmetric(vertical: AppSpacing.m),
-              decoration: BoxDecoration(
-                color: p.garis,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-              ),
-            ),
-            Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.l,
-                  0,
-                  AppSpacing.l,
-                  AppSpacing.l,
-                ),
-                child: isi,
-              ),
-            ),
-          ],
+    // Naik bersama keyboard (lembar berisi kolom pencarian).
+    Builder(
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom,
         ),
+        child: _isiLembar(p, isi),
       ),
     ),
     backgroundColor: p.permukaanTinggi,
@@ -165,4 +144,37 @@ Future<T?> bukaLembar<T>(Widget isi) {
       ),
     ),
   );
+}
+
+Widget _isiLembar(Palet p, Widget isi) {
+  return (SafeArea(
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: Get.height * 0.85),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: AppSpacing.xxl,
+            height: AppSpacing.xs,
+            margin: const EdgeInsets.symmetric(vertical: AppSpacing.m),
+            decoration: BoxDecoration(
+              color: p.garis,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+            ),
+          ),
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.l,
+                0,
+                AppSpacing.l,
+                AppSpacing.l,
+              ),
+              child: isi,
+            ),
+          ),
+        ],
+      ),
+    ),
+  ));
 }

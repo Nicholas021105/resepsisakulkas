@@ -9,9 +9,13 @@ import 'package:resepsisakulkas/app/data/models/bahan_model.dart';
 import 'package:resepsisakulkas/app/data/models/hasil_cocok.dart';
 import 'package:resepsisakulkas/app/data/models/katalog_model.dart';
 import 'package:resepsisakulkas/app/data/models/resep_model.dart';
+import 'package:resepsisakulkas/app/modules/belanja/controllers/belanja_controller.dart';
+import 'package:resepsisakulkas/app/modules/belanja/views/belanja_view.dart';
 import 'package:resepsisakulkas/app/modules/kulkas/controllers/kulkas_controller.dart';
+import 'package:resepsisakulkas/app/modules/kulkas/views/kulkas_view.dart';
 import 'package:resepsisakulkas/app/modules/resep/controllers/resep_controller.dart';
 import 'package:resepsisakulkas/app/routes/app_routes.dart';
+import 'package:resepsisakulkas/app/utils/notifikasi.dart';
 import 'package:resepsisakulkas/app/widgets/ikon_bahan.dart';
 import 'package:resepsisakulkas/app/widgets/kartu_resep.dart';
 
@@ -218,6 +222,88 @@ void main() {
 
   testWidgets('pengaturan', (tester) async {
     await uji(tester, '/pengaturan', rute: (_) => Routes.pengaturan);
+  });
+
+  // --- Daftar belanja ---
+
+  /// Data kosong: daftar kosong. Data ekstrem: bahan bernama panjang,
+  /// sebagian sudah dibeli.
+  void isiBelanja(KondisiData kondisi) {
+    if (kondisi != KondisiData.ekstrem) return;
+    Get.find<KulkasController>().lepasBanyak(['b0', 'b1', 'b2', 'b3']);
+    Get.find<BelanjaController>()
+      ..tambah(['b0', 'b1', 'b2', 'b3', 'b40', 'b41'], resepId: 'r0')
+      ..setelDibeli('b0', true)
+      ..setelDibeli('b40', true);
+  }
+
+  testWidgets('belanja: kosong & terisi', (tester) async {
+    await uji(
+      tester,
+      '/belanja',
+      rute: (_) => Routes.belanja,
+      lanjutan: isiBelanja,
+      cek: (kondisi, konteks) async {
+        expect(
+          find.byKey(const Key('belanja-kosong')),
+          kondisi == KondisiData.kosong ? findsOneWidget : findsNothing,
+          reason: konteks,
+        );
+      },
+    );
+  });
+
+  testWidgets('belanja + lembar tambah bahan (dengan keyboard)', (
+    tester,
+  ) async {
+    await uji(
+      tester,
+      '/belanja + lembar tambah',
+      rute: (_) => Routes.belanja,
+      keyboard: true,
+      lanjutan: (kondisi) {
+        isiBelanja(kondisi);
+        bukaLembar<void>(const LembarTambahBelanja());
+      },
+      cek: (kondisi, konteks) async {
+        expect(
+          find.byKey(const Key('lembar-tambah-belanja')),
+          findsOneWidget,
+          reason: konteks,
+        );
+      },
+    );
+  });
+
+  testWidgets('kulkas + lembar opsi bahan', (tester) async {
+    await uji(
+      tester,
+      '/kulkas + lembar opsi bahan',
+      rute: (_) => Routes.kulkas,
+      lanjutan: (kondisi) {
+        final kulkas = Get.find<KulkasController>();
+        final id = kondisi == KondisiData.ekstrem ? 'b5' : 'bayam';
+        kulkas
+          ..tempel(id)
+          ..toggleSegera(id);
+        bukaLembar<void>(
+          LembarOpsiBahan(
+            bahan:
+                (kondisi == KondisiData.ekstrem
+                        ? katalogEkstrem()
+                        : katalogAsli)
+                    .bahanById[id]!,
+          ),
+        );
+      },
+      cek: (kondisi, konteks) async {
+        expect(
+          find.byKey(const Key('lembar-opsi-bahan')),
+          findsOneWidget,
+          reason: konteks,
+        );
+      },
+    );
   });
 
   // --- Widget hasil poles UI ---

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../data/models/bahan_model.dart';
 import '../data/models/hasil_cocok.dart';
 import '../data/services/katalog_service.dart';
+import '../modules/belanja/controllers/belanja_controller.dart';
 import '../routes/app_routes.dart';
 import '../theme/app_palet.dart';
 import '../theme/app_spacing.dart';
@@ -86,9 +87,18 @@ class KartuResep extends StatelessWidget {
                                   teks: '✓ Semua bahan ada',
                                   kurang: false,
                                 )
-                              : ChipStatus(
-                                  teks: 'kurang: ${namaKurang.join(', ')}',
-                                  kurang: true,
+                              : Row(
+                                  children: [
+                                    Flexible(
+                                      child: ChipStatus(
+                                        teks:
+                                            'kurang: ${namaKurang.join(', ')}',
+                                        kurang: true,
+                                      ),
+                                    ),
+                                    const SizedBox(width: AppSpacing.xs),
+                                    TombolBelanja(hasil: hasil),
+                                  ],
                                 ),
                         ],
                       ),
@@ -109,6 +119,36 @@ class KartuResep extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Tombol kecil di kartu: tambah bahan yang kurang ke daftar belanja. Bila
+/// semuanya sudah di daftar, berubah menjadi pintasan ke tab Belanja.
+class TombolBelanja extends StatelessWidget {
+  final HasilCocok hasil;
+
+  const TombolBelanja({super.key, required this.hasil});
+
+  @override
+  Widget build(BuildContext context) {
+    final belanja = Get.find<BelanjaController>();
+    final p = context.palet;
+    return Obx(() {
+      final sudah = belanja.belumAda(hasil.kurang).isEmpty;
+      return IconButton(
+        key: Key('belanja-${hasil.resep.id}'),
+        tooltip: sudah
+            ? 'Sudah di daftar belanja, buka daftar'
+            : 'Tambah bahan kurang ke daftar belanja',
+        onPressed: sudah
+            ? belanja.bukaTab
+            : () => belanja.tambahDariResep(hasil),
+        icon: Icon(
+          sudah ? Icons.shopping_basket : Icons.add_shopping_cart,
+          color: sudah ? p.aksenTua : p.wortelTeks,
+        ),
+      );
+    });
   }
 }
 

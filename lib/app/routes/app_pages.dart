@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 import '../controllers/main_controller.dart';
+import '../modules/belanja/bindings/belanja_binding.dart';
 import '../modules/beranda/tab_middleware.dart';
 import '../modules/beranda/views/beranda_view.dart';
 import '../modules/detail_resep/bindings/detail_resep_binding.dart';
@@ -20,7 +21,12 @@ abstract class AppPages {
   static GetPage<dynamic> _tab(String nama, int index) => GetPage(
     name: nama,
     page: () => const BerandaView(),
-    bindings: [KulkasBinding(), ResepBinding(), FavoritBinding()],
+    bindings: [
+      KulkasBinding(),
+      ResepBinding(),
+      FavoritBinding(),
+      BelanjaBinding(),
+    ],
     middlewares: [TabMiddleware(index)],
     transition: Transition.noTransition,
   );
@@ -29,6 +35,7 @@ abstract class AppPages {
     _tab(Routes.kulkas, MainController.tabKulkas),
     _tab(Routes.resep, MainController.tabResep),
     _tab(Routes.favorit, MainController.tabFavorit),
+    _tab(Routes.belanja, MainController.tabBelanja),
     GetPage(
       name: Routes.detailResep,
       page: () => const DetailResepView(),

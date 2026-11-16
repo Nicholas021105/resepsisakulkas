@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../controllers/main_controller.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../widgets/bottom_nav.dart';
+import '../../belanja/views/belanja_view.dart';
 import '../../favorit/views/favorit_view.dart';
 import '../../kulkas/views/kulkas_view.dart';
 import '../../resep/views/resep_view.dart';
@@ -26,7 +27,12 @@ class BerandaView extends GetView<MainController> {
         child: Scaffold(
           body: TumpukanTab(
             index: index,
-            halaman: const [KulkasView(), ResepView(), FavoritView()],
+            halaman: const [
+              KulkasView(),
+              ResepView(),
+              FavoritView(),
+              BelanjaView(),
+            ],
           ),
           bottomNavigationBar: const BottomNav(),
         ),

@@ -14,6 +14,7 @@ import '../../../theme/app_text.dart';
 import '../../../widgets/bottom_nav.dart';
 import '../../../widgets/ikon_bahan.dart';
 import '../../../widgets/kulkas_widgets.dart';
+import '../../belanja/controllers/belanja_controller.dart';
 import '../controllers/detail_resep_controller.dart';
 
 class DetailResepView extends GetView<DetailResepController> {
@@ -134,6 +135,10 @@ class _Isi extends GetView<DetailResepController> {
         ),
         const SizedBox(height: AppSpacing.s),
         _KartuBahan(bahan: r.bahan),
+        if (!hasil.siapDimasak) ...[
+          const SizedBox(height: AppSpacing.m),
+          _TombolBelanja(hasil: hasil),
+        ],
         const SizedBox(height: AppSpacing.xl),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
@@ -236,6 +241,40 @@ class _Info extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// "Tambah n bahan kurang ke daftar belanja"; bila sudah, pintasan ke
+/// daftar belanja.
+class _TombolBelanja extends StatelessWidget {
+  final HasilCocok hasil;
+
+  const _TombolBelanja({required this.hasil});
+
+  @override
+  Widget build(BuildContext context) {
+    final belanja = Get.find<BelanjaController>();
+    return Obx(() {
+      final belum = belanja.belumAda(hasil.kurang).length;
+      return SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          key: const Key('tambah-belanja'),
+          onPressed: belum == 0
+              ? belanja.bukaTab
+              : () => belanja.tambahDariResep(hasil),
+          icon: Icon(
+            belum == 0 ? Icons.shopping_basket : Icons.add_shopping_cart,
+          ),
+          label: Text(
+            belum == 0
+                ? 'Sudah di daftar belanja · lihat'
+                : 'Tambah $belum bahan kurang ke belanja',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    });
   }
 }
 

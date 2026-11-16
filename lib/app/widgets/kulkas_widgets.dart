@@ -392,6 +392,101 @@ class IlustrasiHati extends StatelessWidget {
   }
 }
 
+/// Keranjang belanja berisi "magnet" bahan (CustomPainter) untuk keadaan
+/// daftar belanja kosong.
+class IlustrasiKeranjang extends StatelessWidget {
+  const IlustrasiKeranjang({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return _LingkaranIlustrasi(
+      ukuran: 120,
+      child: CustomPaint(
+        size: const Size(68, 64),
+        painter: _KeranjangPainter(context.palet),
+      ),
+    );
+  }
+}
+
+class _KeranjangPainter extends CustomPainter {
+  const _KeranjangPainter(this.p);
+
+  final Palet p;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width, h = size.height;
+    final garis = Paint()
+      ..color = p.tinta
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.04
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round;
+
+    // Gagang.
+    canvas.drawArc(
+      Rect.fromLTWH(w * 0.24, h * 0.02, w * 0.52, h * 0.78),
+      pi,
+      pi,
+      false,
+      garis,
+    );
+    // Isi keranjang: tiga "magnet" berwarna kategori.
+    for (final (x, y, sudut, kategori) in [
+      (0.3, 0.36, -0.35, KategoriBahan.protein),
+      (0.5, 0.3, 0.1, KategoriBahan.sayur),
+      (0.7, 0.37, 0.4, KategoriBahan.karbohidrat),
+    ]) {
+      canvas
+        ..save()
+        ..translate(w * x, h * y)
+        ..rotate(sudut);
+      final magnet = RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset.zero, width: w * 0.2, height: h * 0.3),
+        Radius.circular(w * 0.07),
+      );
+      canvas
+        ..drawRRect(magnet, Paint()..color = AppColors.magnet(kategori))
+        ..drawRRect(magnet, garis)
+        ..restore();
+    }
+    // Badan keranjang.
+    final badan = Path()
+      ..moveTo(w * 0.1, h * 0.46)
+      ..lineTo(w * 0.9, h * 0.46)
+      ..lineTo(w * 0.78, h * 0.96)
+      ..lineTo(w * 0.22, h * 0.96)
+      ..close();
+    canvas
+      ..drawPath(badan, Paint()..color = p.permukaan)
+      ..drawPath(badan, garis);
+    // Anyaman.
+    final anyam = Paint()
+      ..color = p.aksen
+      ..strokeWidth = w * 0.03
+      ..strokeCap = StrokeCap.round;
+    for (final x in [0.36, 0.5, 0.64]) {
+      canvas.drawLine(
+        Offset(w * x, h * 0.6),
+        Offset(w * (0.5 + (x - 0.5) * 0.8), h * 0.86),
+        anyam,
+      );
+    }
+    // Bibir keranjang.
+    final bibir = RRect.fromRectAndRadius(
+      Rect.fromLTWH(w * 0.04, h * 0.4, w * 0.92, h * 0.12),
+      Radius.circular(w * 0.06),
+    );
+    canvas
+      ..drawRRect(bibir, Paint()..color = p.aksen)
+      ..drawRRect(bibir, garis);
+  }
+
+  @override
+  bool shouldRepaint(_KeranjangPainter lama) => lama.p != p;
+}
+
 /// Lingkaran mint pucat dengan bayangan halus sebagai latar ilustrasi.
 class _LingkaranIlustrasi extends StatelessWidget {
   final Widget child;
