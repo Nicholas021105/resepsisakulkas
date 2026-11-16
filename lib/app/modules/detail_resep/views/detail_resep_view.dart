@@ -66,6 +66,28 @@ class DetailResepView extends GetView<DetailResepController> {
           ],
         ),
         body: SafeArea(child: _Isi(hasil: hasil)),
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.l,
+              AppSpacing.s,
+              AppSpacing.l,
+              AppSpacing.m,
+            ),
+            child: FilledButton.icon(
+              key: const Key('mulai-masak'),
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                controller.mulaiMasak();
+              },
+              icon: const Icon(Icons.soup_kitchen_outlined),
+              label: const FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text('Mulai memasak'),
+              ),
+            ),
+          ),
+        ),
       );
     });
   }
@@ -114,6 +136,16 @@ class _Isi extends GetView<DetailResepController> {
                   ),
                   _Info(ikon: Icons.people_outline, teks: '${r.porsi} porsi'),
                   _Info(ikon: Icons.signal_cellular_alt, teks: r.tingkat.label),
+                  // Obx sendiri: riwayat berubah setelah mode masak selesai.
+                  Obx(
+                    () => controller.jumlahDimasak > 0
+                        ? _Info(
+                            key: const Key('jumlah-dimasak'),
+                            ikon: Icons.history,
+                            teks: 'Dimasak ${controller.jumlahDimasak}×',
+                          )
+                        : const SizedBox.shrink(),
+                  ),
                   if (r.kategori != KategoriResep.lainnya)
                     _Info(ikon: Icons.restaurant_menu, teks: r.kategori.label),
                 ],
@@ -250,7 +282,7 @@ class _Info extends StatelessWidget {
   final IconData ikon;
   final String teks;
 
-  const _Info({required this.ikon, required this.teks});
+  const _Info({super.key, required this.ikon, required this.teks});
 
   @override
   Widget build(BuildContext context) {

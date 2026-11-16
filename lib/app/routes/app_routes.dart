@@ -8,5 +8,10 @@ abstract class Routes {
   static const belanja = '/belanja';
   static const pengaturan = '/pengaturan';
 
+  /// Mode masak langkah demi langkah untuk satu resep.
+  static const masak = '/resep/:id/masak';
+
   static String keDetail(String id) => '/resep/$id';
+
+  static String keMasak(String id) => '/resep/$id/masak';
 }

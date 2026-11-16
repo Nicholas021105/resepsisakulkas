@@ -277,3 +277,17 @@ class AksiLembar extends StatelessWidget {
     );
   }
 }
+
+/// Tombol "Tutup" di dasar lembar bawah.
+class AksiTutupLembar extends StatelessWidget {
+  const AksiTutupLembar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      key: const Key('tutup-lembar'),
+      onPressed: () => Navigator.of(context).pop(),
+      child: const Text('Tutup'),
+    );
+  }
+}

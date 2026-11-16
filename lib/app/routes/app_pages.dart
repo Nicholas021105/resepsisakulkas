@@ -8,6 +8,8 @@ import '../modules/detail_resep/bindings/detail_resep_binding.dart';
 import '../modules/detail_resep/views/detail_resep_view.dart';
 import '../modules/favorit/bindings/favorit_binding.dart';
 import '../modules/kulkas/bindings/kulkas_binding.dart';
+import '../modules/masak/bindings/masak_binding.dart';
+import '../modules/masak/views/masak_view.dart';
 import '../modules/pengaturan/bindings/pengaturan_binding.dart';
 import '../modules/pengaturan/views/pengaturan_view.dart';
 import '../modules/resep/bindings/resep_binding.dart';
@@ -41,6 +43,12 @@ abstract class AppPages {
       page: () => const DetailResepView(),
       binding: DetailResepBinding(),
       transition: Transition.cupertino,
+    ),
+    GetPage(
+      name: Routes.masak,
+      page: () => const MasakView(),
+      binding: MasakBinding(),
+      transition: Transition.downToUp,
     ),
     GetPage(
       name: Routes.pengaturan,

@@ -5,7 +5,9 @@ import '../../../data/models/bahan_model.dart';
 import '../../../data/models/hasil_cocok.dart';
 import '../../../data/services/katalog_service.dart';
 import '../../../utils/pencocok_resep.dart';
+import '../../../routes/app_routes.dart';
 import '../../favorit/controllers/favorit_controller.dart';
+import '../../favorit/controllers/riwayat_controller.dart';
 import '../../kulkas/controllers/kulkas_controller.dart';
 
 /// Detail resep dari route dinamis `/resep/:id`.
@@ -45,6 +47,11 @@ class DetailResepController extends GetxController {
       _katalog.katalog.value?.bahanById ?? const {};
 
   bool get favorit => _favorit.favorit.contains(id);
+
+  /// Berapa kali resep ini sudah dimasak (dari riwayat).
+  int get jumlahDimasak => Get.find<RiwayatController>().jumlahMasak(id);
+
+  void mulaiMasak() => Get.toNamed(Routes.keMasak(id));
 
   void toggleFavorit() => _favorit.toggle(id, nama: hasil.value?.resep.nama);
 

@@ -8,6 +8,7 @@ import 'package:resepsisakulkas/app/data/services/katalog_service.dart';
 import 'package:resepsisakulkas/app/data/services/storage_service.dart';
 import 'package:resepsisakulkas/app/modules/belanja/controllers/belanja_controller.dart';
 import 'package:resepsisakulkas/app/modules/favorit/controllers/favorit_controller.dart';
+import 'package:resepsisakulkas/app/modules/favorit/controllers/riwayat_controller.dart';
 import 'package:resepsisakulkas/app/modules/kulkas/controllers/kulkas_controller.dart';
 import 'package:resepsisakulkas/app/routes/app_pages.dart';
 import 'package:resepsisakulkas/app/theme/app_theme.dart';
@@ -46,6 +47,7 @@ RepoTetap siapkanDependensi({
   Get.put(KulkasController(jam: jam), permanent: true);
   Get.put(FavoritController(), permanent: true);
   Get.put(BelanjaController(), permanent: true);
+  Get.put(RiwayatController(jam: jam), permanent: true);
   Get.put(MainController(), permanent: true);
   return repo;
 }

@@ -11,6 +11,9 @@ class FavoritController extends GetxController {
 
   final favorit = <String>{}.obs;
 
+  /// Segmen tab Favorit: false = resep favorit, true = riwayat masak.
+  final lihatRiwayat = false.obs;
+
   @override
   void onInit() {
     super.onInit();

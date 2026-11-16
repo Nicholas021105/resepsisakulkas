@@ -11,8 +11,12 @@ import 'package:resepsisakulkas/app/data/models/katalog_model.dart';
 import 'package:resepsisakulkas/app/data/models/resep_model.dart';
 import 'package:resepsisakulkas/app/modules/belanja/controllers/belanja_controller.dart';
 import 'package:resepsisakulkas/app/modules/belanja/views/belanja_view.dart';
+import 'package:resepsisakulkas/app/modules/favorit/controllers/favorit_controller.dart';
+import 'package:resepsisakulkas/app/modules/favorit/controllers/riwayat_controller.dart';
 import 'package:resepsisakulkas/app/modules/kulkas/controllers/kulkas_controller.dart';
 import 'package:resepsisakulkas/app/modules/kulkas/views/kulkas_view.dart';
+import 'package:resepsisakulkas/app/modules/masak/controllers/masak_controller.dart';
+import 'package:resepsisakulkas/app/modules/masak/views/masak_view.dart';
 import 'package:resepsisakulkas/app/modules/resep/controllers/resep_controller.dart';
 import 'package:resepsisakulkas/app/routes/app_routes.dart';
 import 'package:resepsisakulkas/app/utils/notifikasi.dart';
@@ -300,6 +304,103 @@ void main() {
         expect(
           find.byKey(const Key('lembar-opsi-bahan')),
           findsOneWidget,
+          reason: konteks,
+        );
+      },
+    );
+  });
+
+  // --- Mode masak & riwayat ---
+
+  String idResep(KondisiData k) => k == KondisiData.ekstrem ? 'r0' : 'sop-ayam';
+
+  testWidgets('mode masak: langkah pertama (dengan timer)', (tester) async {
+    await uji(
+      tester,
+      '/resep/:id/masak',
+      rute: (k) => Routes.keMasak(idResep(k)),
+      cek: (kondisi, konteks) async {
+        expect(find.byKey(const Key('langkah-berikut')), findsOneWidget);
+        if (kondisi == KondisiData.kosong) {
+          // Sop ayam langkah 1: "… merebus selama 15 menit."
+          expect(
+            find.byKey(const Key('timer-0'), skipOffstage: false),
+            findsOneWidget,
+            reason: konteks,
+          );
+        }
+      },
+    );
+  });
+
+  testWidgets('mode masak: lembar bahan', (tester) async {
+    await uji(
+      tester,
+      '/resep/:id/masak + lembar bahan',
+      rute: (k) => Routes.keMasak(idResep(k)),
+      lanjutan: (kondisi) {
+        final resep = Get.find<MasakController>().resep!;
+        bukaLembar<void>(LembarBahanMasak(resep: resep));
+      },
+      cek: (kondisi, konteks) async {
+        expect(
+          find.byKey(const Key('lembar-bahan-masak')),
+          findsOneWidget,
+          reason: konteks,
+        );
+      },
+    );
+  });
+
+  testWidgets('mode masak: layar selesai', (tester) async {
+    await uji(
+      tester,
+      '/resep/:id/masak (selesai)',
+      rute: (k) => Routes.keMasak(idResep(k)),
+      lanjutan: (kondisi) {
+        final c = Get.find<MasakController>();
+        if (kondisi == KondisiData.kosong) {
+          Get.find<KulkasController>().tempelBanyak(['ayam', 'wortel']);
+        }
+        c.pageController.jumpToPage(c.jumlahLangkah);
+      },
+      cek: (kondisi, konteks) async {
+        expect(
+          find.byKey(const Key('halaman-selesai')),
+          findsOneWidget,
+          reason: konteks,
+        );
+        expect(find.text('Selamat makan!'), findsOneWidget, reason: konteks);
+      },
+    );
+  });
+
+  testWidgets('mode masak: resep tidak ditemukan', (tester) async {
+    await uji(
+      tester,
+      '/resep/:id/masak (tidak valid)',
+      rute: (_) => Routes.keMasak('tidak-ada'),
+    );
+  });
+
+  testWidgets('favorit: riwayat masak', (tester) async {
+    await uji(
+      tester,
+      '/favorit riwayat',
+      rute: (_) => Routes.favorit,
+      lanjutan: (kondisi) {
+        if (kondisi == KondisiData.ekstrem) {
+          final riwayat = Get.find<RiwayatController>();
+          for (final r in katalogEkstrem().resep.take(12)) {
+            riwayat.catat(r);
+          }
+        }
+        Get.find<FavoritController>().lihatRiwayat.value = true;
+      },
+      cek: (kondisi, konteks) async {
+        expect(
+          find.byKey(const Key('riwayat-kosong')),
+          kondisi == KondisiData.kosong ? findsOneWidget : findsNothing,
           reason: konteks,
         );
       },
