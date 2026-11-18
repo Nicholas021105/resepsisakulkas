@@ -178,6 +178,22 @@ const _teri = Komponen.hiasan(
   jumlah: 9,
   skala: 1.3,
 );
+const _kejuParut = Komponen.hiasan(
+  'keju-parut',
+  BentukMakanan.taburan,
+  _W.keju,
+  _W.kejuTua,
+  jumlah: 1,
+  rasio: 0.2,
+);
+const _meses = Komponen.hiasan(
+  'meses',
+  BentukMakanan.taburan,
+  _W.meses,
+  _W.kecap,
+  jumlah: 1,
+  rasio: 0.2,
+);
 const _timunIris = Komponen(
   'timun-iris',
   BentukMakanan.irisan,
@@ -489,5 +505,306 @@ const petaSampulResep = <String, GayaSampul>{
     balut: false,
     pendamping: [],
     hiasan: [],
+  ),
+
+  // --- Penyesuaian kecil ---------------------------------------------------
+
+  // Tahu digoreng dulu (kulit keemasan), lalu dimasak di saus kecap.
+  'tahu-kecap': GayaSampul(
+    utama: Komponen(
+      'tahu-goreng',
+      BentukMakanan.kubus,
+      _W.tahuGoreng,
+      _W.tahuGorengTua,
+      jumlah: 5,
+      skala: 0.9,
+    ),
+    hiasan: [_cabaiIris, _bawangMerahIris],
+  ),
+  'ayam-kecap': GayaSampul(
+    utama: Komponen(
+      'ayam-kecap',
+      BentukMakanan.ayamKecap,
+      _W.ayamKecap,
+      _W.kecap,
+      jumlah: 3,
+      skala: 1.1,
+    ),
+  ),
+  'ayam-bakar-kecap': GayaSampul(
+    utama: Komponen(
+      'ayam-bakar',
+      BentukMakanan.ayamBakar,
+      _W.ayamBakar,
+      _W.kecap,
+      jumlah: 3,
+      skala: 1.1,
+    ),
+    pendamping: [],
+    hiasan: [],
+    // Kecapnya sudah menjadi lapisan karamel, bukan siraman.
+    siraman: GayaSampul.tanpaWarna,
+    pelengkap: [
+      _timunIris,
+      Komponen(
+        'jeruk-iris',
+        BentukMakanan.irisan,
+        _W.jeruk,
+        _W.jerukKulit,
+        jumlah: 1,
+      ),
+    ],
+  ),
+  'bakwan-sayur': GayaSampul(
+    utama: Komponen(
+      'bakwan',
+      BentukMakanan.bakwan,
+      _W.gorengan,
+      _W.gorenganTua,
+      jumlah: 4,
+      skala: 1.15,
+    ),
+    balut: false,
+    pendamping: [],
+    hiasan: [],
+  ),
+  // Tauge yang padat sebagai isi utama, tahu goreng dadu sebagai pendamping.
+  'oseng-tahu-tauge': GayaSampul(
+    utama: Komponen(
+      'tauge',
+      BentukMakanan.tauge,
+      _W.tauge,
+      _W.jagung,
+      jumlah: 18,
+      skala: 1.1,
+    ),
+    tata: TataUtama.tumpuk,
+    pendamping: [
+      Komponen(
+        'tahu-dadu',
+        BentukMakanan.kubus,
+        _W.tahuGoreng,
+        _W.tahuGorengTua,
+        jumlah: 3,
+        skala: 0.75,
+      ),
+    ],
+    hiasan: [_cabaiIris, _bawangPutihIris],
+  ),
+  'tumis-sosis': GayaSampul(
+    utama: Komponen(
+      'sosis-iris',
+      BentukMakanan.irisanMiring,
+      _W.sosisDalam,
+      _W.sosis,
+      jumlah: 14,
+      skala: 0.8,
+      rasio: 0.55,
+    ),
+    tata: TataUtama.tumpuk,
+  ),
+  // Data: sayurnya kol (bukan sawi), wortel diiris korek api (bukan serut).
+  'bihun-goreng': GayaSampul(
+    pendamping: [
+      _telurOrakArik,
+      Komponen(
+        'kol',
+        BentukMakanan.daun,
+        _W.daunPucat,
+        _W.daunPucatTua,
+        jumlah: 2,
+        rasio: 0.85,
+      ),
+      Komponen(
+        'wortel-korek',
+        BentukMakanan.batang,
+        _W.wortel,
+        _W.wortelTua,
+        jumlah: 2,
+        skala: 0.9,
+        rasio: 0.14,
+      ),
+    ],
+    hiasan: [_bawangPutihIris],
+  ),
+  'kolak-pisang-ubi': GayaSampul(
+    kuah: _W.kuahKolak,
+    utama: Komponen(
+      'pisang-potong',
+      BentukMakanan.irisanMiring,
+      _W.pisang,
+      _W.pisangTua,
+      jumlah: 5,
+      skala: 0.95,
+      rasio: 0.6,
+    ),
+    pendamping: [
+      Komponen(
+        'ubi-kubus',
+        BentukMakanan.kubus,
+        _W.ubi,
+        _W.ubiKulit,
+        jumlah: 3,
+        skala: 0.85,
+      ),
+    ],
+  ),
+  // Kuah kental kuning pucat: butir jagung, serat telur, daun bawang.
+  'sup-jagung-telur': GayaSampul(
+    kuah: _W.kuahJagung,
+    utama: Komponen(
+      'jagung-pipil',
+      BentukMakanan.butirJagung,
+      _W.jagung,
+      _W.jagungTua,
+      jumlah: 9,
+      skala: 0.85,
+    ),
+    tata: TataUtama.tumpuk,
+    pendamping: [
+      Komponen(
+        'serat-telur',
+        BentukMakanan.seratTelur,
+        _W.telurPutih,
+        _W.telurTepi,
+        jumlah: 3,
+        skala: 1.3,
+      ),
+    ],
+    hiasan: [_daunBawangIris],
+  ),
+  'jagung-susu-keju': GayaSampul(
+    wadah: WadahSampul.cup,
+    kuah: _W.jagungTua,
+    utama: Komponen(
+      'jagung-pipil',
+      BentukMakanan.butirJagung,
+      _W.jagung,
+      _W.jagungTua,
+      jumlah: 14,
+      skala: 0.95,
+    ),
+    tata: TataUtama.tumpuk,
+    pendamping: [],
+    hiasan: [],
+    siraman: _W.susu,
+    taburan: [_kejuParut],
+  ),
+  'roti-bakar-cokelat-keju': GayaSampul(
+    utama: Komponen(
+      'roti-bakar',
+      BentukMakanan.rotiBakar,
+      _W.rotiBakar,
+      _W.rotiKulit,
+      tunggal: true,
+    ),
+    pendamping: [],
+    hiasan: [],
+    taburan: [_meses, _kejuParut],
+  ),
+  'pisang-bakar-cokelat-keju': GayaSampul(
+    utama: Komponen(
+      'pisang-bakar',
+      BentukMakanan.kapsul,
+      _W.pisangBakar,
+      _W.pisangTua,
+      jumlah: 3,
+      rasio: 0.36,
+    ),
+    tata: TataUtama.jajar,
+    pendamping: [],
+    hiasan: [],
+    siraman: _W.susu,
+    siramanTipis: true,
+    taburan: [_meses, _kejuParut],
+  ),
+  // Roti dicelup telur lalu digoreng: lembar keemasan, tanpa telur terpisah.
+  'roti-telur': GayaSampul(
+    utama: Komponen(
+      'roti-telur',
+      BentukMakanan.roti,
+      _W.rotiTelur,
+      _W.rotiKulit,
+      tunggal: true,
+    ),
+    pendamping: [],
+    hiasan: [],
+  ),
+  'roti-lapis-telur-keju': GayaSampul(
+    utama: Komponen(
+      'roti-lapis',
+      BentukMakanan.rotiLapis,
+      _W.roti,
+      _W.rotiKulit,
+      tunggal: true,
+    ),
+    pendamping: [],
+    hiasan: [],
+  ),
+  // Sayur rebus tertutup bumbu kacang kental (bukan garis siraman).
+  'pecel-sayur': GayaSampul(
+    pendamping: [
+      Komponen(
+        'tauge',
+        BentukMakanan.tauge,
+        _W.tauge,
+        _W.jagung,
+        jumlah: 3,
+        skala: 0.85,
+      ),
+      Komponen(
+        'kol',
+        BentukMakanan.daun,
+        _W.daunPucat,
+        _W.daunPucatTua,
+        jumlah: 2,
+        rasio: 0.85,
+      ),
+    ],
+    hiasan: [],
+    siraman: GayaSampul.tanpaWarna,
+    selimut: _W.bumbuKacang,
+    pelengkap: [
+      Komponen(
+        'jeruk-iris',
+        BentukMakanan.irisan,
+        _W.jeruk,
+        _W.jerukKulit,
+        jumlah: 1,
+      ),
+    ],
+  ),
+  // Mangkuk kecil berisi kecap dengan irisan cabai, bawang merah, tomat.
+  'sambal-kecap': GayaSampul(
+    wadah: WadahSampul.mangkukKecil,
+    kuah: _W.kecap,
+    tanpaUtama: true,
+    pendamping: [],
+    hiasan: [
+      Komponen.hiasan(
+        'cabai-iris',
+        BentukMakanan.cincin,
+        _W.cabai,
+        _W.cabaiTua,
+        jumlah: 6,
+        skala: 1.1,
+      ),
+      Komponen.hiasan(
+        'bawang-merah-iris',
+        BentukMakanan.cincin,
+        _W.bawangMerah,
+        _W.bawangMerahTua,
+        jumlah: 4,
+        skala: 1.15,
+      ),
+      Komponen.hiasan(
+        'tomat-dadu',
+        BentukMakanan.kubus,
+        _W.tomatDalam,
+        _W.tomat,
+        jumlah: 3,
+        skala: 1.1,
+      ),
+    ],
   ),
 };

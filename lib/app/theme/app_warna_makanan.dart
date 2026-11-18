@@ -133,6 +133,16 @@ abstract class WarnaMakanan {
   static const bawangGorengTua = Color(0xFF8E5524);
   static const cabaiTua = Color(0xFF9E1B1B);
   static const sambalTua = Color(0xFF9E2B1E);
+  static const ayamKecap = Color(0xFF7A4220);
+  static const ayamBakar = Color(0xFF8E4D24);
+  static const gosong = Color(0xFF3A2414);
+  static const sosisDalam = Color(0xFFF2A68F);
+  static const kuahKolak = Color(0xFFD7B184);
+  static const kuahJagung = Color(0xFFF3E3A2);
+  static const rotiTelur = Color(0xFFEDC35C);
+  static const rotiBakar = Color(0xFFE6BA6E);
+  static const pisangBakar = Color(0xFFE9BC4A);
+  static const bumbuKacang = Color(0xFFC48A4E);
 
   // Kuah di mangkuk.
   static const kuahBening = Color(0xFFF3E6AE);

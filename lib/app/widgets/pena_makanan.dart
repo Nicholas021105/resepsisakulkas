@@ -99,6 +99,24 @@ enum BentukMakanan {
   /// Irisan ubi berbalut tepung: daging oranye (warnaTua) tampak, kulit
   /// ungu di tepi.
   ubiGoreng,
+
+  /// Paha ayam terlapis kecap; kilau saus saat detail.
+  ayamKecap,
+
+  /// Paha ayam bakar dengan garis bekas bakaran gosong.
+  ayamBakar,
+
+  /// Bakwan: gorengan kasar tak beraturan dengan serutan wortel dan kol.
+  bakwan,
+
+  /// Gerombol butir jagung pipil.
+  butirJagung,
+
+  /// Dua lembar roti panggang dengan garis bekas panggangan.
+  rotiBakar,
+
+  /// Dua lembar roti bertumpuk miring; telur dan keju menyembul di tepi.
+  rotiLapis,
 }
 
 /// Peran sebuah bahan di sampul.
@@ -784,6 +802,212 @@ class PenaMakanan {
         _ikanTeri(k, r, w);
       case BentukMakanan.ubiGoreng:
         _ubiGoreng(k, r, w, acak);
+      case BentukMakanan.ayamKecap:
+        gambar(BentukMakanan.ayam, k, r, acak, warna: w);
+        if (detail) {
+          c.drawArc(
+            Rect.fromCenter(
+              center: Offset(-r * 0.24, -r * 0.06),
+              width: r * 0.95,
+              height: r * 0.7,
+            ),
+            pi * 1.08,
+            pi * 0.38,
+            false,
+            garis(_kilau(w), tg * 1.1),
+          );
+        }
+      case BentukMakanan.ayamBakar:
+        gambar(BentukMakanan.ayam, k, r, acak, warna: w);
+        // Garis bakaran gosong di daging (selalu: ciri utamanya).
+        c
+          ..save()
+          ..clipPath(
+            Path()..addOval(
+              Rect.fromCenter(
+                center: Offset(-r * 0.22, 0),
+                width: r * 1.5,
+                height: r * 1.2,
+              ),
+            ),
+          );
+        for (final x in [-0.62, -0.26, 0.1]) {
+          c.drawLine(
+            Offset(r * (x - 0.16), -r * 0.62),
+            Offset(r * (x + 0.16), r * 0.62),
+            garis(_W.gosong, r * 0.1),
+          );
+        }
+        c
+          ..restore()
+          ..drawOval(
+            Rect.fromCenter(
+              center: Offset(-r * 0.22, 0),
+              width: r * 1.5,
+              height: r * 1.2,
+            ),
+            garis(_tinta, tg),
+          );
+      case BentukMakanan.bakwan:
+        _bakwan(k, r, w, acak);
+      case BentukMakanan.butirJagung:
+        _butirJagung(k, r, w, acak);
+      case BentukMakanan.rotiBakar:
+        for (final (dx, dy, putar) in const [
+          (-0.2, -0.14, -0.22),
+          (0.2, 0.14, 0.2),
+        ]) {
+          _lembarRoti(Offset(r * dx, r * dy), putar, r, k.warnaTua, w, (dalam) {
+            // Garis bekas panggangan.
+            for (final t in [-0.32, 0.0, 0.32]) {
+              c.drawLine(
+                Offset(r * (t - 0.25), dalam.top),
+                Offset(r * (t + 0.25), dalam.bottom),
+                garis(Color.lerp(k.warnaTua, _tinta, 0.2)!, r * 0.08),
+              );
+            }
+          });
+        }
+      case BentukMakanan.rotiLapis:
+        _lembarRoti(Offset(-r * 0.12, r * 0.1), -0.3, r, k.warnaTua, w, null);
+        // Isi: telur dadar dan keju yang menyembul dari tepi roti.
+        kontur(
+          _bergelombang(
+            r * 0.8,
+            r * 0.74,
+            10,
+            0.1,
+            acak,
+            o: Offset(r * 0.05, 0),
+          ),
+          _W.dadar,
+        );
+        c
+          ..save()
+          ..rotate(0.62);
+        kontur(
+          Path()..addRRect(
+            RRect.fromRectAndRadius(
+              Rect.fromCenter(
+                center: Offset.zero,
+                width: r * 1.16,
+                height: r * 1.16,
+              ),
+              Radius.circular(r * 0.06),
+            ),
+          ),
+          _W.keju,
+        );
+        c.restore();
+        _lembarRoti(Offset(r * 0.08, -r * 0.06), 0.1, r, k.warnaTua, w, null);
+    }
+  }
+
+  /// Satu lembar roti tawar di [o] diputar [putar]: kulit [kulit] dan isi
+  /// [isiRoti]; [atas] menggambar di atas isi (sudah dipotong ke isi).
+  void _lembarRoti(
+    Offset o,
+    double putar,
+    double r,
+    Color kulit,
+    Color isiRoti,
+    void Function(Rect dalam)? atas,
+  ) {
+    c
+      ..save()
+      ..translate(o.dx, o.dy)
+      ..rotate(putar);
+    final lembar = RRect.fromRectAndCorners(
+      Rect.fromCenter(center: Offset.zero, width: r * 1.34, height: r * 1.34),
+      topLeft: Radius.circular(r * 0.42),
+      topRight: Radius.circular(r * 0.42),
+      bottomLeft: Radius.circular(r * 0.14),
+      bottomRight: Radius.circular(r * 0.14),
+    );
+    kontur(Path()..addRRect(lembar), kulit);
+    final dalam = lembar.deflate(r * 0.12);
+    c.drawRRect(dalam, isi(isiRoti));
+    if (atas != null) {
+      c
+        ..save()
+        ..clipRRect(dalam);
+      atas(dalam.outerRect);
+      c.restore();
+    }
+    c.restore();
+  }
+
+  void _bakwan(Komponen k, double r, Color w, Random acak) {
+    // Serutan wortel dan kol yang mencuat dari tepi adonan.
+    for (var i = 0; i < 7; i++) {
+      final a = i * 2 * pi / 7 + acak.nextDouble() * 0.5;
+      final dari = Offset.fromDirection(a, r * 0.55);
+      final ke = Offset.fromDirection(
+        a + (acak.nextDouble() - 0.5) * 0.5,
+        r * 1.05,
+      );
+      _gores(
+        Path()
+          ..moveTo(dari.dx, dari.dy)
+          ..lineTo(ke.dx, ke.dy),
+        i.isEven ? _W.wortel : _W.daunPucatTua,
+        r * 0.07,
+      );
+    }
+    kontur(_bergelombang(r * 0.86, r * 0.78, 13, 0.2, acak), w);
+    // Serutan di permukaan (kasar, tak beraturan).
+    for (var i = 0; i < (detail ? 9 : 5); i++) {
+      final o = _acakDalam(acak, r * 0.55, r * 0.5);
+      final d = Offset.fromDirection(acak.nextDouble() * pi, r * 0.16);
+      c.drawPath(
+        Path()
+          ..moveTo(o.dx - d.dx, o.dy - d.dy)
+          ..quadraticBezierTo(
+            o.dx + d.dy * 0.4,
+            o.dy - d.dx * 0.4,
+            o.dx + d.dx,
+            o.dy + d.dy,
+          ),
+        garis(i.isEven ? _W.wortel : _W.daunPucatTua, r * 0.07),
+      );
+    }
+    if (detail) {
+      for (var i = 0; i < 6; i++) {
+        c.drawCircle(
+          _acakDalam(acak, r * 0.65, r * 0.6),
+          r * 0.04,
+          isi(k.warnaTua),
+        );
+      }
+    }
+  }
+
+  void _butirJagung(Komponen k, double r, Color w, Random acak) {
+    for (var i = 0; i < 6; i++) {
+      final o = i == 0
+          ? Offset.zero
+          : Offset.fromDirection(
+              i * 2 * pi / 5 + acak.nextDouble() * 0.5,
+              r * (0.48 + acak.nextDouble() * 0.18),
+            );
+      final butir = RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset.zero, width: r * 0.46, height: r * 0.4),
+        Radius.circular(r * 0.13),
+      );
+      c
+        ..save()
+        ..translate(o.dx, o.dy)
+        ..rotate(acak.nextDouble() * pi)
+        ..drawRRect(butir, isi(w))
+        ..drawRRect(butir, garis(_tinta, tg * 0.8));
+      if (detail) {
+        c.drawCircle(
+          Offset(-r * 0.08, -r * 0.06),
+          r * 0.05,
+          isi(_W.telurPutih),
+        );
+      }
+      c.restore();
     }
   }
 

@@ -14,7 +14,9 @@ import 'package:resepsisakulkas/app/widgets/sampul_resep.dart';
 /// Bentuk olahan yang belum dipakai resep mana pun karena gaya khusus per
 /// resep (petaSampulResep) belum diisi. Harus kosong setelah semua sampul
 /// khusus selesai.
-const _menungguGayaKhusus = {BentukMakanan.seratTelur};
+// "gorengan" (balut tepung otomatis) kini hanya cadangan untuk gorengan
+// bertepung dari server yang belum punya gaya khusus.
+const _menungguGayaKhusus = {BentukMakanan.gorengan};
 
 /// Sampul resep: pemetaan bahan → komponen, susunan per resep, tata letak
 /// deterministik, dan pelukis untuk seluruh katalog.
