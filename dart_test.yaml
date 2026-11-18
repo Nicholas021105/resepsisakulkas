@@ -1,0 +1,5 @@
+# Tag tes. Golden test ikut `flutter test` biasa; lewati dengan
+# `flutter test --exclude-tags golden` (mis. di mesin dengan antialiasing
+# yang berbeda jauh).
+tags:
+  golden:

@@ -62,39 +62,6 @@ abstract class AppColors {
   static const bayanganHalus = Color(0x0F17322B);
   static const transparan = Color(0x00000000);
 
-  /// Ikon bahan gambar sendiri (IkonBahan).
-  static const tahuMuka = Color(0xFFF8E7B4);
-  static const tahuAtas = Color(0xFFFFF5DA);
-  static const tahuSisi = Color(0xFFE5C987);
-  static const tahuGaris = Color(0xFFB8925A);
-  static const tempeMuka = Color(0xFF9C6B3F);
-  static const tempeAtas = Color(0xFFBA8653);
-  static const tempeSisi = Color(0xFF77502D);
-  static const tempeTitik = Color(0xFFF1DDB5);
-  static const kecapBotol = Color(0xFF3A2418);
-  static const kecapKilau = Color(0xFF6B4A36);
-  static const kecapLabel = Color(0xFFF6D58E);
-  static const kecapTutup = Color(0xFFC0392B);
-  static const buncisTua = Color(0xFF2F7D32);
-  static const buncisMuda = Color(0xFF7CC35A);
-  static const buncisBiji = Color(0xFFB8E39A);
-  static const minyakEmas = Color(0xFFF2B705);
-  static const minyakTepi = Color(0xFFC58A00);
-  static const minyakKilau = Color(0xFFFFE58A);
-  static const minyakTutup = Color(0xFF2F6F3E);
-  static const bawangMerah = Color(0xFFB5426B);
-  static const bawangMerahTua = Color(0xFF7E2148);
-  static const bawangMerahKilau = Color(0xFFE38AA8);
-  static const bawangPutih = Color(0xFFFAF4E6);
-  static const bawangPutihGaris = Color(0xFFC2B08C);
-  static const bawangAkar = Color(0xFFB79466);
-  static const margarinMuka = Color(0xFFF9DC72);
-  static const margarinAtas = Color(0xFFFCEAA8);
-  static const margarinSisi = Color(0xFFE2B93B);
-  static const tiramBotol = Color(0xFF4A3A30);
-  static const tiramLabel = Color(0xFFF3E9D2);
-  static const tiramCangkang = Color(0xFF8C8277);
-
   /// Sampul resep gambar sendiri (SampulResep): ubin pastel per nada,
   /// warna sajian + sisi gelapnya, dan perkakas dapur.
   static const sampulHijau = Color(0xFFD9F0DD);

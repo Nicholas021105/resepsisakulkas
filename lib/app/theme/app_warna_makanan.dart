@@ -1,7 +1,7 @@
 import 'package:flutter/painting.dart';
 
-/// Warna komponen makanan pada sampul resep (`SampulResep`). Ilustrasi:
-/// sama di tema terang dan gelap, seperti ikon bahan dan magnet.
+/// Warna komponen makanan pada sampul resep (`SampulResep`) dan ikon bahan
+/// (`IkonBahan`). Ilustrasi: sama di tema terang dan gelap, seperti magnet.
 abstract class WarnaMakanan {
   // Telur.
   static const telurPutih = Color(0xFFFFFDF6);
@@ -88,8 +88,34 @@ abstract class WarnaMakanan {
   static const kecap = Color(0xFF4A2A14);
   static const sausTomat = Color(0xFFD9482F);
   static const sausTiram = Color(0xFF6B4A36);
+  static const sausTiramBotol = Color(0xFF9A4E36);
   static const gulaMerah = Color(0xFF8A552F);
   static const susu = Color(0xFFFFFDF6);
+
+  // Khusus ikon bahan (IkonBahan): bahan mentah & kemasannya.
+  static const wortelTua = Color(0xFFC8661A);
+  static const ubiKulitTua = Color(0xFF64305F);
+  static const gulaMerahTua = Color(0xFF5E3719);
+  static const bawangAkar = Color(0xFFB79466);
+  static const batangPucat = Color(0xFFF1F5DF);
+  static const garam = Color(0xFFF8FAFA);
+  static const garamTutup = Color(0xFFB4C1C4);
+  static const merica = Color(0xFF4A4038);
+  static const gulaPasir = Color(0xFFFFFFFF);
+  static const gulaPasirTua = Color(0xFFD5E3DF);
+  static const kaldu = Color(0xFFE4572E);
+  static const kalduTua = Color(0xFFA93A1B);
+  static const karung = Color(0xFFF2E8D5);
+  static const karungTua = Color(0xFFC9B48E);
+  static const kelapa = Color(0xFFFFFFFF);
+  static const kelapaKulit = Color(0xFF8A5B32);
+  static const air = Color(0xFF9ED6F2);
+  static const airTua = Color(0xFF4FA3D1);
+  static const toples = Color(0xFFE6F1EE);
+  static const tutupToples = Color(0xFFD9482F);
+  static const labelKrem = Color(0xFFF3E9D2);
+  static const cangkang = Color(0xFF8C8277);
+  static const susuLabel = Color(0xFF9CCBEA);
 
   // Kuah di mangkuk.
   static const kuahBening = Color(0xFFF3E6AE);
