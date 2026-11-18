@@ -439,4 +439,143 @@ void main() {
       expect(penuh, greaterThan(ringkas));
     });
   });
+
+  group('pembeda & kepadatan', () {
+    test('kelompok gorengan: tiap resep punya siluet (bentuk) sendiri', () {
+      const gorengan = [
+        'tempe-mendoan',
+        'bakwan-sayur',
+        'perkedel-kentang',
+        'perkedel-jagung',
+        'pisang-goreng',
+        'ubi-goreng',
+        'udang-goreng-tepung',
+        'ayam-goreng-tepung',
+      ];
+      final bentuk = {for (final id in gorengan) id: rancang(id).utama?.bentuk};
+      expect(bentuk.values, isNot(contains(null)));
+      expect(
+        bentuk.values.toSet(),
+        hasLength(gorengan.length),
+        reason: 'gorengan yang sama bentuknya akan tampak kembar: $bentuk',
+      );
+      // Bukan sekadar balutan tepung generik.
+      expect(bentuk.values, isNot(contains(BentukMakanan.gorengan)));
+    });
+
+    test('kelompok telur: tiap resep punya siluet (bentuk) sendiri', () {
+      const telur = [
+        'telur-dadar',
+        'omelet-sayur',
+        'telur-kornet',
+        'fuyunghai',
+        'telur-orak-arik-tomat',
+      ];
+      final bentuk = {for (final id in telur) id: rancang(id).utama?.bentuk};
+      expect(bentuk.values.toSet(), hasLength(telur.length), reason: '$bentuk');
+      // Fuyunghai hampir seluruhnya tersiram saus.
+      expect(rancang('fuyunghai').selimut, isNotNull);
+    });
+
+    test(
+      'bawang goreng hanya di masakan yang lazim, dan hanya saat detail',
+      () {
+        const lazim = {
+          'nasi-goreng',
+          'nasi-goreng-sosis',
+          'nasi-goreng-teri',
+          'bubur-ayam',
+          'sop-ayam',
+          'sayur-sop',
+          'opor-ayam',
+          'semur-ayam-kentang',
+        };
+        for (final r in katalog.resep) {
+          final ada = susunSampul(
+            r,
+            byId,
+          ).taburan.where((k) => k.nama == 'bawang-goreng').toList();
+          expect(ada.isNotEmpty, lazim.contains(r.id), reason: r.id);
+          expect(ada.every((k) => k.hanyaDetail), isTrue, reason: r.id);
+        }
+      },
+    );
+
+    testWidgets('kepadatan: makanan mengisi ≥ 40% area isi wadah', (
+      tester,
+    ) async {
+      final nilai = <String, double>{};
+      for (final r in katalog.resep) {
+        nilai[r.id] = await _kepadatan(tester, susunSampul(r, byId));
+      }
+      final urut = nilai.entries.toList()
+        ..sort((a, b) => a.value.compareTo(b.value));
+      final terendah = urut.first;
+      // Dilaporkan di keluaran tes agar mudah dipantau.
+      // ignore: avoid_print
+      print(
+        'Kepadatan terendah: ${terendah.key} '
+        '${terendah.value.toStringAsFixed(3)}; 5 terendah: '
+        '${urut.take(5).map((e) => '${e.key} ${e.value.toStringAsFixed(3)}').join(', ')}',
+      );
+      expect({
+        for (final e in urut)
+          if (e.value < 0.4) e.key: e.value,
+      }, isEmpty);
+    });
+  });
+}
+
+/// Proporsi piksel di area isi wadah yang BUKAN warna alas: piring, bibir
+/// piring, kuah polos (juga batu cobek, daun pisang, dan cup). Dirender
+/// pada 224 px (2 × ukuran detail 112) dengan detail penuh.
+Future<double> _kepadatan(WidgetTester tester, RancanganSampul r) async {
+  const sisi = 224;
+  final perekam = ui.PictureRecorder();
+  SampulPainter(
+    r,
+    detailPaksa: true,
+  ).paint(ui.Canvas(perekam), const ui.Size.square(224));
+  final gambar = perekam.endRecording();
+  final bita = await tester.runAsync(() async {
+    final citra = await gambar.toImage(sisi, sisi);
+    final data = await citra.toByteData();
+    citra.dispose();
+    return data!.buffer.asUint8List();
+  });
+  gambar.dispose();
+  final rIsi = sisi * SampulPainter.porsiWadah / 2 * batasIsi(r.wadah);
+  final alas = [
+    WarnaMakanan.piring,
+    WarnaMakanan.piringBibir,
+    r.kuah,
+    if (r.wadah == WadahSampul.cobek) ...[
+      WarnaMakanan.batu,
+      WarnaMakanan.batuDalam,
+    ],
+    if (r.wadah == WadahSampul.daunPisang) ...[
+      WarnaMakanan.daunPisang,
+      WarnaMakanan.daunPisangTua,
+    ],
+    if (r.wadah == WadahSampul.cup) ...[
+      WarnaMakanan.cup,
+      WarnaMakanan.cupBibir,
+    ],
+  ].map((c) => c.toARGB32()).toList();
+  bool samaAlas(int i) => alas.any(
+    (v) =>
+        ((v >> 16 & 0xFF) - bita![i]).abs() <= 10 &&
+        ((v >> 8 & 0xFF) - bita[i + 1]).abs() <= 10 &&
+        ((v & 0xFF) - bita[i + 2]).abs() <= 10,
+  );
+  var total = 0, terisi = 0;
+  for (var y = 0; y < sisi; y++) {
+    for (var x = 0; x < sisi; x++) {
+      final dx = x + 0.5 - sisi / 2, dy = y + 0.5 - sisi / 2;
+      if (dx * dx + dy * dy > rIsi * rIsi) continue;
+      total++;
+      if (!samaAlas((y * sisi + x) * 4)) terisi++;
+    }
+  }
+  return terisi / total;
 }
