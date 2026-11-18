@@ -46,3 +46,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Keluaran golden test yang gagal (gambar selisih)
+test/failures/
