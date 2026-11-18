@@ -176,14 +176,14 @@ class IkonBahanPainter extends CustomPainter {
     'gula': (1.077, 23.95, 27.35),
     'kaldu-bubuk': (0.983, 24.00, 24.00),
     'tepung-terigu': (0.917, 24.00, 24.25),
-    'santan': (0.852, 24.00, 24.00),
+    'santan': (0.917, 24.00, 24.25),
     'margarin': (1.012, 24.00, 28.50),
     'meses': (0.983, 24.00, 25.50),
     'gula-merah': (0.900, 24.00, 25.50),
     'air': (0.905, 24.00, 24.00),
     'nasi': (0.852, 24.00, 26.30),
     'mie-instan': (0.900, 24.00, 24.00),
-    'bihun': (0.848, 24.00, 24.00),
+    'bihun': (0.901, 24.00, 24.00),
     'roti-tawar': (0.900, 24.00, 24.50),
   };
 
@@ -1616,28 +1616,60 @@ class _Lukis {
   }
 
   void _santan() {
-    lingkar(_pusat, 19, _W.kelapaKulit);
-    lingkar(_pusat, 15, _W.kelapa);
-    c
-      ..drawCircle(_pusat, 11, isi(_W.kuahSantan))
-      ..drawCircle(_pusat, 11, garis(_W.nasiTua, tg * 0.6));
+    // Kotak karton santan tampak depan (flat), senada dengan kaleng susu
+    // dan sachet kaldu: badan putih susu, pita kelapaKulit, gambar setengah
+    // kelapa, tutup ulir kecil di atas.
+    kontur(
+      Path()..addRRect(
+        RRect.fromRectAndRadius(
+          const Rect.fromLTRB(20.5, 5.5, 27.5, 11),
+          const Radius.circular(1.2),
+        ),
+      ),
+      _W.daunTua,
+    );
     if (detail) {
-      c.drawArc(
-        Rect.fromCircle(center: _pusat, radius: 7.5),
-        pi * 1.1,
-        pi * 0.35,
-        false,
-        garis(_W.kelapa, tg),
-      );
-      for (final sudut in [0.4, 1.5, 2.6, 3.7, 4.8, 5.8]) {
-        final arah = Offset.fromDirection(sudut);
-        c.drawLine(
-          _pusat + arah * 16.6,
-          _pusat + arah * 18,
-          garis(_W.tempe, tg * 0.6),
-        );
+      for (final x in [22.8, 25.2]) {
+        c.drawLine(Offset(x, 7), Offset(x, 9.5), garis(_tinta, tg * 0.4));
       }
     }
+    final badan = Path()
+      ..moveTo(15.5, 10)
+      ..lineTo(32.5, 10)
+      ..lineTo(37, 15)
+      ..lineTo(37, 41)
+      ..quadraticBezierTo(37, 43, 35, 43)
+      ..lineTo(13, 43)
+      ..quadraticBezierTo(11, 43, 11, 41)
+      ..lineTo(11, 15)
+      ..close();
+    c
+      ..drawPath(badan, isi(_W.susu))
+      ..save()
+      ..clipPath(badan)
+      ..drawRect(const Rect.fromLTRB(0, 17, 48, 22), isi(_W.kelapaKulit))
+      ..drawRect(const Rect.fromLTRB(0, 39, 48, 48), isi(_W.kelapaKulit))
+      ..restore();
+    final tepi = garis(_tinta, tg * 0.6);
+    c
+      ..drawLine(const Offset(11, 15), const Offset(37, 15), tepi)
+      ..drawLine(const Offset(11, 17), const Offset(37, 17), tepi)
+      ..drawLine(const Offset(11, 22), const Offset(37, 22), tepi)
+      ..drawLine(const Offset(11, 39), const Offset(37, 39), tepi);
+    // Setengah kelapa: tempurung dan daging putih.
+    const pusat = Offset(24, 28.5);
+    final tempurung = Rect.fromCircle(center: pusat, radius: 8);
+    c
+      ..drawArc(tempurung, 0, pi, true, isi(_W.kelapaKulit))
+      ..drawArc(tempurung, 0, pi, true, garis(_tinta, tg * 0.7))
+      ..drawArc(
+        Rect.fromCircle(center: pusat, radius: 5.6),
+        0,
+        pi,
+        true,
+        isi(_W.kelapa),
+      );
+    c.drawPath(badan, garis(_tinta));
   }
 
   void _margarin() {
@@ -1849,62 +1881,39 @@ class _Lukis {
   }
 
   void _bihun() {
-    // Sarang bihun pipih tampak atas: helai TIPIS melingkar (mie = tebal
-    // dan zig-zag), diikat pita merah bersimpul. Pita sengaja landai dan
-    // bersimpul agar tidak terbaca sebagai rambu dilarang.
-    const sarang = Rect.fromLTRB(5, 8, 43, 40);
-    kontur(Path()..addOval(sarang), _W.bihun);
-    c.drawOval(sarang.deflate(2.6), garis(_W.bihunTua, tg * 0.7));
-    final helai = garis(_W.bihunTua, tg * 0.45);
-    for (final (dx, dy, rx, ry, awal, sapu) in [
-      (-2.0, 1.0, 12.5, 10.0, 0.3, 4.2),
-      (2.0, -1.0, 9.0, 7.0, 2.6, 4.0),
-      (-1.0, 1.5, 5.5, 4.2, 4.8, 3.8),
-      if (detail) (1.5, 0.5, 14.5, 11.5, 3.6, 3.0),
-      if (detail) (-2.5, -1.5, 11.0, 8.5, 5.6, 3.2),
-      if (detail) (0.5, 1.0, 7.5, 5.8, 1.0, 3.6),
-    ]) {
-      c.drawArc(
-        Rect.fromCenter(
-          center: _pusat + Offset(dx, dy),
-          width: rx * 2,
-          height: ry * 2,
-        ),
-        awal,
-        sapu,
-        false,
-        helai,
-      );
-    }
-    putar(_pusat, -0.22, () {
-      // Pita melintang yang mengikuti lengkung sarang.
+    // Ikatan bihun tampak samping, miring diagonal: helai TIPIS sejajar
+    // (mie = blok kotak zig-zag), diikat dua tali di sepertiga atas dan
+    // bawah, kedua ujungnya sedikit mekar.
+    putar(_pusat, _diag, () {
+      final ikat = Path()
+        ..moveTo(-20, -7.5)
+        ..quadraticBezierTo(0, -3.6, 20, -7.5)
+        ..quadraticBezierTo(21.6, 0, 20, 7.5)
+        ..quadraticBezierTo(0, 3.6, -20, 7.5)
+        ..quadraticBezierTo(-21.6, 0, -20, -7.5)
+        ..close();
       c
+        ..drawPath(ikat, isi(_W.bihun))
         ..save()
-        ..clipPath(
-          Path()..addOval(
-            Rect.fromCenter(center: Offset.zero, width: 37, height: 33),
-          ),
-        );
-      kontur(
-        Path()..addRect(const Rect.fromLTRB(-24, -3.4, 24, 3.4)),
-        _W.cabai,
-      );
-      c.restore();
-      // Simpul: dua kelopak pita dan ikatan di tengah.
-      for (final arah in [-1.0, 1.0]) {
-        kontur(
+        ..clipPath(ikat);
+      final n = detail ? 8 : 4;
+      final helai = garis(_W.bihunTua, tg * (detail ? 0.4 : 0.5));
+      for (var i = 1; i < n; i++) {
+        final t = -1 + i * 2 / n;
+        c.drawPath(
           Path()
-            ..moveTo(0, 0)
-            ..lineTo(arah * 9, -6.5)
-            ..quadraticBezierTo(arah * 11, 0, arah * 9, 6.5)
-            ..close(),
-          _W.cabai,
+            ..moveTo(-23, t * 8)
+            ..quadraticBezierTo(0, t * 3.6, 23, t * 8),
+          helai,
         );
       }
-      lingkar(Offset.zero, 3.2, _W.cabai);
+      c
+        ..restore()
+        ..drawPath(ikat, garis(_tinta));
+      for (final x in [-7.0, 7.0]) {
+        batang(garisLurus(Offset(x, -5.4), Offset(x, 5.4)), _W.bihunTua, 2);
+      }
     });
-    // Tepi sarang di atas ujung pita.
-    c.drawOval(sarang, garis(_tinta));
   }
 
   void _roti() {
