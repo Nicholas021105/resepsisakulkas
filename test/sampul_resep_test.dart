@@ -8,27 +8,13 @@ import 'package:resepsisakulkas/app/data/models/katalog_model.dart';
 import 'package:resepsisakulkas/app/data/models/resep_model.dart';
 import 'package:resepsisakulkas/app/theme/app_colors.dart';
 import 'package:resepsisakulkas/app/theme/app_spacing.dart';
+import 'package:resepsisakulkas/app/theme/app_warna_makanan.dart';
 import 'package:resepsisakulkas/app/widgets/sampul_resep.dart';
 
 /// Bentuk olahan yang belum dipakai resep mana pun karena gaya khusus per
 /// resep (petaSampulResep) belum diisi. Harus kosong setelah semua sampul
 /// khusus selesai.
-const _menungguGayaKhusus = {
-  BentukMakanan.batang,
-  BentukMakanan.lembarTepung,
-  BentukMakanan.perkedel,
-  BentukMakanan.suwir,
-  BentukMakanan.udangTepung,
-  BentukMakanan.ayamTepung,
-  BentukMakanan.pisangGoreng,
-  BentukMakanan.gorenganJagung,
-  BentukMakanan.irisanMiring,
-  BentukMakanan.batangKangkung,
-  BentukMakanan.seratTelur,
-  BentukMakanan.taburan,
-  BentukMakanan.kerupuk,
-  BentukMakanan.cakwe,
-};
+const _menungguGayaKhusus = {BentukMakanan.seratTelur};
 
 /// Sampul resep: pemetaan bahan → komponen, susunan per resep, tata letak
 /// deterministik, dan pelukis untuk seluruh katalog.
@@ -105,13 +91,29 @@ void main() {
 
   group('susunSampul', () {
     test('utama = bahan isi wajib pertama; hiasan dari bumbu', () {
-      final r = rancang('orek-tempe');
-      expect(r.utama?.nama, 'tempe');
+      // Resep tanpa gaya khusus: komposisi otomatis dari bahannya.
+      expect(petaSampulResep, isNot(contains('tumis-jamur')));
+      final r = rancang('tumis-jamur');
+      expect(r.utama?.nama, 'jamur');
       expect(r.wadah, WadahSampul.piring);
-      expect(r.hiasan.map((k) => k.nama), ['bawang-merah', 'bawang-putih']);
-      // Tumisan berkecap: genangan saus, bukan siraman di atas.
+      expect(r.hiasan.map((k) => k.nama), ['bawang-putih', 'cabai']);
+      // Tumisan bersaus: genangan saus, bukan siraman di atas.
       expect(r.genangan, isNotNull);
       expect(r.siraman, isNull);
+    });
+
+    test('gaya khusus menimpa hasil bawaan, termasuk menghapus warna', () {
+      final orek = rancang('orek-tempe');
+      expect(orek.utama?.bentuk, BentukMakanan.batang);
+      expect(orek.tata, TataUtama.tumpuk);
+      // Orek itu kering: genangan bawaan dihapus lewat tanpaWarna.
+      expect(orek.genangan, isNull);
+      final mendoan = rancang('tempe-mendoan');
+      expect(mendoan.balut, isFalse, reason: 'tepungnya sudah di bentuk');
+      expect(mendoan.pelengkap.map((k) => k.nama), ['cabai-rawit']);
+      // Tanda ikut berubah karena penimpaan.
+      expect(orek.tanda, contains('batang'));
+      expect(mendoan.tanda, contains('cabai-rawit'));
     });
 
     test('telur digambar menurut cara masaknya', () {
@@ -160,22 +162,27 @@ void main() {
       );
     });
 
-    test('gorengan bertepung dibalut; telur pelapisnya tidak digambar', () {
+    test('gorengan bertepung berbentuk olahan; telur pelapisnya tidak '
+        'digambar', () {
       final ayam = rancang('ayam-goreng-tepung');
-      expect(ayam.balut, isTrue);
-      expect(ayam.utama?.nama, 'ayam');
+      // Tepungnya sudah ada di bentuk ayamTepung, jadi tidak dibalut lagi.
+      expect(ayam.utama?.bentuk, BentukMakanan.ayamTepung);
+      expect(ayam.balut, isFalse);
       expect(
         ayam.pendamping.map((k) => k.nama),
         isNot(contains('telur-dadar')),
       );
+      // Ayam goreng biasa tetap paha mulus tanpa tepung.
+      expect(rancang('ayam-goreng').utama?.bentuk, BentukMakanan.ayam);
       expect(rancang('ayam-goreng').balut, isFalse);
-      expect(rancang('bakwan-sayur').balut, isTrue);
     });
 
-    test('bubur: nasi menjadi kuah, lauknya yang utama', () {
+    test('bubur: nasi menjadi kuah, lauknya (ayam suwir) yang utama', () {
       final r = rancang('bubur-ayam');
       expect(r.wadah, WadahSampul.mangkuk);
-      expect(r.utama?.nama, 'ayam');
+      expect(r.kuah, WarnaMakanan.nasi);
+      expect(r.utama?.bentuk, BentukMakanan.suwir);
+      expect(r.pelengkap.map((k) => k.bentuk), [BentukMakanan.kerupuk]);
     });
 
     test('nasi goreng kecap berwarna kecokelatan, tanpa siraman', () {
@@ -255,6 +262,8 @@ void main() {
           s.utama!.tunggal ? 1 : s.utama!.jumlah,
           reason: r.id,
         );
+        // Tumpukan, jajaran, dan kipas memang sengaja saling menumpang.
+        if (s.tata != TataUtama.cincin) continue;
         for (var i = 0; i < utama.length; i++) {
           for (var j = i + 1; j < utama.length; j++) {
             expect(
@@ -332,6 +341,7 @@ void main() {
           ...s.pendamping.map((k) => k.bentuk),
           ...s.hiasan.map((k) => k.bentuk),
           ...s.pelengkap.map((k) => k.bentuk),
+          ...s.taburan.map((k) => k.bentuk),
           if (s.balut) BentukMakanan.gorengan,
         ]);
       }

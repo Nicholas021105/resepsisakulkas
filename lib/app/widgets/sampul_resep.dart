@@ -447,6 +447,9 @@ class RancanganSampul {
   /// Warna siraman di atas makanan (kecap, saus, susu); null = tidak ada.
   final Color? siraman;
 
+  /// Siraman berupa garis tipis, bukan aliran tebal.
+  final bool siramanTipis;
+
   /// Warna genangan saus di bawah tumisan; null = tidak ada.
   final Color? genangan;
 
@@ -457,6 +460,9 @@ class RancanganSampul {
 
   /// Pelengkap saji di tepi wadah (kerupuk, irisan timun, cabai rawit).
   final List<Komponen> pelengkap;
+
+  /// Taburan halus di atas makanan utama (bawang goreng, keju, meses).
+  final List<Komponen> taburan;
 
   /// Cara potongan utama yang banyak ditata.
   final TataUtama tata;
@@ -472,9 +478,11 @@ class RancanganSampul {
     this.warnaUtama,
     this.balut = false,
     this.siraman,
+    this.siramanTipis = false,
     this.genangan,
     this.selimut,
     this.pelengkap = const [],
+    this.taburan = const [],
     this.tata = TataUtama.cincin,
   });
 
@@ -492,8 +500,9 @@ class RancanganSampul {
       daftar(pendamping),
       daftar(hiasan),
       daftar(pelengkap),
+      daftar(taburan),
       warna(warnaUtama),
-      warna(siraman),
+      '${warna(siraman)}${siramanTipis ? '-tipis' : ''}',
       warna(genangan),
       warna(selimut),
       warna(kuah),
@@ -641,8 +650,10 @@ RancanganSampul _terapkan(RancanganSampul r, GayaSampul g) => RancanganSampul(
   pendamping: g.pendamping ?? r.pendamping,
   hiasan: g.hiasan ?? r.hiasan,
   pelengkap: g.pelengkap ?? r.pelengkap,
+  taburan: g.taburan ?? r.taburan,
   tata: g.tata ?? r.tata,
   siraman: GayaSampul.pilih(g.siraman, r.siraman),
+  siramanTipis: g.siramanTipis ?? r.siramanTipis,
   genangan: GayaSampul.pilih(g.genangan, r.genangan),
   selimut: GayaSampul.pilih(g.selimut, r.selimut),
   kuah: g.kuah ?? r.kuah,
@@ -992,8 +1003,9 @@ class SampulPainter extends CustomPainter {
       for (var i = 0; i < potongan.length; i++) {
         final p = potongan[i];
         if ((p.lapis == 2) != hiasan) continue;
-        // Hiasan terkecil disembunyikan di ukuran kartu.
+        // Hiasan terkecil dan taburan halus disembunyikan di ukuran kartu.
         if (!detail && p.lapis == 2 && p.r < 0.11 && i.isOdd) continue;
+        if (!detail && p.komponen.hanyaDetail) continue;
         canvas
           ..save()
           ..translate(p.pos.dx * jari, p.pos.dy * jari)
@@ -1016,6 +1028,23 @@ class SampulPainter extends CustomPainter {
     if (r.selimut != null) _selimut(pena, jari, r);
     lukis(true);
     if (r.siraman != null) _siraman(canvas, jari, r);
+    // Taburan halus di atas makanan utama (atau seluruh area makanan).
+    if (r.taburan.isNotEmpty) {
+      final dasar = potongan
+          .where((p) => p.lapis == 0 && p.komponen.tunggal)
+          .firstOrNull;
+      final o = (dasar?.pos ?? Offset.zero) * jari;
+      final rad = (dasar?.r ?? batasIsi(r.wadah)) * 0.8 * jari;
+      for (var j = 0; j < r.taburan.length; j++) {
+        final k = r.taburan[j];
+        if (!detail && k.hanyaDetail) continue;
+        canvas
+          ..save()
+          ..translate(o.dx, o.dy);
+        pena.gambar(k.bentuk, k, rad, Random(r.benih + 991 * (j + 1)));
+        canvas.restore();
+      }
+    }
     canvas.restore();
 
     // Garis tepi wadah di atas isi.
@@ -1171,15 +1200,17 @@ class SampulPainter extends CustomPainter {
   /// Siraman berkelok di atas makanan.
   void _siraman(Canvas canvas, double jari, RancanganSampul r) {
     final sudut = (r.benih % 12) * pi / 6;
-    final lebar = jari * 0.52;
-    final jalur = Path()..moveTo(-lebar, -jari * 0.12);
+    final tipis = r.siramanTipis;
+    final lebar = jari * (tipis ? 0.46 : 0.52);
+    final ayun = tipis ? 0.6 : 1.0;
+    final jalur = Path()..moveTo(-lebar, -jari * 0.12 * ayun);
     for (var i = 1; i <= 5; i++) {
       final x = -lebar + 2 * lebar * i / 5;
       jalur.quadraticBezierTo(
         x - lebar / 5,
-        (i.isOdd ? 1 : -1) * jari * 0.32,
+        (i.isOdd ? 1 : -1) * jari * 0.32 * ayun,
         x,
-        (i.isOdd ? 1 : -1) * jari * 0.1,
+        (i.isOdd ? 1 : -1) * jari * 0.1 * ayun,
       );
     }
     canvas
@@ -1190,7 +1221,7 @@ class SampulPainter extends CustomPainter {
         Paint()
           ..color = r.siraman!
           ..style = PaintingStyle.stroke
-          ..strokeWidth = jari * 0.085
+          ..strokeWidth = jari * (tipis ? 0.04 : 0.085)
           ..strokeCap = StrokeCap.round
           ..strokeJoin = StrokeJoin.round,
       )

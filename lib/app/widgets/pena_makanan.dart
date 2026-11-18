@@ -88,6 +88,17 @@ enum BentukMakanan {
 
   /// Mie/bihun goreng dengan helai terlihat. `rasio` < 0,4 = helai tipis.
   mieGoreng,
+
+  /// Kubus tahu berkulit goreng keemasan; sebagian terpotong sehingga sisi
+  /// dalam putihnya terlihat.
+  tahuGoreng,
+
+  /// Ikan teri kecil: badan ramping, ekor bercabang.
+  ikanTeri,
+
+  /// Irisan ubi berbalut tepung: daging oranye (warnaTua) tampak, kulit
+  /// ungu di tepi.
+  ubiGoreng,
 }
 
 /// Peran sebuah bahan di sampul.
@@ -127,6 +138,9 @@ class Komponen {
   /// komponen lain ditata di atasnya.
   final bool tunggal;
 
+  /// Hanya digambar saat detail (taburan halus seperti bawang goreng).
+  final bool hanyaDetail;
+
   const Komponen(
     this.nama,
     this.bentuk,
@@ -137,6 +151,7 @@ class Komponen {
     this.skala = 1,
     this.rasio = 0.5,
     this.tunggal = false,
+    this.hanyaDetail = false,
   });
 
   const Komponen.hiasan(
@@ -147,6 +162,7 @@ class Komponen {
     this.jumlah = 4,
     this.skala = 1,
     this.rasio = 0.5,
+    this.hanyaDetail = false,
   }) : peran = PeranMakanan.hiasan,
        tunggal = false;
 
@@ -157,7 +173,8 @@ class Komponen {
       jumlah = 0,
       skala = 1,
       rasio = 0.5,
-      tunggal = false;
+      tunggal = false,
+      hanyaDetail = false;
 
   const Komponen.tanpa(this.nama)
     : bentuk = BentukMakanan.generik,
@@ -167,7 +184,8 @@ class Komponen {
       jumlah = 0,
       skala = 1,
       rasio = 0.5,
-      tunggal = false;
+      tunggal = false,
+      hanyaDetail = false;
 }
 
 /// Pena bersama sampul resep dan ikon bahan: garis tepi tinta, warna dari
@@ -760,6 +778,128 @@ class PenaMakanan {
         _cakwe(k, r, w);
       case BentukMakanan.mieGoreng:
         _mieGoreng(k, r, w, acak);
+      case BentukMakanan.tahuGoreng:
+        _tahuGoreng(k, r, w, acak);
+      case BentukMakanan.ikanTeri:
+        _ikanTeri(k, r, w);
+      case BentukMakanan.ubiGoreng:
+        _ubiGoreng(k, r, w, acak);
+    }
+  }
+
+  void _tahuGoreng(Komponen k, double r, Color w, Random acak) {
+    final luar = RRect.fromRectAndRadius(
+      Rect.fromCenter(center: Offset.zero, width: r * 1.6, height: r * 1.6),
+      Radius.circular(r * 0.26),
+    );
+    kontur(Path()..addRRect(luar), k.warnaTua);
+    final muka = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(-r * 0.08, -r * 0.08),
+        width: r * 1.22,
+        height: r * 1.22,
+      ),
+      Radius.circular(r * 0.2),
+    );
+    c.drawRRect(muka, isi(w));
+    if (acak.nextBool()) {
+      // Terpotong: separuh muka memperlihatkan isi tahu yang putih.
+      final a = Offset(muka.left, muka.bottom),
+          b = Offset(muka.right, muka.top);
+      c
+        ..save()
+        ..clipRRect(muka)
+        ..drawPath(
+          Path()
+            ..moveTo(a.dx, a.dy)
+            ..lineTo(b.dx, b.dy)
+            ..lineTo(muka.right, muka.bottom)
+            ..close(),
+          isi(_W.tahu),
+        )
+        ..restore()
+        ..drawLine(a, b, garis(Color.lerp(k.warnaTua, _tinta, 0.3)!, tg * 0.8));
+      if (detail) {
+        for (final (x, y) in const [(0.3, 0.32), (0.12, 0.42), (0.42, 0.1)]) {
+          c.drawCircle(Offset(r * x, r * y), r * 0.045, isi(_W.tahuTua));
+        }
+      }
+    } else if (detail) {
+      for (final (x, y) in const [(-0.3, -0.2), (0.15, 0.12), (-0.1, 0.32)]) {
+        c.drawCircle(Offset(r * x, r * y), r * 0.05, isi(k.warnaTua));
+      }
+    }
+  }
+
+  void _ikanTeri(Komponen k, double r, Color w) {
+    kontur(
+      Path()
+        ..moveTo(-r * 0.6, 0)
+        ..lineTo(-r, -r * 0.32)
+        ..lineTo(-r * 0.84, 0)
+        ..lineTo(-r, r * 0.32)
+        ..close(),
+      k.warnaTua,
+    );
+    kontur(
+      Path()
+        ..moveTo(-r * 0.7, 0)
+        ..quadraticBezierTo(-r * 0.1, -r * 0.38, r * 0.92, -r * 0.05)
+        ..quadraticBezierTo(r, 0, r * 0.92, r * 0.05)
+        ..quadraticBezierTo(-r * 0.1, r * 0.32, -r * 0.7, 0)
+        ..close(),
+      w,
+    );
+    // Garis perak di sisi badan.
+    c.drawLine(
+      Offset(-r * 0.45, r * 0.02),
+      Offset(r * 0.6, -r * 0.02),
+      garis(k.warnaTua, tg * 0.7),
+    );
+    if (detail) {
+      c.drawCircle(Offset(r * 0.62, -r * 0.1), r * 0.07, isi(_tinta));
+    }
+  }
+
+  void _ubiGoreng(Komponen k, double r, Color w, Random acak) {
+    kontur(_bergelombang(r * 0.96, r * 0.8, 12, 0.08, acak), w);
+    final daging = Rect.fromCenter(
+      center: Offset(r * 0.04, r * 0.02),
+      width: r * 1.3,
+      height: r * 1.0,
+    );
+    c
+      ..drawOval(daging, isi(k.warnaTua))
+      ..drawOval(daging, garis(Color.lerp(k.warnaTua, _tinta, 0.35)!, tg * 0.7))
+      // Kulit ungu di sebagian tepi daging.
+      ..drawArc(
+        daging,
+        pi * 0.12,
+        pi * 0.62,
+        false,
+        garis(_W.ubiKulit, r * 0.13),
+      )
+      // Tepung menutup sebagian daging.
+      ..drawPath(
+        _bergelombang(
+          r * 0.36,
+          r * 0.24,
+          6,
+          0.2,
+          acak,
+          o: Offset(-r * 0.38, -r * 0.2),
+        ),
+        isi(w),
+      );
+    if (detail) {
+      for (var i = 0; i < 5; i++) {
+        final o = _acakDalam(acak, r * 0.85, r * 0.7);
+        if ((o.dx / (r * 0.65)) * (o.dx / (r * 0.65)) +
+                (o.dy / (r * 0.5)) * (o.dy / (r * 0.5)) >
+            1) {
+          c.drawCircle(o, r * 0.045, isi(_W.gorenganTua));
+        }
+      }
     }
   }
 
@@ -851,9 +991,9 @@ class PenaMakanan {
     }
     // Tepung menutup sebagian tempe.
     for (final (x, y, rx, ry) in const [
-      (-0.42, 0.22, 0.34, 0.26),
-      (0.36, 0.3, 0.3, 0.22),
-      (0.05, -0.34, 0.36, 0.2),
+      (-0.5, 0.3, 0.26, 0.2),
+      (0.42, 0.34, 0.24, 0.18),
+      (0.05, -0.4, 0.3, 0.16),
     ]) {
       c.drawPath(
         _bergelombang(r * rx, r * ry, 7, 0.16, acak, o: Offset(r * x, r * y)),
@@ -1020,7 +1160,7 @@ class PenaMakanan {
       ..drawLine(a, b, garis(_W.tulang, r * 0.26))
       ..drawCircle(b, r * 0.17, isi(_W.tulang));
     final pusat = Offset(-r * 0.18, 0);
-    kontur(_bergelombang(r * 0.74, r * 0.62, 16, 0.12, acak, o: pusat), w);
+    kontur(_bergelombang(r * 0.8, r * 0.7, 16, 0.12, acak, o: pusat), w);
     // Kerak tepung: gumpil gelap, lebih banyak saat detail.
     for (var i = 0; i < (detail ? 7 : 3); i++) {
       final o = pusat + _acakDalam(acak, r * 0.48, r * 0.36);
@@ -1114,11 +1254,11 @@ class PenaMakanan {
   }
 
   void _batangKangkung(Komponen k, double r, Color w) {
-    final tebal = r * 0.24;
+    final tebal = r * 0.2;
     final daun = Path()
-      ..moveTo(r * 0.05, 0)
-      ..quadraticBezierTo(r * 0.5, -r * 0.32, r, -r * 0.06)
-      ..quadraticBezierTo(r * 0.5, r * 0.18, r * 0.05, 0)
+      ..moveTo(r * -0.05, 0)
+      ..quadraticBezierTo(r * 0.5, -r * 0.44, r, -r * 0.06)
+      ..quadraticBezierTo(r * 0.5, r * 0.26, -r * 0.05, 0)
       ..close();
     kontur(daun, k.warnaTua);
     if (detail) {
@@ -1248,7 +1388,7 @@ class PenaMakanan {
 
   void _mieGoreng(Komponen k, double r, Color w, Random acak) {
     final dasar = Path()
-      ..addOval(Rect.fromCircle(center: Offset.zero, radius: r));
+      ..addPath(_bergelombang(r, r * 0.94, 13, 0.06, acak), Offset.zero);
     final tipis = k.rasio < 0.4;
     c
       ..drawPath(dasar, isi(Color.lerp(w, _tinta, tipis ? 0.2 : 0.3)!))

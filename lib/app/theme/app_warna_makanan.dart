@@ -117,6 +117,23 @@ abstract class WarnaMakanan {
   static const cangkang = Color(0xFF8C8277);
   static const susuLabel = Color(0xFF9CCBEA);
 
+  // Olahan matang khusus sampul (sampul_khusus.dart).
+  static const tempeKecap = Color(0xFF8A5530);
+  static const tempeBalado = Color(0xFFA9532E);
+  static const tepungMendoan = Color(0xFFF1DC9C);
+  static const tahuGoreng = Color(0xFFDDA24B);
+  static const tahuGorengTua = Color(0xFFAE7429);
+  static const ayamSuwir = Color(0xFFEBCB97);
+  static const ayamSuwirTua = Color(0xFFC29A61);
+  static const cakwe = Color(0xFFD18A3D);
+  static const cakweTua = Color(0xFF9C5D22);
+  static const kerupuk = Color(0xFFF7EAC8);
+  static const kerupukTua = Color(0xFFD8BE86);
+  static const bawangGoreng = Color(0xFFC98A4B);
+  static const bawangGorengTua = Color(0xFF8E5524);
+  static const cabaiTua = Color(0xFF9E1B1B);
+  static const sambalTua = Color(0xFF9E2B1E);
+
   // Kuah di mangkuk.
   static const kuahBening = Color(0xFFF3E6AE);
   static const kuahSantan = Color(0xFFF7EED6);
