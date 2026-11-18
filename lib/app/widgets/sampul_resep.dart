@@ -997,6 +997,16 @@ class SampulPainter extends CustomPainter {
         Color.lerp(r.genangan, _W.piring, 0.25)!,
         r.benih,
       );
+      if (detail && _mengilap(r.genangan)) {
+        // Kilau saus di tepi genangan yang tidak tertutup makanan.
+        canvas.drawArc(
+          Rect.fromCircle(center: Offset.zero, radius: jari * 0.58),
+          pi * 0.72,
+          pi * 0.32,
+          false,
+          pena.garis(Color.lerp(r.genangan, _W.piring, 0.55)!, tg),
+        );
+      }
     }
     final potongan = tataSampul(r);
     void lukis(bool hiasan) {
@@ -1025,9 +1035,9 @@ class SampulPainter extends CustomPainter {
 
     // Makanan dulu, lalu saus kental yang menyelimutinya, lalu hiasan.
     lukis(false);
-    if (r.selimut != null) _selimut(pena, jari, r);
+    if (r.selimut != null) _selimut(pena, jari, r, potongan);
     lukis(true);
-    if (r.siraman != null) _siraman(canvas, jari, r);
+    if (r.siraman != null) _siraman(canvas, jari, r, detail: detail);
     // Taburan halus di atas makanan utama (atau seluruh area makanan).
     if (r.taburan.isNotEmpty) {
       final dasar = potongan
@@ -1058,8 +1068,18 @@ class SampulPainter extends CustomPainter {
   static const _cupDalam = 0.82;
 
   /// Saus kental berombak yang menutupi sebagian besar makanan.
-  void _selimut(PenaMakanan pena, double jari, RancanganSampul r) {
-    final rad = jari * batasIsi(r.wadah) * 0.72;
+  void _selimut(
+    PenaMakanan pena,
+    double jari,
+    RancanganSampul r,
+    List<Potongan> potongan,
+  ) {
+    // Di atas utama tunggal (fuyunghai) saus menutup hampir seluruhnya.
+    final dasar = potongan
+        .where((p) => p.lapis == 0 && p.komponen.tunggal)
+        .firstOrNull;
+    final rad =
+        jari * (dasar == null ? batasIsi(r.wadah) * 0.72 : dasar.r * 0.82);
     final o = Offset.fromDirection(r.benih * 0.7, jari * 0.05);
     pena.gumpal(o, rad, r.selimut!, r.benih + 5, tepi: _tinta);
     if (pena.detail) {
@@ -1198,7 +1218,15 @@ class SampulPainter extends CustomPainter {
   }
 
   /// Siraman berkelok di atas makanan.
-  void _siraman(Canvas canvas, double jari, RancanganSampul r) {
+  /// Kecap dan saus tiram mengilap: diberi garis kilau saat detail.
+  static bool _mengilap(Color? w) => w == _W.kecap || w == _W.sausTiram;
+
+  void _siraman(
+    Canvas canvas,
+    double jari,
+    RancanganSampul r, {
+    required bool detail,
+  }) {
     final sudut = (r.benih % 12) * pi / 6;
     final tipis = r.siramanTipis;
     final lebar = jari * (tipis ? 0.46 : 0.52);
@@ -1225,6 +1253,21 @@ class SampulPainter extends CustomPainter {
           ..strokeCap = StrokeCap.round
           ..strokeJoin = StrokeJoin.round,
       )
+      ..save()
+      ..translate(-jari * 0.012, -jari * 0.012);
+    if (detail && _mengilap(r.siraman)) {
+      canvas.drawPath(
+        jalur,
+        Paint()
+          ..color = Color.lerp(r.siraman, _W.piring, 0.5)!
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = jari * (tipis ? 0.012 : 0.022)
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round,
+      );
+    }
+    canvas
+      ..restore()
       ..restore();
   }
 

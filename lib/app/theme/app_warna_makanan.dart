@@ -143,6 +143,7 @@ abstract class WarnaMakanan {
   static const rotiBakar = Color(0xFFE6BA6E);
   static const pisangBakar = Color(0xFFE9BC4A);
   static const bumbuKacang = Color(0xFFC48A4E);
+  static const dadarCokelat = Color(0xFFC88A35);
 
   // Kuah di mangkuk.
   static const kuahBening = Color(0xFFF3E6AE);

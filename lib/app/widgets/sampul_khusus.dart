@@ -371,6 +371,7 @@ const petaSampulResep = <String, GayaSampul>{
   'nasi-goreng-teri': GayaSampul(
     hiasan: [_teri, _cabaiIris],
     pelengkap: [_timunIris, _tomatIris],
+    taburan: [_bawangGoreng],
   ),
   // Bubur putih: ayam suwir, cakwe, kerupuk di tepi, kecap tipis.
   'bubur-ayam': GayaSampul(
@@ -505,6 +506,8 @@ const petaSampulResep = <String, GayaSampul>{
     balut: false,
     pendamping: [],
     hiasan: [],
+    // Pelengkap lazim ayam goreng; juga mengisi piring yang lapang.
+    pelengkap: [_timunIris],
   ),
 
   // --- Penyesuaian kecil ---------------------------------------------------
@@ -634,8 +637,8 @@ const petaSampulResep = <String, GayaSampul>{
       BentukMakanan.irisanMiring,
       _W.pisang,
       _W.pisangTua,
-      jumlah: 5,
-      skala: 0.95,
+      jumlah: 6,
+      skala: 1.1,
       rasio: 0.6,
     ),
     pendamping: [
@@ -645,7 +648,7 @@ const petaSampulResep = <String, GayaSampul>{
         _W.ubi,
         _W.ubiKulit,
         jumlah: 3,
-        skala: 0.85,
+        skala: 0.95,
       ),
     ],
   ),
@@ -675,7 +678,7 @@ const petaSampulResep = <String, GayaSampul>{
   ),
   'jagung-susu-keju': GayaSampul(
     wadah: WadahSampul.cup,
-    kuah: _W.jagungTua,
+    kuah: _W.susu,
     utama: Komponen(
       'jagung-pipil',
       BentukMakanan.butirJagung,
@@ -774,6 +777,121 @@ const petaSampulResep = <String, GayaSampul>{
       ),
     ],
   ),
+  // --- Pembeda kelompok telur ----------------------------------------------
+
+  // Dadar bulat tipis bertepi kecokelatan; irisan bawang & daun bawang.
+  'telur-dadar': GayaSampul(
+    utama: Komponen(
+      'telur-dadar',
+      BentukMakanan.dadarBulat,
+      _W.dadar,
+      _W.dadarCokelat,
+      tunggal: true,
+      skala: 1.05,
+    ),
+    pendamping: [],
+    hiasan: [
+      Komponen.hiasan(
+        'bawang-merah-iris',
+        BentukMakanan.cincin,
+        _W.bawangMerah,
+        _W.bawangMerahTua,
+        jumlah: 4,
+        skala: 1.1,
+      ),
+      _daunBawangIris,
+    ],
+  ),
+  // Dilipat setengah lingkaran; wortel, daun bawang, tomat menyembul.
+  'omelet-sayur': GayaSampul(
+    utama: Komponen(
+      'omelet-lipat',
+      BentukMakanan.dadarLipat,
+      _W.dadar,
+      _W.dadarCokelat,
+      tunggal: true,
+      skala: 1.05,
+    ),
+    pendamping: [],
+    hiasan: [],
+  ),
+  // Dadar tebal dipotong empat, kornet terlihat di sisi potong.
+  'telur-kornet': GayaSampul(
+    utama: Komponen(
+      'telur-kornet',
+      BentukMakanan.dadarPotong,
+      _W.dadar,
+      _W.dadarTua,
+      tunggal: true,
+      skala: 1.05,
+    ),
+    pendamping: [],
+    hiasan: [_daunBawangIris],
+  ),
+  // Telur tebal mengembang yang hampir seluruhnya tersiram saus asam manis.
+  // Data: tanpa kacang polong maupun daun bawang (sayurnya kol & wortel).
+  'fuyunghai': GayaSampul(
+    utama: Komponen(
+      'fuyunghai',
+      BentukMakanan.fuyunghai,
+      _W.dadar,
+      _W.dadarTua,
+      tunggal: true,
+      skala: 1.05,
+    ),
+    pendamping: [],
+    hiasan: [],
+    siraman: GayaSampul.tanpaWarna,
+    selimut: _W.sausTomat,
+  ),
+
+  // --- Polesan & kepadatan --------------------------------------------------
+
+  // Telur ceplok berkecap ditaburi irisan cabai dan bawang merah.
+  'telur-ceplok-kecap': GayaSampul(
+    hiasan: [
+      _cabaiIris,
+      Komponen.hiasan(
+        'bawang-merah-iris',
+        BentukMakanan.cincin,
+        _W.bawangMerah,
+        _W.bawangMerahTua,
+        jumlah: 4,
+        skala: 1.1,
+      ),
+    ],
+  ),
+  // Satu telur ceplok besar di atas nasi, kecap, dan margarin.
+  'nasi-telur': GayaSampul(
+    pendamping: [
+      Komponen(
+        'telur-ceplok',
+        BentukMakanan.telurCeplok,
+        _W.telurPutih,
+        _W.telurKuning,
+        jumlah: 1,
+        skala: 2.1,
+      ),
+      Komponen(
+        'margarin',
+        BentukMakanan.kubus,
+        _W.margarin,
+        _W.margarinTua,
+        jumlah: 1,
+        skala: 1.0,
+      ),
+    ],
+    hiasan: [],
+  ),
+
+  // Bawang goreng hanya pada masakan yang lazim memakainya (detail saja).
+  'nasi-goreng': GayaSampul(taburan: [_bawangGoreng]),
+  'nasi-goreng-sosis': GayaSampul(taburan: [_bawangGoreng]),
+  'sop-ayam': GayaSampul(taburan: [_bawangGoreng]),
+  'sayur-sop': GayaSampul(taburan: [_bawangGoreng]),
+  'opor-ayam': GayaSampul(taburan: [_bawangGoreng]),
+  'semur-ayam-kentang': GayaSampul(taburan: [_bawangGoreng]),
+
   // Mangkuk kecil berisi kecap dengan irisan cabai, bawang merah, tomat.
   'sambal-kecap': GayaSampul(
     wadah: WadahSampul.mangkukKecil,

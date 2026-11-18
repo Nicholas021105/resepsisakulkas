@@ -117,6 +117,18 @@ enum BentukMakanan {
 
   /// Dua lembar roti bertumpuk miring; telur dan keju menyembul di tepi.
   rotiLapis,
+
+  /// Dadar bulat tipis bertepi kecokelatan (warnaTua).
+  dadarBulat,
+
+  /// Dadar dilipat setengah lingkaran, sayur menyembul dari lipatan.
+  dadarLipat,
+
+  /// Dadar tebal dipotong empat; isi (kornet) terlihat di sisi potong.
+  dadarPotong,
+
+  /// Fuyunghai: telur tebal mengembang dengan kol & wortel di tepinya.
+  fuyunghai,
 }
 
 /// Peran sebuah bahan di sampul.
@@ -873,8 +885,8 @@ class PenaMakanan {
         // Isi: telur dadar dan keju yang menyembul dari tepi roti.
         kontur(
           _bergelombang(
-            r * 0.8,
-            r * 0.74,
+            r * 0.96,
+            r * 0.9,
             10,
             0.1,
             acak,
@@ -884,14 +896,14 @@ class PenaMakanan {
         );
         c
           ..save()
-          ..rotate(0.62);
+          ..rotate(0.78);
         kontur(
           Path()..addRRect(
             RRect.fromRectAndRadius(
               Rect.fromCenter(
                 center: Offset.zero,
-                width: r * 1.16,
-                height: r * 1.16,
+                width: r * 1.4,
+                height: r * 1.4,
               ),
               Radius.circular(r * 0.06),
             ),
@@ -900,7 +912,146 @@ class PenaMakanan {
         );
         c.restore();
         _lembarRoti(Offset(r * 0.08, -r * 0.06), 0.1, r, k.warnaTua, w, null);
+      case BentukMakanan.dadarBulat:
+        _dadarBulat(k, r, w, acak);
+      case BentukMakanan.dadarLipat:
+        _dadarLipat(k, r, w, acak);
+      case BentukMakanan.dadarPotong:
+        _dadarPotong(k, r, w, acak);
+      case BentukMakanan.fuyunghai:
+        _fuyunghai(k, r, w, acak);
     }
+  }
+
+  void _dadarBulat(Komponen k, double r, Color w, Random acak) {
+    kontur(_bergelombang(r, r * 0.97, 14, 0.04, acak), k.warnaTua);
+    c.drawPath(_bergelombang(r * 0.8, r * 0.77, 12, 0.05, acak), isi(w));
+    // Bercak kecokelatan bekas wajan.
+    final bercak = isi(Color.lerp(w, k.warnaTua, 0.55)!);
+    for (var i = 0; i < (detail ? 6 : 3); i++) {
+      c.drawPath(
+        _bergelombang(
+          r * 0.12,
+          r * 0.08,
+          5,
+          0.25,
+          acak,
+          o: _acakDalam(acak, r * 0.55, r * 0.55),
+        ),
+        bercak,
+      );
+    }
+  }
+
+  void _dadarLipat(Komponen k, double r, Color w, Random acak) {
+    const y0 = 0.38;
+    // Diturunkan sedikit agar bentuk setengah lingkaran tampak di tengah.
+    c
+      ..save()
+      ..translate(0, r * 0.17);
+    // Sayur menyembul dari lipatan (digambar di bawah dadar).
+    for (var i = 0; i < 7; i++) {
+      final o = Offset(r * (-0.72 + i * 0.24), r * (y0 + 0.04));
+      switch (i % 3) {
+        case 0:
+          _gores(
+            Path()
+              ..moveTo(o.dx, o.dy)
+              ..lineTo(o.dx + r * 0.06, o.dy + r * 0.24),
+            _W.wortel,
+            r * 0.08,
+          );
+        case 1:
+          final daun = o + Offset(0, r * 0.12);
+          c
+            ..drawCircle(daun, r * 0.1, isi(_W.daun))
+            ..drawCircle(daun, r * 0.1, garis(_tinta, tg * 0.7));
+        default:
+          final tomat = RRect.fromRectAndRadius(
+            Rect.fromCenter(
+              center: o + Offset(0, r * 0.12),
+              width: r * 0.18,
+              height: r * 0.16,
+            ),
+            Radius.circular(r * 0.04),
+          );
+          c
+            ..drawRRect(tomat, isi(_W.tomat))
+            ..drawRRect(tomat, garis(_tinta, tg * 0.7));
+      }
+    }
+    final dadar = Path()
+      ..moveTo(-r, r * y0)
+      ..arcToPoint(Offset(r, r * y0), radius: Radius.elliptical(r, r * 1.12))
+      ..quadraticBezierTo(0, r * (y0 + 0.12), -r, r * y0)
+      ..close();
+    kontur(dadar, w);
+    // Tepi lipatan sedikit kecokelatan.
+    c.drawPath(
+      Path()
+        ..moveTo(-r * 0.86, r * (y0 - 0.06))
+        ..quadraticBezierTo(0, r * (y0 + 0.04), r * 0.86, r * (y0 - 0.06)),
+      garis(k.warnaTua, tg),
+    );
+    if (detail) {
+      for (var i = 0; i < 5; i++) {
+        final o = _acakDalam(acak, r * 0.6, r * 0.4) - Offset(0, r * 0.25);
+        c.drawCircle(o, r * 0.05, isi(Color.lerp(w, k.warnaTua, 0.6)!));
+      }
+    }
+    c.restore();
+  }
+
+  void _dadarPotong(Komponen k, double r, Color w, Random acak) {
+    final awal = acak.nextDouble() * pi;
+    const n = 4, sapu = 2 * pi / n;
+    final rr = r * 0.9;
+    for (var i = 0; i < n; i++) {
+      final a0 = awal + i * sapu;
+      final geser = Offset.fromDirection(a0 + sapu / 2, r * 0.08);
+      kontur(
+        Path()
+          ..moveTo(geser.dx, geser.dy)
+          ..arcTo(Rect.fromCircle(center: geser, radius: rr), a0, sapu, false)
+          ..close(),
+        w,
+      );
+      // Kornet terlihat di sisi potong yang tebal.
+      for (final a in [a0 + 0.14, a0 + sapu - 0.14]) {
+        for (final t in [0.4, 0.72]) {
+          final o = geser + Offset.fromDirection(a, rr * t);
+          c
+            ..drawCircle(o, r * 0.075, isi(_W.kornet))
+            ..drawCircle(o, r * 0.075, garis(_W.kornetTua, tg * 0.6));
+        }
+      }
+      if (detail) {
+        final o = geser + Offset.fromDirection(a0 + sapu / 2, rr * 0.6);
+        c.drawCircle(o, r * 0.05, isi(_W.kornetTua));
+      }
+    }
+  }
+
+  void _fuyunghai(Komponen k, double r, Color w, Random acak) {
+    // Kol dan wortel mencuat dari tepi telur yang tebal.
+    for (var i = 0; i < 8; i++) {
+      final a = i * 2 * pi / 8 + acak.nextDouble() * 0.4;
+      final dari = Offset.fromDirection(a, r * 0.7);
+      final ke = Offset.fromDirection(a + 0.25, r * 1.04);
+      _gores(
+        Path()
+          ..moveTo(dari.dx, dari.dy)
+          ..lineTo(ke.dx, ke.dy),
+        i.isEven ? _W.wortel : _W.daunPucatTua,
+        r * 0.08,
+      );
+    }
+    kontur(_bergelombang(r * 0.96, r * 0.92, 9, 0.12, acak), w);
+    // Lingkar dalam memberi kesan tebal mengembang.
+    c.drawPath(
+      _bergelombang(r * 0.72, r * 0.68, 8, 0.1, acak),
+      garis(k.warnaTua, tg * 0.8),
+    );
   }
 
   /// Satu lembar roti tawar di [o] diputar [putar]: kulit [kulit] dan isi
@@ -991,7 +1142,7 @@ class PenaMakanan {
               r * (0.48 + acak.nextDouble() * 0.18),
             );
       final butir = RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset.zero, width: r * 0.46, height: r * 0.4),
+        Rect.fromCenter(center: Offset.zero, width: r * 0.52, height: r * 0.46),
         Radius.circular(r * 0.13),
       );
       c
@@ -999,7 +1150,10 @@ class PenaMakanan {
         ..translate(o.dx, o.dy)
         ..rotate(acak.nextDouble() * pi)
         ..drawRRect(butir, isi(w))
-        ..drawRRect(butir, garis(_tinta, tg * 0.8));
+        ..drawRRect(
+          butir,
+          garis(Color.lerp(k.warnaTua, _tinta, 0.45)!, tg * 0.75),
+        );
       if (detail) {
         c.drawCircle(
           Offset(-r * 0.08, -r * 0.06),
@@ -1508,7 +1662,7 @@ class PenaMakanan {
   }
 
   void _seratTelur(Komponen k, double r, Color w, Random acak) {
-    final tebal = r * 0.15;
+    final tebal = r * 0.18;
     final serat = <Path>[];
     for (var j = 0; j < 3; j++) {
       final y = (j - 1) * r * 0.36 + (acak.nextDouble() - 0.5) * r * 0.15;
@@ -1528,7 +1682,7 @@ class PenaMakanan {
       serat.add(p);
     }
     for (final p in serat) {
-      c.drawPath(p, garis(_tinta, tebal + tg * 1.2));
+      c.drawPath(p, garis(_tinta, tebal + tg * 0.8));
     }
     for (final p in serat) {
       c.drawPath(p, garis(w, tebal));
