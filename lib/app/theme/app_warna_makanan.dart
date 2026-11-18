@@ -130,6 +130,8 @@ abstract class WarnaMakanan {
   static const batu = Color(0xFF7D8884);
   static const batuDalam = Color(0xFF5F6B67);
   static const ulekan = Color(0xFF99A39F);
+  static const cup = Color(0xFFF4F8F7);
+  static const cupBibir = Color(0xFFDCE8E5);
   static const daunPisang = Color(0xFF6DB56F);
   static const daunPisangTua = Color(0xFF3F8A4C);
 

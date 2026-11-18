@@ -10,6 +10,26 @@ import 'package:resepsisakulkas/app/theme/app_colors.dart';
 import 'package:resepsisakulkas/app/theme/app_spacing.dart';
 import 'package:resepsisakulkas/app/widgets/sampul_resep.dart';
 
+/// Bentuk olahan yang belum dipakai resep mana pun karena gaya khusus per
+/// resep (petaSampulResep) belum diisi. Harus kosong setelah semua sampul
+/// khusus selesai.
+const _menungguGayaKhusus = {
+  BentukMakanan.batang,
+  BentukMakanan.lembarTepung,
+  BentukMakanan.perkedel,
+  BentukMakanan.suwir,
+  BentukMakanan.udangTepung,
+  BentukMakanan.ayamTepung,
+  BentukMakanan.pisangGoreng,
+  BentukMakanan.gorenganJagung,
+  BentukMakanan.irisanMiring,
+  BentukMakanan.batangKangkung,
+  BentukMakanan.seratTelur,
+  BentukMakanan.taburan,
+  BentukMakanan.kerupuk,
+  BentukMakanan.cakwe,
+};
+
 /// Sampul resep: pemetaan bahan → komponen, susunan per resep, tata letak
 /// deterministik, dan pelukis untuk seluruh katalog.
 void main() {
@@ -99,6 +119,33 @@ void main() {
       expect(rancang('telur-ceplok-kecap').utama?.nama, 'telur-ceplok');
       expect(rancang('telur-balado').utama?.nama, 'telur-rebus');
       expect(rancang('telur-ceplok-kecap').siraman, isNotNull);
+      // "orak-arik" dikenali sebelum "kocok/dadar".
+      expect(
+        rancang('nasi-goreng').pendamping.map((k) => k.nama),
+        contains('telur-orak-arik'),
+      );
+    });
+
+    test('nasi/mie/bihun goreng selalu kecokelatan; mie & bihun berhelai', () {
+      for (final id in [
+        'nasi-goreng-teri',
+        'mie-goreng-telur',
+        'bihun-goreng',
+      ]) {
+        expect(rancang(id).warnaUtama, isNotNull, reason: id);
+      }
+      expect(
+        rancang('mie-goreng-telur').utama?.bentuk,
+        BentukMakanan.mieGoreng,
+      );
+      expect(rancang('bihun-goreng').utama?.bentuk, BentukMakanan.mieGoreng);
+      expect(
+        rancang('bihun-goreng').utama!.rasio,
+        lessThan(rancang('mie-goreng-telur').utama!.rasio),
+        reason: 'helai bihun lebih tipis dari mie',
+      );
+      // Mie rebus tetap gulungan berkuah.
+      expect(rancang('mie-rebus').utama?.bentuk, BentukMakanan.mie);
     });
 
     test('wadah mengikuti sajian', () {
@@ -284,13 +331,16 @@ void main() {
           ?s.utama?.bentuk,
           ...s.pendamping.map((k) => k.bentuk),
           ...s.hiasan.map((k) => k.bentuk),
+          ...s.pelengkap.map((k) => k.bentuk),
           if (s.balut) BentukMakanan.gorengan,
         ]);
       }
       // "generik" hanya untuk bahan di luar katalog; "roti"/"mie" dll.
-      // semuanya harus muncul.
+      // semuanya harus muncul. Bentuk olahan baru menunggu gaya khusus
+      // per resep (petaSampulResep) yang diisi bertahap.
       expect(BentukMakanan.values.toSet().difference(terpakai), {
         BentukMakanan.generik,
+        ..._menungguGayaKhusus,
       });
     });
 

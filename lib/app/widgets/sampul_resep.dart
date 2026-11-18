@@ -10,8 +10,11 @@ import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_warna_makanan.dart';
 import 'pena_makanan.dart';
+import 'sampul_khusus.dart';
 
 export 'pena_makanan.dart' show BentukMakanan, Komponen, PeranMakanan;
+export 'sampul_khusus.dart'
+    show GayaSampul, TataUtama, WadahSampul, petaSampulResep;
 
 typedef _W = WarnaMakanan;
 
@@ -76,6 +79,13 @@ const _telurRebus = Komponen(
   _W.telurKuning,
   jumlah: 4,
   skala: 0.95,
+);
+const _telurOrakArik = Komponen(
+  'telur-orak-arik',
+  BentukMakanan.orakArik,
+  _W.dadar,
+  _W.dadarTua,
+  jumlah: 3,
 );
 
 /// SATU tempat pemetaan bahanId → komponen sampul. Bahan yang tidak ada di
@@ -403,19 +413,19 @@ Komponen komponenUntuk(String bahanId, [Bahan? bahan]) {
 }
 
 /// Telur digambar menurut cara masaknya di resep: direbus (takaran menyebut
-/// "rebus"), dikocok/diorak-arik (dadar), atau diceplok.
+/// "rebus"), diorak-arik (gumpalan), dikocok/didadar, atau diceplok.
+/// "orak-arik" dicek lebih dulu karena telur orak-arik juga dikocok.
 Komponen _varianTelur(Resep resep, BahanResep telur) {
   if (telur.takaran.toLowerCase().contains('rebus')) return _telurRebus;
   final langkah = resep.langkah.join(' ').toLowerCase();
-  final dikocok = RegExp(r'kocok|orak-arik|dadar').hasMatch(langkah);
+  if (langkah.contains('orak-arik')) return _telurOrakArik;
+  final dikocok = RegExp(r'kocok|dadar').hasMatch(langkah);
   return dikocok ? _telurDadar : _telurCeplok;
 }
 
 // ---------------------------------------------------------------------------
 // Rancangan & tata letak
 // ---------------------------------------------------------------------------
-
-enum WadahSampul { piring, mangkuk, cobek, daunPisang }
 
 /// Apa saja yang digambar di sampul satu resep (hasil [susunSampul]).
 @immutable
@@ -439,8 +449,17 @@ class RancanganSampul {
 
   /// Warna genangan saus di bawah tumisan; null = tidak ada.
   final Color? genangan;
+
+  /// Saus kental yang menyelimuti sebagian besar makanan; null = tidak ada.
+  final Color? selimut;
   final Color kuah;
   final int benih;
+
+  /// Pelengkap saji di tepi wadah (kerupuk, irisan timun, cabai rawit).
+  final List<Komponen> pelengkap;
+
+  /// Cara potongan utama yang banyak ditata.
+  final TataUtama tata;
 
   const RancanganSampul({
     required this.wadah,
@@ -454,19 +473,32 @@ class RancanganSampul {
     this.balut = false,
     this.siraman,
     this.genangan,
+    this.selimut,
+    this.pelengkap = const [],
+    this.tata = TataUtama.cincin,
   });
 
   /// Ringkasan komposisi (tanpa benih tata letak): dua resep dengan tanda
-  /// sama akan tampak mirip.
-  String get tanda => [
-    wadah.name,
-    nada.name,
-    '${utama?.nama}${balut ? '+balut' : ''}',
-    pendamping.map((k) => k.nama).join('+'),
-    hiasan.map((k) => k.nama).join('+'),
-    siraman?.toARGB32().toRadixString(16) ?? '-',
-    genangan?.toARGB32().toRadixString(16) ?? '-',
-  ].join('|');
+  /// sama akan tampak mirip. Ikut mencerminkan penimpaan [GayaSampul].
+  String get tanda {
+    String warna(Color? w) => w?.toARGB32().toRadixString(16) ?? '-';
+    String daftar(List<Komponen> ks) =>
+        ks.map((k) => '${k.nama}:${k.bentuk.name}').join('+');
+    return [
+      wadah.name,
+      nada.name,
+      '${utama?.nama}:${utama?.bentuk.name}${balut ? '+balut' : ''}',
+      tata.name,
+      daftar(pendamping),
+      daftar(hiasan),
+      daftar(pelengkap),
+      warna(warnaUtama),
+      warna(siraman),
+      warna(genangan),
+      warna(selimut),
+      warna(kuah),
+    ].join('|');
+  }
 }
 
 (Color, Color) _warnaNada(NadaSampul nada) => switch (nada) {
@@ -544,9 +576,26 @@ RancanganSampul susunSampul(Resep resep, [Map<String, Bahan> byId = const {}]) {
   final karbo =
       utama?.bentuk == BentukMakanan.nasi || utama?.bentuk == BentukMakanan.mie;
   final menyatu = karbo && digoreng;
-  final warnaUtama = menyatu && pekat
-      ? Color.lerp(utama!.warna, warnaNada, 0.38)
+  // Nasi/mie/bihun GORENG selalu kecokelatan (bercampur kecap/bumbu),
+  // walau nada resepnya bukan cokelat atau merah.
+  final warnaUtama = menyatu
+      ? Color.lerp(
+          utama!.warna,
+          pekat ? warnaNada : AppColors.sajianCokelat,
+          0.38,
+        )
       : null;
+  // Mie/bihun goreng memperlihatkan helainya (bukan gulungan mie rebus).
+  final utamaAkhir = menyatu && utama!.bentuk == BentukMakanan.mie
+      ? Komponen(
+          utama.nama,
+          BentukMakanan.mieGoreng,
+          utama.warna,
+          utama.warnaTua,
+          tunggal: utama.tunggal,
+          rasio: utama.nama == 'bihun' ? 0.3 : 0.6,
+        )
+      : utama;
 
   final tumis = sajian == JenisSajian.tumis;
   final kuah = bubur
@@ -559,10 +608,10 @@ RancanganSampul susunSampul(Resep resep, [Map<String, Bahan> byId = const {}]) {
           _ => _W.kuahBening,
         };
 
-  return RancanganSampul(
+  final bawaan = RancanganSampul(
     wadah: wadah,
     nada: nada,
-    utama: utama,
+    utama: utamaAkhir,
     warnaUtama: warnaUtama,
     balut: balut,
     pendamping: pendamping,
@@ -574,7 +623,31 @@ RancanganSampul susunSampul(Resep resep, [Map<String, Bahan> byId = const {}]) {
     kuah: kuah,
     benih: resep.id.codeUnits.fold<int>(7, (a, b) => (a * 31 + b) & 0x3fffffff),
   );
+  final gaya = petaSampulResep[resep.id];
+  return gaya == null ? bawaan : _terapkan(bawaan, gaya);
 }
+
+/// Hasil bawaan [susunSampul] yang ditimpa [GayaSampul] khusus resep.
+RancanganSampul _terapkan(RancanganSampul r, GayaSampul g) => RancanganSampul(
+  wadah: g.wadah ?? r.wadah,
+  nada: r.nada,
+  utama: g.tanpaUtama ? null : (g.utama ?? r.utama),
+  warnaUtama: GayaSampul.pilih(
+    g.warnaUtama,
+    // Warna pengganti bawaan hanya untuk utama bawaan.
+    g.utama == null ? r.warnaUtama : null,
+  ),
+  balut: g.balut ?? r.balut,
+  pendamping: g.pendamping ?? r.pendamping,
+  hiasan: g.hiasan ?? r.hiasan,
+  pelengkap: g.pelengkap ?? r.pelengkap,
+  tata: g.tata ?? r.tata,
+  siraman: GayaSampul.pilih(g.siraman, r.siraman),
+  genangan: GayaSampul.pilih(g.genangan, r.genangan),
+  selimut: GayaSampul.pilih(g.selimut, r.selimut),
+  kuah: g.kuah ?? r.kuah,
+  benih: r.benih,
+);
 
 /// Satu potongan makanan yang sudah ditempatkan. Koordinat memakai satuan
 /// jari-jari wadah (pusat wadah = 0,0; tepi wadah = 1).
@@ -585,7 +658,7 @@ class Potongan {
   final double r;
   final double putar;
 
-  /// 0 = utama, 1 = pendamping, 2 = hiasan.
+  /// 0 = utama, 1 = pendamping, 2 = hiasan, 3 = pelengkap di tepi wadah.
   final int lapis;
 
   const Potongan(this.komponen, this.pos, this.r, this.putar, this.lapis);
@@ -597,7 +670,97 @@ double batasIsi(WadahSampul wadah) => switch (wadah) {
   WadahSampul.mangkuk => 0.7,
   WadahSampul.cobek => 0.52,
   WadahSampul.daunPisang => 0.68,
+  WadahSampul.cup => 0.7,
+  WadahSampul.mangkukKecil => 0.46,
 };
+
+/// Pelengkap saji berderet di tepi area makanan, mulai dari sudut acak
+/// (benih tersendiri agar tata letak resep tanpa pelengkap tidak berubah).
+List<Potongan> _tataPelengkap(RancanganSampul r, double batas) {
+  if (r.pelengkap.isEmpty) return const [];
+  final acak = Random(r.benih ^ 0x2545F491);
+  var sudut = acak.nextDouble() * 2 * pi;
+  final hasil = <Potongan>[];
+  for (final k in r.pelengkap) {
+    final rad = 0.17 * k.skala;
+    final jarak = batas - rad;
+    final langkah = 2 * asin(min(1.0, rad / jarak)) * 0.92;
+    for (var i = 0; i < k.jumlah; i++) {
+      hasil.add(
+        Potongan(
+          k,
+          Offset.fromDirection(sudut, jarak),
+          rad,
+          sudut + pi / 2 + (acak.nextDouble() - 0.5) * 0.6,
+          3,
+        ),
+      );
+      sudut += langkah;
+    }
+  }
+  return hasil;
+}
+
+/// Potongan utama [TataUtama.tumpuk], [TataUtama.jajar], atau
+/// [TataUtama.kipas]. Semua potongan tetap di dalam [batas].
+List<Potongan> _tataUtamaKhusus(
+  Komponen k,
+  TataUtama tata,
+  double batas,
+  Random acak,
+) {
+  final n = k.jumlah;
+  final hasil = <Potongan>[];
+  switch (tata) {
+    case TataUtama.cincin:
+      break;
+    case TataUtama.tumpuk:
+      // Sebaran spiral emas: rapat merata, saling menumpang sebagian.
+      final rad = min(0.2 * k.skala, batas * 0.5);
+      final jangkau = batas - rad;
+      final awal = acak.nextDouble() * 2 * pi;
+      for (var i = 0; i < n; i++) {
+        var pos =
+            Offset.fromDirection(
+              awal + i * 2.39996,
+              jangkau * sqrt((i + 0.5) / n),
+            ) +
+            Offset(acak.nextDouble() - 0.5, acak.nextDouble() - 0.5) *
+                rad *
+                0.3;
+        if (pos.distance > jangkau) pos = pos / pos.distance * jangkau;
+        hasil.add(Potongan(k, pos, rad, acak.nextDouble() * 2 * pi, 0));
+      }
+    case TataUtama.jajar:
+    case TataUtama.kipas:
+      final arah = -0.5 + (acak.nextDouble() - 0.5) * 0.5;
+      final normal = Offset(-sin(arah), cos(arah));
+      List<(Offset, double)> letak(double rad) => [
+        for (var i = 0; i < n; i++)
+          if (tata == TataUtama.jajar)
+            (normal * ((i - (n - 1) / 2) * rad * 2 * k.rasio * 1.08), arah)
+          else
+            () {
+              final sudut = arah + (i - (n - 1) / 2) * 0.42;
+              return (
+                Offset.fromDirection(arah + pi, batas * 0.42) +
+                    Offset.fromDirection(sudut, rad * 0.98),
+                sudut,
+              );
+            }(),
+      ];
+      var rad = 0.6 * k.skala;
+      while (letak(rad).any((p) => p.$1.distance + rad > batas)) {
+        rad *= 0.97;
+      }
+      for (final (pos, sudut) in letak(rad)) {
+        hasil.add(
+          Potongan(k, pos, rad, sudut + (acak.nextDouble() - 0.5) * 0.12, 0),
+        );
+      }
+  }
+  return hasil;
+}
 
 /// Menata potongan secara deterministik dari [RancanganSampul.benih].
 ///
@@ -613,6 +776,9 @@ List<Potongan> tataSampul(RancanganSampul r) {
   final acak = Random(r.benih);
   final batas = batasIsi(r.wadah);
   final hasil = <Potongan>[];
+  // Pelengkap ditempatkan lebih dulu agar potongan lain menghindarinya,
+  // tetapi disisipkan ke daftar setelah pendamping (urutan gambar).
+  final pelengkap = _tataPelengkap(r, batas);
 
   void sebar(Komponen k, int n, double rad, double batasIni, int lapis) {
     final jangkau = batasIni - rad;
@@ -625,7 +791,7 @@ List<Potongan> tataSampul(RancanganSampul r) {
           final jarak = jangkau * sqrt(acak.nextDouble());
           final pos = Offset(cos(sudut) * jarak, sin(sudut) * jarak);
           final putar = acak.nextDouble() * 2 * pi;
-          if (hasil.every(
+          if ([...hasil, ...pelengkap].every(
             (q) =>
                 (q.komponen.tunggal && q.lapis == 0) ||
                 (q.pos - pos).distance >=
@@ -644,20 +810,21 @@ List<Potongan> tataSampul(RancanganSampul r) {
   final tunggal = utama?.tunggal ?? false;
   var batasAtas = batas;
   if (utama != null && tunggal) {
-    final rad = min(0.62 * utama.skala, batas - 0.06);
-    hasil.add(
-      Potongan(
-        utama,
-        Offset(
-          (acak.nextDouble() - 0.5) * 0.06,
-          (acak.nextDouble() - 0.5) * 0.06,
-        ),
-        rad,
-        acak.nextDouble() * 2 * pi,
-        0,
-      ),
+    var rad = min(0.62 * utama.skala, batas - 0.06);
+    var pos = Offset(
+      (acak.nextDouble() - 0.5) * 0.06,
+      (acak.nextDouble() - 0.5) * 0.06,
     );
+    if (pelengkap.isNotEmpty) {
+      // Beri ruang untuk pelengkap: geser menjauh dan sedikit mengecil.
+      final arah = pelengkap.fold(Offset.zero, (a, p) => a + p.pos);
+      if (arah.distance > 0) pos -= arah / arah.distance * 0.08;
+      rad -= 0.06;
+    }
+    hasil.add(Potongan(utama, pos, rad, acak.nextDouble() * 2 * pi, 0));
     batasAtas = rad * 0.86;
+  } else if (utama != null && r.tata != TataUtama.cincin) {
+    hasil.addAll(_tataUtamaKhusus(utama, r.tata, batas, acak));
   } else if (utama != null) {
     final n = utama.jumlah;
     final diCincin = n >= 5 ? n - 1 : n;
@@ -698,10 +865,17 @@ List<Potongan> tataSampul(RancanganSampul r) {
       1,
     );
   }
+  final sebelumHiasan = hasil.length;
   for (final k in r.hiasan) {
     sebar(k, k.jumlah, 0.1 * k.skala, batasAtas, 2);
   }
-  return hasil;
+  return pelengkap.isEmpty
+      ? hasil
+      : [
+          ...hasil.take(sebelumHiasan),
+          ...pelengkap,
+          ...hasil.skip(sebelumHiasan),
+        ];
 }
 
 // ---------------------------------------------------------------------------
@@ -785,11 +959,15 @@ class SampulPainter extends CustomPainter {
     _wadah(canvas, pena, jari);
 
     // Makanan tidak pernah keluar dari wadah.
+    final klip = switch (r.wadah) {
+      WadahSampul.mangkukKecil => jari * _mangkukKecilDalam,
+      WadahSampul.cup => jari * _cupDalam,
+      _ => jari - tg,
+    };
     canvas
       ..save()
       ..clipPath(
-        Path()
-          ..addOval(Rect.fromCircle(center: Offset.zero, radius: jari - tg)),
+        Path()..addOval(Rect.fromCircle(center: Offset.zero, radius: klip)),
       );
     final (warnaNada, warnaNadaTua) = _warnaNada(r.nada);
     if (r.wadah == WadahSampul.cobek) {
@@ -810,25 +988,33 @@ class SampulPainter extends CustomPainter {
       );
     }
     final potongan = tataSampul(r);
-    for (var i = 0; i < potongan.length; i++) {
-      final p = potongan[i];
-      // Hiasan terkecil disembunyikan di ukuran kartu.
-      if (!detail && p.lapis == 2 && p.r < 0.11 && i.isOdd) continue;
-      canvas
-        ..save()
-        ..translate(p.pos.dx * jari, p.pos.dy * jari)
-        ..rotate(p.putar);
-      final k = p.komponen;
-      final balut = r.balut && p.lapis == 0;
-      pena.gambar(
-        balut ? BentukMakanan.gorengan : k.bentuk,
-        k,
-        p.r * jari,
-        Random(r.benih + i * 97),
-        warna: p.lapis == 0 ? r.warnaUtama : null,
-      );
-      canvas.restore();
+    void lukis(bool hiasan) {
+      for (var i = 0; i < potongan.length; i++) {
+        final p = potongan[i];
+        if ((p.lapis == 2) != hiasan) continue;
+        // Hiasan terkecil disembunyikan di ukuran kartu.
+        if (!detail && p.lapis == 2 && p.r < 0.11 && i.isOdd) continue;
+        canvas
+          ..save()
+          ..translate(p.pos.dx * jari, p.pos.dy * jari)
+          ..rotate(p.putar);
+        final k = p.komponen;
+        final balut = r.balut && p.lapis == 0;
+        pena.gambar(
+          balut ? BentukMakanan.gorengan : k.bentuk,
+          k,
+          p.r * jari,
+          Random(r.benih + i * 97),
+          warna: p.lapis == 0 ? r.warnaUtama : null,
+        );
+        canvas.restore();
+      }
     }
+
+    // Makanan dulu, lalu saus kental yang menyelimutinya, lalu hiasan.
+    lukis(false);
+    if (r.selimut != null) _selimut(pena, jari, r);
+    lukis(true);
     if (r.siraman != null) _siraman(canvas, jari, r);
     canvas.restore();
 
@@ -838,10 +1024,62 @@ class SampulPainter extends CustomPainter {
     canvas.restore();
   }
 
+  /// Jari-jari bagian dalam mangkuk kecil dan cup (satuan jari-jari wadah).
+  static const _mangkukKecilDalam = 0.5;
+  static const _cupDalam = 0.82;
+
+  /// Saus kental berombak yang menutupi sebagian besar makanan.
+  void _selimut(PenaMakanan pena, double jari, RancanganSampul r) {
+    final rad = jari * batasIsi(r.wadah) * 0.72;
+    final o = Offset.fromDirection(r.benih * 0.7, jari * 0.05);
+    pena.gumpal(o, rad, r.selimut!, r.benih + 5, tepi: _tinta);
+    if (pena.detail) {
+      pena.c.drawArc(
+        Rect.fromCircle(center: o, radius: rad * 0.55),
+        pi * 1.15,
+        pi * 0.35,
+        false,
+        pena.garis(Color.lerp(r.selimut, _W.piring, 0.45)!, pena.tg),
+      );
+    }
+  }
+
   void _wadah(Canvas canvas, PenaMakanan pena, double jari) {
     final r = rancangan;
     Paint isi(Color c) => Paint()..color = c;
     switch (r.wadah) {
+      case WadahSampul.cup:
+        // Gelas plastik tampak atas: cincin bibir tebal, isi di dalamnya.
+        canvas
+          ..drawCircle(Offset.zero, jari, isi(_W.cup))
+          ..drawCircle(
+            Offset.zero,
+            jari * 0.91,
+            pena.garis(_W.cupBibir, jari * 0.1),
+          )
+          ..drawCircle(Offset.zero, jari * _cupDalam, isi(r.kuah))
+          ..drawCircle(
+            Offset.zero,
+            jari * _cupDalam,
+            pena.garis(_tinta, pena.tg * 0.8),
+          );
+      case WadahSampul.mangkukKecil:
+        // Piring dengan mangkuk kecil berisi saus di tengahnya.
+        canvas
+          ..drawCircle(Offset.zero, jari, isi(_W.piring))
+          ..drawCircle(
+            Offset.zero,
+            jari * 0.8,
+            pena.garis(_W.piringBibir, pena.tg),
+          )
+          ..drawCircle(Offset.zero, jari * 0.64, isi(_W.piring))
+          ..drawCircle(Offset.zero, jari * 0.64, pena.garis(_tinta, pena.tg))
+          ..drawCircle(Offset.zero, jari * _mangkukKecilDalam, isi(r.kuah))
+          ..drawCircle(
+            Offset.zero,
+            jari * _mangkukKecilDalam,
+            pena.garis(_tinta, pena.tg * 0.8),
+          );
       case WadahSampul.piring:
         canvas
           ..drawCircle(Offset.zero, jari, isi(_W.piring))
