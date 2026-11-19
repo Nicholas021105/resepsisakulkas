@@ -2,6 +2,14 @@
 
 Tempel bahan yang ada di kulkas seperti magnet di pintunya, lalu temukan resep rumahan Indonesia yang bisa langsung dimasak. Aplikasi Flutter + GetX, berjalan penuh tanpa internet.
 
+## Unduh APK
+
+Unduh versi terbaru di halaman [Releases](https://github.com/Nicholas021105/resepsisakulkas/releases/latest).
+
+- `app-arm64-v8a-release.apk`: untuk hampir semua HP Android
+- `app-armeabi-v7a-release.apk`: untuk HP Android lama (32-bit)
+- `app-x86_64-release.apk`: untuk emulator
+
 ## Fitur
 
 **Kulkas**
