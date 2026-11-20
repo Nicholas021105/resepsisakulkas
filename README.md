@@ -57,14 +57,24 @@ flutter test screenshot_test/   # merender semua halaman ke ../screenshots/resep
 
 Yang dijaga test:
 
-| Berkas | Isi |
-| --- | --- |
-| `pencocok_resep_test`, `kesegaran_test`, `jelajah_resep_test` | persentase, peringkat bahan segera habis, pencarian, urutan, saran |
-| `belanja_test`, `masak_test` | daftar belanja, timer, pengurangan stok, riwayat |
-| `migrasi_storage_test` | data versi 1.0 tetap utuh, pembacaan data rusak tidak membuat crash |
-| `dataset_test`, `kompatibilitas_katalog_test` | integritas `resep.json`, kedua salinan identik, tetap terbaca aplikasi versi 1.0 |
-| `kontras_test` | kontras WCAG kedua palet (teks ≥ 4,5:1, grafis ≥ 3:1) |
-| `overflow_semua_halaman_test` | semua halaman di 4 ukuran layar × skala huruf × data ekstrem, tanpa overflow |
+| Kelompok | Berkas | Isi |
+| --- | --- | --- |
+| Logika | `pencocok_resep_test`, `kesegaran_test`, `jelajah_resep_test` | persentase, umur & "segera habiskan", peringkat resep penyelamat, pencarian, urutan, saran |
+| | `belanja_test`, `masak_test` | daftar belanja, timer, pengurangan stok, riwayat |
+| Data | `model_test`, `resep_repository_test` | JSON bolak-balik; server → cache 24 jam → bawaan, termasuk 404, timeout, dan JSON rusak |
+| | `migrasi_storage_test` | data versi 1.0 tetap utuh, pembacaan data rusak tidak membuat crash |
+| | `dataset_test`, `kompatibilitas_katalog_test` | integritas `resep.json`, kedua salinan identik, tetap terbaca aplikasi versi 1.0 |
+| Layar | `alur_ui_test`, `kulkas_pintar_ui_test` | alur pilih bahan → resep → detail → favorit; banner, lembar opsi, dan resep penyelamat |
+| | `status_resep_test`, `navigasi_tab_test` | empat status halaman Resep, route `/resep/:id`, state tab bertahan, tombol kembali |
+| | `onboarding_test` | tiga layar pengenalan, Lewati, pilihan tema di Pengaturan |
+| | `overflow_semua_halaman_test` | semua halaman di 4 ukuran layar × skala huruf × data ekstrem, tanpa overflow |
+| | `kontras_test` | kontras WCAG kedua palet (teks ≥ 4,5:1, grafis ≥ 3:1) |
+| Gambar | `ikon_bahan_test`, `ikon_bahan_golden_test` | semua bahan punya ikon pelukis (tanpa emoji) yang terisi; golden 48 dp dan 22 dp |
+| | `sampul_resep_test`, `sampul_resep_golden_test` | komposisi tiap resep unik, tata letak di dalam wadah, kepadatan, pembeda sampul mirip; golden ukuran kartu & detail |
+| | `ikon_aplikasi_test`, `ilustrasi_kulkas_test` | ikon aset & launcher Android; ilustrasi kulkas kosong, animasi, dan "kurangi gerak" |
+| Alat | `helper_foto_test` | penulisan screenshot tahan berkas yang sedang dikunci (Windows) |
+
+Golden test (`ikon_bahan_golden_test`, `sampul_resep_golden_test`) bertag `golden`. Di mesin yang hasil antialiasing-nya berbeda, lewati dengan `flutter test --exclude-tags golden`; perbarui gambar acuannya dengan `flutter test --update-goldens <berkas>`.
 
 ## Arsitektur
 
@@ -82,7 +92,9 @@ lib/app/
                  AppSpacing, AppText, AppTheme
   utils/         logika murni: pencocok_resep, kesegaran, daftar_belanja,
                  durasi_langkah, migrasi_storage
-  widgets/       magnet, ikon bahan, sampul resep, kartu resep, kerangka
+  widgets/       magnet, ikon bahan, sampul resep, kartu resep, kerangka,
+                 pena_makanan (pena gambar bersama ikon & sampul),
+                 sampul_khusus (gaya sampul per resep)
 ```
 
 Beberapa keputusan:
