@@ -58,6 +58,7 @@ class GayaSampul {
     this.siramanTipis,
     this.genangan,
     this.selimut,
+    this.luasSelimut,
     this.balut,
   });
 
@@ -94,6 +95,10 @@ class GayaSampul {
   /// Saus kental yang menyelimuti sebagian besar makanan (bumbu kacang
   /// pecel, saus asam manis fuyunghai).
   final Color? selimut;
+
+  /// Bagian luas dasar yang tertutup [selimut] (0–1); tepi makanan di luar
+  /// saus tetap terlihat.
+  final double? luasSelimut;
   final bool? balut;
 
   /// [baru] bila diisi ([tanpaWarna] → null), selain itu [lama].
@@ -170,6 +175,17 @@ const _telurOrakArik = Komponen(
   jumlah: 3,
   skala: 1.15,
 );
+
+/// Orak-arik di atas mie/nasi goreng: gumpalan kuning bertepi keemasan
+/// (tanpa garis tinta di tiap gumpal) agar kuningnya terbaca di kartu.
+const _telurOrakArikKuning = Komponen(
+  'telur-orak-arik',
+  BentukMakanan.remah,
+  _W.dadar,
+  _W.dadarTua,
+  jumlah: 3,
+  skala: 1.15,
+);
 const _teri = Komponen.hiasan(
   'teri',
   BentukMakanan.ikanTeri,
@@ -207,6 +223,14 @@ const _tomatIris = Komponen(
   _W.tomatDalam,
   _W.tomat,
   jumlah: 1,
+);
+const _bawangMerahCincin = Komponen.hiasan(
+  'bawang-merah-iris',
+  BentukMakanan.cincin,
+  _W.bawangMerah,
+  _W.bawangMerahTua,
+  jumlah: 4,
+  skala: 1.1,
 );
 
 /// Gaya khusus per resep (kunci = id resep). Resep yang tidak ada di sini
@@ -302,17 +326,19 @@ const petaSampulResep = <String, GayaSampul>{
     hiasan: [_cabaiIris, _bawangPutihIris],
     genangan: _W.sausTiram,
   ),
-  // Data: telurnya diorak-arik (bukan ceplok) dan tanpa cabai.
+  // Helai tebal keemasan, telur orak-arik kuning, sawi. Data: telurnya
+  // diorak-arik (bukan ceplok) dan tanpa cabai.
   'mie-goreng-telur': GayaSampul(
     pendamping: [
-      _telurOrakArik,
+      _telurOrakArikKuning,
       Komponen(
         'sawi',
         BentukMakanan.daun,
         _W.daunMuda,
         _W.daunTua,
         jumlah: 2,
-        rasio: 0.55,
+        skala: 1.3,
+        rasio: 0.62,
       ),
     ],
     hiasan: [_bawangPutihIris],
@@ -373,7 +399,9 @@ const petaSampulResep = <String, GayaSampul>{
     pelengkap: [_timunIris, _tomatIris],
     taburan: [_bawangGoreng],
   ),
-  // Bubur putih: ayam suwir, cakwe, kerupuk di tepi, kecap tipis.
+  // Bubur putih yang lega: satu gundukan ayam suwir di tengah, 2 cakwe
+  // besar, kerupuk di tepi, satu siraman kecap tipis. Daun bawang dan
+  // bawang goreng hanya saat detail.
   'bubur-ayam': GayaSampul(
     utama: Komponen(
       'ayam-suwir',
@@ -381,7 +409,7 @@ const petaSampulResep = <String, GayaSampul>{
       _W.ayamSuwir,
       _W.ayamSuwirTua,
       jumlah: 1,
-      skala: 1.15,
+      skala: 1.2,
     ),
     pendamping: [
       Komponen(
@@ -389,11 +417,20 @@ const petaSampulResep = <String, GayaSampul>{
         BentukMakanan.cakwe,
         _W.cakwe,
         _W.cakweTua,
-        jumlah: 3,
-        skala: 1.15,
+        jumlah: 2,
+        skala: 1.35,
       ),
     ],
-    hiasan: [_daunBawangIris],
+    hiasan: [
+      Komponen.hiasan(
+        'daun-bawang',
+        BentukMakanan.cincin,
+        _W.daun,
+        _W.daunTua,
+        jumlah: 4,
+        hanyaDetail: true,
+      ),
+    ],
     pelengkap: [
       Komponen(
         'kerupuk',
@@ -594,38 +631,43 @@ const petaSampulResep = <String, GayaSampul>{
     ],
     hiasan: [_cabaiIris, _bawangPutihIris],
   ),
+  // Irisan serong besar berkulit merah kecokelatan, bawang merah iris, di
+  // genangan saus merah.
   'tumis-sosis': GayaSampul(
     utama: Komponen(
       'sosis-iris',
       BentukMakanan.irisanMiring,
       _W.sosisDalam,
       _W.sosis,
-      jumlah: 14,
-      skala: 0.8,
-      rasio: 0.55,
+      jumlah: 7,
+      skala: 1.25,
+      rasio: 0.56,
     ),
     tata: TataUtama.tumpuk,
+    hiasan: [_bawangMerahCincin, _bawangPutihIris],
+    genangan: _W.cabaiTua,
   ),
-  // Data: sayurnya kol (bukan sawi), wortel diiris korek api (bukan serut).
+  // Helai tipis pucat dengan wortel korek api dan kol (data: telurnya
+  // opsional; tanpa telur agar tidak tertukar dengan mie goreng).
   'bihun-goreng': GayaSampul(
     pendamping: [
-      _telurOrakArik,
+      Komponen(
+        'wortel-korek',
+        BentukMakanan.batang,
+        _W.wortel,
+        _W.wortelTua,
+        jumlah: 3,
+        skala: 1.05,
+        rasio: 0.1,
+      ),
       Komponen(
         'kol',
         BentukMakanan.daun,
         _W.daunPucat,
         _W.daunPucatTua,
         jumlah: 2,
+        skala: 1.1,
         rasio: 0.85,
-      ),
-      Komponen(
-        'wortel-korek',
-        BentukMakanan.batang,
-        _W.wortel,
-        _W.wortelTua,
-        jumlah: 2,
-        skala: 0.9,
-        rasio: 0.14,
       ),
     ],
     hiasan: [_bawangPutihIris],
@@ -744,38 +786,22 @@ const petaSampulResep = <String, GayaSampul>{
     pendamping: [],
     hiasan: [],
   ),
-  // Sayur rebus tertutup bumbu kacang kental (bukan garis siraman).
+  // Bayam, tauge, dan kol rebus melingkar di tepi; bumbu kacang hanya di
+  // tengah (bukan garis siraman).
   'pecel-sayur': GayaSampul(
-    pendamping: [
-      Komponen(
-        'tauge',
-        BentukMakanan.tauge,
-        _W.tauge,
-        _W.jagung,
-        jumlah: 3,
-        skala: 0.85,
-      ),
-      Komponen(
-        'kol',
-        BentukMakanan.daun,
-        _W.daunPucat,
-        _W.daunPucatTua,
-        jumlah: 2,
-        rasio: 0.85,
-      ),
-    ],
+    utama: Komponen(
+      'sayur-pecel',
+      BentukMakanan.sayurPecel,
+      _W.daun,
+      _W.daunTua,
+      tunggal: true,
+      skala: 1.1,
+    ),
+    pendamping: [],
     hiasan: [],
     siraman: GayaSampul.tanpaWarna,
     selimut: _W.bumbuKacang,
-    pelengkap: [
-      Komponen(
-        'jeruk-iris',
-        BentukMakanan.irisan,
-        _W.jeruk,
-        _W.jerukKulit,
-        jumlah: 1,
-      ),
-    ],
+    luasSelimut: 0.53,
   ),
   // --- Pembeda kelompok telur ----------------------------------------------
 
@@ -828,8 +854,9 @@ const petaSampulResep = <String, GayaSampul>{
     pendamping: [],
     hiasan: [_daunBawangIris],
   ),
-  // Telur tebal mengembang yang hampir seluruhnya tersiram saus asam manis.
-  // Data: tanpa kacang polong maupun daun bawang (sayurnya kol & wortel).
+  // Telur tebal mengembang; saus asam manis menutup ± 60% bagian tengah,
+  // cincin tepi keemasan tampak di sekelilingnya. Data: tanpa kacang
+  // polong maupun daun bawang (sayurnya kol & wortel).
   'fuyunghai': GayaSampul(
     utama: Komponen(
       'fuyunghai',
@@ -843,6 +870,7 @@ const petaSampulResep = <String, GayaSampul>{
     hiasan: [],
     siraman: GayaSampul.tanpaWarna,
     selimut: _W.sausTomat,
+    luasSelimut: 0.45,
   ),
 
   // --- Polesan & kepadatan --------------------------------------------------
@@ -884,9 +912,30 @@ const petaSampulResep = <String, GayaSampul>{
     hiasan: [],
   ),
 
+  // Tiga nasi goreng dibedakan lewat topping: telur orak-arik kuning
+  // (nasi goreng), irisan sosis bulat (sosis), teri & lalapan (teri).
+  'nasi-goreng': GayaSampul(
+    pendamping: [_telurOrakArikKuning],
+    hiasan: [_bawangMerahCincin, _cabaiIris],
+    taburan: [_bawangGoreng],
+  ),
+  // Data: sosis "iris bulat"; telurnya opsional (tidak digambar).
+  'nasi-goreng-sosis': GayaSampul(
+    pendamping: [
+      Komponen(
+        'sosis-bulat',
+        BentukMakanan.irisan,
+        _W.sosisDalam,
+        _W.sosis,
+        jumlah: 3,
+        skala: 1.05,
+      ),
+    ],
+    hiasan: [_bawangMerahCincin],
+    taburan: [_bawangGoreng],
+  ),
+
   // Bawang goreng hanya pada masakan yang lazim memakainya (detail saja).
-  'nasi-goreng': GayaSampul(taburan: [_bawangGoreng]),
-  'nasi-goreng-sosis': GayaSampul(taburan: [_bawangGoreng]),
   'sop-ayam': GayaSampul(taburan: [_bawangGoreng]),
   'sayur-sop': GayaSampul(taburan: [_bawangGoreng]),
   'opor-ayam': GayaSampul(taburan: [_bawangGoreng]),

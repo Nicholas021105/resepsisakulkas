@@ -455,6 +455,10 @@ class RancanganSampul {
 
   /// Saus kental yang menyelimuti sebagian besar makanan; null = tidak ada.
   final Color? selimut;
+
+  /// Perkiraan bagian luas dasar (lingkaran potongan utama tunggal, atau
+  /// area makanan) yang tertutup [selimut].
+  final double luasSelimut;
   final Color kuah;
   final int benih;
 
@@ -481,6 +485,7 @@ class RancanganSampul {
     this.siramanTipis = false,
     this.genangan,
     this.selimut,
+    this.luasSelimut = 0.6,
     this.pelengkap = const [],
     this.taburan = const [],
     this.tata = TataUtama.cincin,
@@ -585,24 +590,30 @@ RancanganSampul susunSampul(Resep resep, [Map<String, Bahan> byId = const {}]) {
   final karbo =
       utama?.bentuk == BentukMakanan.nasi || utama?.bentuk == BentukMakanan.mie;
   final menyatu = karbo && digoreng;
-  // Nasi/mie/bihun GORENG selalu kecokelatan (bercampur kecap/bumbu),
-  // walau nada resepnya bukan cokelat atau merah.
-  final warnaUtama = menyatu
-      ? Color.lerp(
-          utama!.warna,
-          pekat ? warnaNada : AppColors.sajianCokelat,
-          0.38,
-        )
-      : null;
-  // Mie/bihun goreng memperlihatkan helainya (bukan gulungan mie rebus).
-  final utamaAkhir = menyatu && utama!.bentuk == BentukMakanan.mie
+  // Nasi/mie/bihun GORENG selalu cokelat hangat (bercampur kecap/bumbu),
+  // walau nada resepnya bukan cokelat atau merah. Mie: keemasan; bihun:
+  // cokelat muda pucat; nasi: kemerahan.
+  final bihun = utama?.nama == 'bihun';
+  final (warnaGoreng, warnaGorengTua) = utama?.bentuk == BentukMakanan.mie
+      ? (bihun
+            ? (_W.bihunGoreng, _W.bihunGorengTua)
+            : (_W.mieGoreng, _W.mieGorengTua))
+      : (_W.nasiGoreng, _W.nasiGorengTua);
+  final warnaUtama = menyatu ? warnaGoreng : null;
+  // Mie/bihun goreng memperlihatkan helainya (bukan gulungan mie rebus);
+  // nasi goreng memperlihatkan butirnya saat detail.
+  final utamaAkhir = menyatu
       ? Komponen(
-          utama.nama,
-          BentukMakanan.mieGoreng,
-          utama.warna,
-          utama.warnaTua,
+          utama!.nama,
+          utama.bentuk == BentukMakanan.mie
+              ? BentukMakanan.mieGoreng
+              : BentukMakanan.nasiGoreng,
+          warnaGoreng,
+          warnaGorengTua,
           tunggal: utama.tunggal,
-          rasio: utama.nama == 'bihun' ? 0.3 : 0.6,
+          rasio: utama.bentuk == BentukMakanan.mie
+              ? (bihun ? 0.3 : 0.6)
+              : utama.rasio,
         )
       : utama;
 
@@ -656,6 +667,7 @@ RancanganSampul _terapkan(RancanganSampul r, GayaSampul g) => RancanganSampul(
   siramanTipis: g.siramanTipis ?? r.siramanTipis,
   genangan: GayaSampul.pilih(g.genangan, r.genangan),
   selimut: GayaSampul.pilih(g.selimut, r.selimut),
+  luasSelimut: g.luasSelimut ?? r.luasSelimut,
   kuah: g.kuah ?? r.kuah,
   benih: r.benih,
 );
@@ -1009,6 +1021,12 @@ class SampulPainter extends CustomPainter {
       }
     }
     final potongan = tataSampul(r);
+    // Urutan tiap potongan di antara potongan sekomponennya.
+    final hitung = <Komponen, int>{};
+    final urutan = [
+      for (final p in potongan)
+        hitung.update(p.komponen, (n) => n + 1, ifAbsent: () => 0),
+    ];
     void lukis(bool hiasan) {
       for (var i = 0; i < potongan.length; i++) {
         final p = potongan[i];
@@ -1028,6 +1046,7 @@ class SampulPainter extends CustomPainter {
           p.r * jari,
           Random(r.benih + i * 97),
           warna: p.lapis == 0 ? r.warnaUtama : null,
+          urutan: urutan[i],
         );
         canvas.restore();
       }
@@ -1067,29 +1086,57 @@ class SampulPainter extends CustomPainter {
   static const _mangkukKecilDalam = 0.5;
   static const _cupDalam = 0.82;
 
-  /// Saus kental berombak yang menutupi sebagian besar makanan.
+  /// Saus kental bertepi tak beraturan di tengah makanan; tepi makanan di
+  /// sekelilingnya tetap terlihat ([RancanganSampul.luasSelimut]).
   void _selimut(
     PenaMakanan pena,
     double jari,
     RancanganSampul r,
     List<Potongan> potongan,
   ) {
-    // Di atas utama tunggal (fuyunghai) saus menutup hampir seluruhnya.
     final dasar = potongan
         .where((p) => p.lapis == 0 && p.komponen.tunggal)
         .firstOrNull;
-    final rad =
-        jari * (dasar == null ? batasIsi(r.wadah) * 0.72 : dasar.r * 0.82);
-    final o = Offset.fromDirection(r.benih * 0.7, jari * 0.05);
-    pena.gumpal(o, rad, r.selimut!, r.benih + 5, tepi: _tinta);
-    if (pena.detail) {
-      pena.c.drawArc(
-        Rect.fromCircle(center: o, radius: rad * 0.55),
-        pi * 1.15,
-        pi * 0.35,
-        false,
-        pena.garis(Color.lerp(r.selimut, _W.piring, 0.45)!, pena.tg),
-      );
+    final rDasar = jari * (dasar?.r ?? batasIsi(r.wadah));
+    final o =
+        (dasar?.pos ?? Offset.zero) * jari +
+        Offset.fromDirection(r.benih * 0.7, rDasar * 0.04);
+    final rad = rDasar * sqrt(r.luasSelimut);
+    final acak = Random(r.benih + 5);
+    final saus = r.selimut!;
+    pena.lelehan(o, rad, saus, acak);
+    if (!pena.detail) return;
+    if (saus == _W.bumbuKacang) {
+      // Bumbu kacang diulek kasar: bintik kacang.
+      for (var i = 0; i < 16; i++) {
+        final p =
+            o +
+            Offset.fromDirection(
+              acak.nextDouble() * 2 * pi,
+              rad * 0.72 * sqrt(acak.nextDouble()),
+            );
+        pena.c.drawCircle(
+          p,
+          rad * (i.isEven ? 0.045 : 0.035),
+          pena.isi(i.isEven ? _W.kacangTua : _W.kacang),
+        );
+      }
+    } else {
+      // Saus mengilap: kilau di sisi kiri atas.
+      final kilau = pena.garis(Color.lerp(saus, _W.piring, 0.5)!, pena.tg);
+      pena.c
+        ..drawArc(
+          Rect.fromCircle(center: o, radius: rad * 0.6),
+          pi * 1.1,
+          pi * 0.32,
+          false,
+          kilau,
+        )
+        ..drawCircle(
+          o + Offset.fromDirection(pi * 1.58, rad * 0.6),
+          pena.tg * 0.7,
+          pena.isi(Color.lerp(saus, _W.piring, 0.5)!),
+        );
     }
   }
 

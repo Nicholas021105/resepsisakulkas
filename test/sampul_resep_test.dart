@@ -9,6 +9,7 @@ import 'package:resepsisakulkas/app/data/models/resep_model.dart';
 import 'package:resepsisakulkas/app/theme/app_colors.dart';
 import 'package:resepsisakulkas/app/theme/app_spacing.dart';
 import 'package:resepsisakulkas/app/theme/app_warna_makanan.dart';
+import 'package:resepsisakulkas/app/widgets/pena_makanan.dart' show PenaMakanan;
 import 'package:resepsisakulkas/app/widgets/sampul_resep.dart';
 
 /// Bentuk olahan yang belum dipakai resep mana pun karena gaya khusus per
@@ -17,6 +18,11 @@ import 'package:resepsisakulkas/app/widgets/sampul_resep.dart';
 // "gorengan" (balut tepung otomatis) kini hanya cadangan untuk gorengan
 // bertepung dari server yang belum punya gaya khusus.
 const _menungguGayaKhusus = {BentukMakanan.gorengan};
+
+/// Bentuk bawaan [petaKomponen] yang di katalog sudah digantikan gaya khusus
+/// (sosis selalu diiris), tetapi tetap menjadi cadangan untuk resep tanpa
+/// gaya khusus (mis. dari server) dan dipakai ikon bahan.
+const _cadanganPetaKomponen = {BentukMakanan.sosis};
 
 /// Sampul resep: pemetaan bahan → komponen, susunan per resep, tata letak
 /// deterministik, dan pelukis untuk seluruh katalog.
@@ -353,7 +359,12 @@ void main() {
       expect(BentukMakanan.values.toSet().difference(terpakai), {
         BentukMakanan.generik,
         ..._menungguGayaKhusus,
+        ..._cadanganPetaKomponen,
       });
+      // Cadangan memang masih dipetakan untuk bahannya.
+      for (final b in _cadanganPetaKomponen) {
+        expect(petaKomponen.values.map((k) => k.bentuk), contains(b));
+      }
     });
 
     testWidgets('60 sampul: tidak ada dua yang pikselnya identik; resep '
@@ -501,6 +512,137 @@ void main() {
       },
     );
 
+    group('sampul yang diperjelas', () {
+      test('omelet: satu dadar lipat di tengah, tanpa tambahan lain', () {
+        final r = rancang('omelet-sayur');
+        expect(r.utama?.bentuk, BentukMakanan.dadarLipat);
+        expect(r.utama?.tunggal, isTrue);
+        expect([...r.pendamping, ...r.hiasan, ...r.pelengkap], isEmpty);
+      });
+
+      testWidgets('fuyunghai: saus menutup 55–65% permukaan dadar, '
+          'cincin keemasan tampak', (tester) async {
+        final r = rancang('fuyunghai');
+        expect(r.utama?.bentuk, BentukMakanan.fuyunghai);
+        final bita = await _piksel(tester, r, 224, detail: false);
+        final saus = _hitung(bita, [WarnaMakanan.sausTomat]);
+        final dadar = _hitung(bita, [
+          WarnaMakanan.dadar,
+          Color.lerp(WarnaMakanan.dadar, WarnaMakanan.dadarTua, 0.55)!,
+        ]);
+        final porsi = saus / (saus + dadar);
+        expect(porsi, inInclusiveRange(0.55, 0.65), reason: '$porsi');
+      });
+
+      testWidgets('pecel: bumbu kacang hanya ± 40–50% tengah; bayam, tauge, '
+          'kol terlihat', (tester) async {
+        final r = rancang('pecel-sayur');
+        expect(r.utama?.bentuk, BentukMakanan.sayurPecel);
+        expect(r.selimut, WarnaMakanan.bumbuKacang);
+        const sisi = 224;
+        final bita = await _piksel(tester, r, sisi, detail: false);
+        // Porsi saus di dalam lingkaran sayur (potongan utama tunggal).
+        final dasar = tataSampul(r).singleWhere((p) => p.lapis == 0);
+        final jari = sisi * SampulPainter.porsiWadah / 2;
+        final pusat = Offset(sisi / 2, sisi / 2) + dasar.pos * jari;
+        var diDasar = 0, saus = 0;
+        for (var y = 0; y < sisi; y++) {
+          for (var x = 0; x < sisi; x++) {
+            if ((Offset(x + 0.5, y + 0.5) - pusat).distance > dasar.r * jari) {
+              continue;
+            }
+            diDasar++;
+            if (_dekat(bita, (y * sisi + x) * 4, WarnaMakanan.bumbuKacang)) {
+              saus++;
+            }
+          }
+        }
+        expect(saus / diDasar, inInclusiveRange(0.38, 0.52));
+        // Ketiga sayur tetap tampak di ukuran kartu: masing-masing ≥ 2% dari
+        // lingkaran sayur (bayam = daun hijau + hamparan hijau tua).
+        for (final (nama, warna) in [
+          ('bayam', [WarnaMakanan.daun, WarnaMakanan.daunTua]),
+          ('tauge', [WarnaMakanan.tauge]),
+          ('kol', [WarnaMakanan.daunPucat]),
+        ]) {
+          expect(
+            _hitung(bita, warna) / diDasar,
+            greaterThanOrEqualTo(0.02),
+            reason: nama,
+          );
+        }
+      });
+
+      test('mie goreng vs bihun goreng: helai, warna, dan pendamping beda', () {
+        final mie = rancang('mie-goreng-telur');
+        final bihun = rancang('bihun-goreng');
+        expect(mie.warnaUtama, WarnaMakanan.mieGoreng);
+        expect(bihun.warnaUtama, WarnaMakanan.bihunGoreng);
+        expect(mie.utama!.rasio, greaterThanOrEqualTo(0.4), reason: 'tebal');
+        expect(bihun.utama!.rasio, lessThan(0.4), reason: 'tipis');
+        expect(
+          mie.pendamping.map((k) => k.nama),
+          containsAll(['telur-orak-arik', 'sawi']),
+        );
+        expect(
+          bihun.pendamping.map((k) => k.nama),
+          containsAll(['wortel-korek', 'kol']),
+        );
+        expect(
+          bihun.pendamping.map((k) => k.nama),
+          isNot(contains('telur-orak-arik')),
+        );
+      });
+
+      test('tiga nasi goreng: cokelat hangat, dibedakan topping', () {
+        const ids = ['nasi-goreng', 'nasi-goreng-sosis', 'nasi-goreng-teri'];
+        final topping = <String>{};
+        for (final id in ids) {
+          final r = rancang(id);
+          expect(r.utama?.bentuk, BentukMakanan.nasiGoreng, reason: id);
+          expect(r.warnaUtama, WarnaMakanan.nasiGoreng, reason: id);
+          topping.add(
+            [...r.pendamping, ...r.hiasan].map((k) => k.nama).join('+'),
+          );
+        }
+        expect(topping, hasLength(ids.length), reason: '$topping');
+      });
+
+      test('tahu goreng: sebagian besar utuh, 1–2 kubus terpotong', () {
+        final tahu = rancang('tahu-goreng').utama!;
+        expect(tahu.bentuk, BentukMakanan.tahuGoreng);
+        final potong = [
+          for (var i = 0; i < tahu.jumlah; i++)
+            if (PenaMakanan.tahuTerpotong(i)) i,
+        ];
+        expect(potong.length, inInclusiveRange(1, 2));
+        expect(tahu.jumlah - potong.length, greaterThan(potong.length));
+      });
+
+      test('tumis sosis: 6–8 irisan serong besar, bawang, genangan saus', () {
+        final r = rancang('tumis-sosis');
+        expect(r.utama?.bentuk, BentukMakanan.irisanMiring);
+        expect(r.utama?.jumlah, inInclusiveRange(6, 8));
+        expect(r.utama?.warna, WarnaMakanan.sosisDalam);
+        expect(r.genangan, isNotNull);
+        expect(r.hiasan.map((k) => k.nama), contains('bawang-merah-iris'));
+      });
+
+      test('bubur ayam: 1 gundukan ayam, 2 cakwe, 1–2 kerupuk, kecap tipis; '
+          'daun & bawang goreng hanya detail', () {
+        final r = rancang('bubur-ayam');
+        final potongan = tataSampul(r);
+        int banyak(String nama) =>
+            potongan.where((p) => p.komponen.nama == nama).length;
+        expect(banyak('ayam-suwir'), 1);
+        expect(banyak('cakwe'), 2);
+        expect(banyak('kerupuk'), inInclusiveRange(1, 2));
+        expect(r.siraman, WarnaMakanan.kecap);
+        expect(r.siramanTipis, isTrue);
+        expect([...r.hiasan, ...r.taburan].every((k) => k.hanyaDetail), isTrue);
+      });
+    });
+
     testWidgets('kepadatan: makanan mengisi ≥ 40% area isi wadah', (
       tester,
     ) async {
@@ -524,6 +666,46 @@ void main() {
       }, isEmpty);
     });
   });
+}
+
+/// Piksel RGBA sampul [r] berukuran [sisi] px.
+Future<List<int>> _piksel(
+  WidgetTester tester,
+  RancanganSampul r,
+  int sisi, {
+  required bool detail,
+}) async {
+  final perekam = ui.PictureRecorder();
+  SampulPainter(
+    r,
+    detailPaksa: detail,
+  ).paint(ui.Canvas(perekam), ui.Size.square(sisi.toDouble()));
+  final gambar = perekam.endRecording();
+  final bita = await tester.runAsync(() async {
+    final citra = await gambar.toImage(sisi, sisi);
+    final data = await citra.toByteData();
+    citra.dispose();
+    return data!.buffer.asUint8List().toList();
+  });
+  gambar.dispose();
+  return bita!;
+}
+
+/// Piksel ke-[i] (indeks bita) berwarna dekat [w] (selisih kanal ≤ 6).
+bool _dekat(List<int> bita, int i, Color w) {
+  final v = w.toARGB32();
+  return ((v >> 16 & 0xFF) - bita[i]).abs() <= 6 &&
+      ((v >> 8 & 0xFF) - bita[i + 1]).abs() <= 6 &&
+      ((v & 0xFF) - bita[i + 2]).abs() <= 6;
+}
+
+/// Banyaknya piksel yang berwarna dekat salah satu [warna].
+int _hitung(List<int> bita, List<Color> warna) {
+  var n = 0;
+  for (var i = 0; i < bita.length; i += 4) {
+    if (warna.any((w) => _dekat(bita, i, w))) n++;
+  }
+  return n;
 }
 
 /// Proporsi piksel di area isi wadah yang BUKAN warna alas: piring, bibir

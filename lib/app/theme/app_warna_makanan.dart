@@ -142,8 +142,17 @@ abstract class WarnaMakanan {
   static const rotiTelur = Color(0xFFEDC35C);
   static const rotiBakar = Color(0xFFE6BA6E);
   static const pisangBakar = Color(0xFFE9BC4A);
-  static const bumbuKacang = Color(0xFFC48A4E);
+  static const bumbuKacang = Color(0xFFD3A262);
   static const dadarCokelat = Color(0xFFC88A35);
+
+  // Nasi, mie, dan bihun GORENG: bumbu & kecap menyatu (cokelat hangat,
+  // bukan abu-abu). Warna tua = butir nasi / sela helai.
+  static const nasiGoreng = Color(0xFFCB7E42);
+  static const nasiGorengTua = Color(0xFF8E4D1E);
+  static const mieGoreng = Color(0xFFDDA14B);
+  static const mieGorengTua = Color(0xFF94571F);
+  static const bihunGoreng = Color(0xFFEBD6AE);
+  static const bihunGorengTua = Color(0xFFC29D6C);
 
   // Kuah di mangkuk.
   static const kuahBening = Color(0xFFF3E6AE);
