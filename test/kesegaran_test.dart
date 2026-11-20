@@ -148,6 +148,31 @@ void main() {
       );
     });
 
+    test('tanda manual tetap disebut di samping kalimat sisa hari', () {
+      String ket(DateTime kini) =>
+          keteranganKesegaran(bayam, hari0, kini, ditandai: true);
+      expect(
+        ket(hari0),
+        'Ditempel hari ini · kira-kira masih segar 2 hari lagi · '
+        'kamu tandai segera habiskan',
+      );
+      expect(
+        ket(hari(2)),
+        'Ditempel 2 hari lalu · sebaiknya dipakai hari ini · '
+        'kamu tandai segera habiskan',
+      );
+      expect(
+        ket(hari(5)),
+        'Ditempel 5 hari lalu · sudah lewat 3 hari dari perkiraan segar · '
+        'kamu tandai segera habiskan',
+      );
+      // Tanpa tanda manual, kalimatnya tidak berubah.
+      expect(
+        keteranganKesegaran(bayam, hari0, hari0, ditandai: false),
+        isNot(contains('kamu tandai')),
+      );
+    });
+
     test('label "Pakai … yang segera habis"', () {
       expect(labelPakaiSegera([]), '');
       expect(labelPakaiSegera(['Bayam']), 'Pakai bayam yang segera habis');

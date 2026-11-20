@@ -52,7 +52,8 @@ String sejakKapan(int umur) => switch (umur) {
 };
 
 /// Kalimat kesegaran untuk lembar opsi bahan, mis.
-/// "Ditempel 2 hari lalu · sebaiknya dipakai hari ini".
+/// "Ditempel 2 hari lalu · sebaiknya dipakai hari ini". Tanda manual
+/// [ditandai] selalu disebut, juga di samping kalimat sisa hari.
 String keteranganKesegaran(
   Bahan bahan,
   DateTime? sejak,
@@ -70,9 +71,10 @@ String keteranganKesegaran(
       1 => 'sebaiknya dipakai paling lambat besok',
       _ => 'kira-kira masih segar $sisa hari lagi',
     });
-  } else if (ditandai) {
+  }
+  if (ditandai) {
     bagian.add('kamu tandai segera habiskan');
-  } else if (bahan.awetHari == null) {
+  } else if (sisa == null && bahan.awetHari == null) {
     bagian.add('bahan awet');
   }
   return bagian.join(' · ');
