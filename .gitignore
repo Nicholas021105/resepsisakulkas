@@ -49,3 +49,7 @@ app.*.map.json
 
 # Keluaran golden test yang gagal (gambar selisih)
 test/failures/
+
+# APK hasil build jangan ikut ke repo (unggah lewat GitHub Releases)
+*.apk
+*.aab
